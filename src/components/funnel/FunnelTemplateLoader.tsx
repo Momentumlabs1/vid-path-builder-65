@@ -25,12 +25,12 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
   const loadSmartTradingFunnel = async () => {
     setLoading(true);
     try {
-      // Check if funnel already exists
+      // Check if funnel already exists - use maybeSingle to avoid error when not found
       const { data: existing } = await supabase
         .from('funnels')
         .select('name')
         .eq('name', SMART_TRADING_FUNNEL_NAME)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         // Update existing funnel
