@@ -477,18 +477,70 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         )}
       </div>
 
-      {/* Node Info Footer - only in builder mode */}
+      {/* Node Info Panel - only in builder mode - takes up to half the height */}
       {!isPreview && (
         <>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-zinc-900 via-zinc-900/95 to-transparent p-3">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
-                <Play className="w-2 h-2 text-white" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-zinc-900 via-zinc-900/98 to-zinc-900/80 p-3 flex flex-col justify-end">
+            {/* Top section - Description/Context */}
+            <div className="flex-1 overflow-hidden mb-2">
+              {data.description ? (
+                <p className="text-zinc-400 text-[10px] leading-tight line-clamp-3">
+                  {String(data.description)}
+                </p>
+              ) : data.overlayText ? (
+                <p className="text-zinc-400 text-[10px] leading-tight line-clamp-3 italic">
+                  "{String(data.overlayText)}"
+                </p>
+              ) : (
+                <p className="text-zinc-500 text-[10px] leading-tight italic">
+                  Keine Beschreibung
+                </p>
+              )}
+            </div>
+            
+            {/* Middle section - Answer Type & Options */}
+            <div className="mb-2 space-y-1">
+              {/* Answer Type Badge */}
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 bg-purple-600/30 text-purple-300 text-[9px] font-medium rounded uppercase tracking-wide">
+                  {(data.answerType as string) || 'button'}
+                </span>
+                {data.delaySeconds && Number(data.delaySeconds) > 0 && (
+                  <span className="px-1.5 py-0.5 bg-amber-600/30 text-amber-300 text-[9px] font-medium rounded">
+                    {String(data.delaySeconds)}s Delay
+                  </span>
+                )}
               </div>
-              <span className="text-white font-medium text-xs truncate flex-1">{String(nodeName)}</span>
-              <div className="text-xs text-purple-400">
-                {(data.answerType as string) || 'button'}
+              
+              {/* Answer Options Preview */}
+              {data.answerType === 'multipleChoice' && (data.answers as string[])?.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {((data.answers as string[]) || []).slice(0, 3).map((answer: string, i: number) => (
+                    <span key={i} className="px-1 py-0.5 bg-zinc-700/50 text-zinc-400 text-[8px] rounded truncate max-w-[60px]">
+                      {String.fromCharCode(65 + i)}. {answer}
+                    </span>
+                  ))}
+                  {((data.answers as string[]) || []).length > 3 && (
+                    <span className="text-zinc-500 text-[8px]">+{((data.answers as string[]) || []).length - 3}</span>
+                  )}
+                </div>
+              )}
+              
+              {/* Button Text Preview */}
+              {(data.answerType === 'button' || !data.answerType) && data.buttonText && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px] text-zinc-500">CTA:</span>
+                  <span className="text-[9px] text-zinc-300 truncate">"{String(data.buttonText)}"</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Bottom section - Node Name & Icon */}
+            <div className="flex items-center gap-2 pt-1 border-t border-zinc-700/50">
+              <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <Play className="w-2.5 h-2.5 text-white" />
               </div>
+              <span className="text-white font-semibold text-xs truncate flex-1">{String(nodeName)}</span>
             </div>
           </div>
 
