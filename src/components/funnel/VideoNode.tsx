@@ -192,19 +192,19 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
           }`}>
             {/* Gradient Background for better readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-xl -m-4 pointer-events-none"></div>
-            <div className="relative z-10 space-y-4 w-full max-w-md">
+            <div className="relative z-10 space-y-2 w-full max-w-xs">
               <input
                 type={data.answerType === 'email' ? 'email' : 'text'}
                 placeholder={(data.placeholder as string) || 'Hier eingeben...'}
                 value={textInput as string}
                 onChange={(e) => typeof setTextInput === 'function' && setTextInput(e.target.value)}
-                className="w-full px-6 py-4 glass-effect rounded-xl text-white font-figtree placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 text-lg smooth-transition"
+                className="w-full px-3 py-2 glass-effect rounded-lg text-white font-figtree placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm smooth-transition"
               />
               <UniversalButton
                 text={submitButtonText}
                 color={submitButtonColor as any}
                 style={submitButtonStyle as any}
-                size={submitButtonSize as any}
+                size="small"
                 onClick={() => handleAnswerClick(textInput, data.answerType as string)}
                 disabled={!String(textInput).trim()}
                 className="w-full"
