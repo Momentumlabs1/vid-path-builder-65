@@ -4,8 +4,16 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileVideo, Check, Loader2 } from 'lucide-react';
 import { smartTradingNodes, smartTradingEdges, SMART_TRADING_FUNNEL_NAME } from '@/data/smartTradingFunnel';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
-// Build structure from nodes and edges - V3.0 (12 Videos, 3 Pfade)
+// Build structure from nodes and edges - V4.0 FINAL (16 Videos, perfekte Psychologie)
 const smartTradingFunnelStructure = {
   nodes: smartTradingNodes.map(node => ({
     id: node.id,
@@ -21,14 +29,6 @@ const smartTradingFunnelStructure = {
     label: edge.label
   }))
 };
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 
 interface FunnelTemplateLoaderProps {
   onFunnelLoaded?: () => void;
@@ -108,28 +108,38 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
           className="border-purple-500/50 text-purple-400 hover:bg-purple-500/20 bg-purple-500/10"
         >
           <FileVideo className="w-4 h-4 mr-2" />
-          Smart Trading Funnel V3.0
+          Smart Trading Funnel V4.0 FINAL
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-black/95 border border-white/10 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl">
-            🎬 Smart Trading Video Funnel V3.0
+            🎬 Smart Trading Video Funnel V4.0 FINAL
           </DialogTitle>
           <DialogDescription className="text-white/60">
-            Optimiert: 12 Videos, 3 klare Pfade, bessere Psychologie
+            Perfekter psychologischer Aufbau – 16 Videos, ~14 Min Content
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Psychologie-Flow */}
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <div className="text-purple-400 text-sm font-medium mb-2">🧠 Psychologischer Flow:</div>
+            <div className="text-white/60 text-xs space-y-1">
+              <div>1. Hook → 2. Vertrauen → 3. Qualifizierung → 4. Traum</div>
+              <div>5. Schmerz → 6. Aha-Moment → 7. Social Proof → 8. Lösung</div>
+              <div>9. Urgency → 10. Doppel-CTA → 11. Open Loop</div>
+            </div>
+          </div>
+
           {/* Funnel Overview */}
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
               <div className="text-green-400 text-sm font-medium mb-2">🟢 Anfänger-Pfad</div>
               <div className="text-white/60 text-xs">
-                • 3 Videos<br />
-                • Traum → Problem → Lösung<br />
-                • Starter Kurs anbieten
+                • 4 Videos<br />
+                • Traum → Schmerz → Aha → Lösung<br />
+                • Starter Programm + E-Mail-Kurs
               </div>
             </div>
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
@@ -137,29 +147,30 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
               <div className="text-white/60 text-xs">
                 • 4 Videos<br />
                 • Situation → Traum → Problem → Lösung<br />
-                • Gruppen-Coaching anbieten
+                • Gruppen-Coaching + Workshop
               </div>
             </div>
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
               <div className="text-red-400 text-sm font-medium mb-2">🔴 Profi-Pfad</div>
               <div className="text-white/60 text-xs">
-                • 3 Videos<br />
-                • Status → Ziel → Lösung<br />
-                • 1:1 Mentoring anbieten
+                • 4 Videos<br />
+                • Status → Engpass → Aha → Lösung<br />
+                • 1:1 Mentoring + Mastermind
               </div>
             </div>
           </div>
 
           {/* Features */}
           <div className="bg-white/5 rounded-lg p-4">
-            <div className="text-white font-medium mb-3">Features V3.0:</div>
+            <div className="text-white font-medium mb-3">Features V4.0 FINAL:</div>
             <ul className="text-white/60 text-sm space-y-2">
-              <li>✓ 12 Videos total (statt 30+)</li>
-              <li>✓ 2 gemeinsame Videos (Welcome + Abschluss)</li>
-              <li>✓ Psychologie: Traum VOR Problem aktivieren</li>
-              <li>✓ Immer 2 CTAs: Bezahlt + Kostenlos</li>
-              <li>✓ Lead-Capture am Ende</li>
-              <li>✓ Aufnahmezeit: ~10 Minuten Content</li>
+              <li>✓ 16 Video-Elemente (~14 Min Content)</li>
+              <li>✓ 3 gemeinsame Videos (Hook, Story, Abschluss)</li>
+              <li>✓ Social Proof Zwischenscreen</li>
+              <li>✓ Pattern Interrupt + Vulnerability</li>
+              <li>✓ Aha-Moment in jedem Pfad</li>
+              <li>✓ Doppel-CTA: Bezahlt + Kostenlos</li>
+              <li>✓ Open Loop am Ende</li>
             </ul>
           </div>
 
