@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EmbedCodeGenerator } from '@/components/funnel/EmbedCodeGenerator';
+import { FunnelTemplateLoader } from '@/components/funnel/FunnelTemplateLoader';
 
 interface Funnel {
   name: string;
@@ -227,13 +228,16 @@ const Dashboard = () => {
               </h1>
               <p className="text-white/60 text-lg">Die Zukunft der Interaktion beginnt heute.</p>
             </div>
-            <Button 
-              onClick={() => navigate('/builder')}
-              variant="outline"
-              className="border-white/20 text-white hover:bg-white/10 bg-transparent backdrop-blur-sm px-6 py-3 text-lg"
-            >
-              Neuer Funnel
-            </Button>
+            <div className="flex gap-3">
+              <FunnelTemplateLoader onFunnelLoaded={loadData} />
+              <Button 
+                onClick={() => navigate('/builder')}
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10 bg-transparent backdrop-blur-sm px-6 py-3 text-lg"
+              >
+                Neuer Funnel
+              </Button>
+            </div>
           </div>
         </div>
       </div>
