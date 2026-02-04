@@ -29,6 +29,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {
+  placeNodeAvoidingOverlaps,
+  resolveOverlaps,
+  resolveOverlapsForNode,
+} from '@/lib/flow/avoidOverlaps';
 
 const nodeTypes: NodeTypes = {
   video: VideoNode,
@@ -113,7 +118,7 @@ function FunnelBuilderInner() {
         nextNodes: {}
       },
     };
-    setNodes((nds) => [...nds, newNode]);
+    setNodes((nds) => [...nds, placeNodeAvoidingOverlaps(nds, newNode)]);
   }, [setNodes]);
 
   const addEndNode = useCallback(() => {
@@ -128,7 +133,7 @@ function FunnelBuilderInner() {
         redirectUrl: ''
       },
     };
-    setNodes((nds) => [...nds, newNode]);
+    setNodes((nds) => [...nds, placeNodeAvoidingOverlaps(nds, newNode)]);
   }, [setNodes]);
 
   const addApiNode = useCallback(() => {
@@ -145,7 +150,7 @@ function FunnelBuilderInner() {
         responseMapping: {}
       },
     };
-    setNodes((nds) => [...nds, newNode]);
+    setNodes((nds) => [...nds, placeNodeAvoidingOverlaps(nds, newNode)]);
   }, [setNodes]);
 
   const addLeadCaptureNode = useCallback(() => {
@@ -161,7 +166,7 @@ function FunnelBuilderInner() {
         optInText: 'Ich möchte weitere Informationen erhalten'
       },
     };
-    setNodes((nds) => [...nds, newNode]);
+    setNodes((nds) => [...nds, placeNodeAvoidingOverlaps(nds, newNode)]);
   }, [setNodes]);
 
   const saveFunnel = async () => {
@@ -321,7 +326,8 @@ function FunnelBuilderInner() {
 
       if (data?.structure && typeof data.structure === 'object') {
         const structure = data.structure as any;
-        setNodes(structure.nodes || []);
+        const loadedNodes: Node[] = structure.nodes || [];
+        setNodes(resolveOverlaps(loadedNodes));
         setEdges(structure.edges || []);
         setFunnelName(data.name);
         setCurrentFunnelId(data.name);
@@ -346,6 +352,12 @@ function FunnelBuilderInner() {
     (window as any).funnelEdges = edges;
     console.log('FunnelBuilder: Updated global edges:', edges);
   }, [edges]);
+
+  // One-time cleanup: ensure loaded funnels aren't stacked on top of each other
+  useEffect(() => {
+    if (!currentFunnelId) return;
+    setNodes((nds) => resolveOverlaps(nds));
+  }, [currentFunnelId, setNodes]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -479,6 +491,9 @@ function FunnelBuilderInner() {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
+            onNodeDragStop={(_, node) =>
+              setNodes((nds) => resolveOverlapsForNode(nds, node.id))
+            }
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             fitView
