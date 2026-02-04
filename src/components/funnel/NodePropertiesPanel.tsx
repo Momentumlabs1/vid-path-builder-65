@@ -1066,6 +1066,26 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       </div>
                     </div>
 
+                    {/* Button Width */}
+                    <div>
+                      <Label className="text-white text-xs mb-2 block">Button Breite</Label>
+                      <Select
+                        value={(localData.mcButtonWidth as string) || 'auto'}
+                        onValueChange={(value) => updateLocalData({ mcButtonWidth: value })}
+                      >
+                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                          <SelectItem value="auto" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Auto (Textbreite)</SelectItem>
+                          <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Schmal (120px)</SelectItem>
+                          <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (180px)</SelectItem>
+                          <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Breit (240px)</SelectItem>
+                          <SelectItem value="full" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Volle Breite</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     {/* Position Grid für Multiple Choice */}
                     <div>
                       <Label className="text-white text-xs mb-2 block">Position</Label>
