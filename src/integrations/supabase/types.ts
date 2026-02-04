@@ -10,14 +10,14 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
       funnel_responses: {
         Row: {
-          answer: string
-          answer_type: string
+          answer: string | null
+          answer_type: string | null
           created_at: string
           funnel_name: string
           id: string
@@ -25,11 +25,11 @@ export type Database = {
           node_id: string
           question: string | null
           user_agent: string | null
-          user_session_id: string
+          user_session_id: string | null
         }
         Insert: {
-          answer: string
-          answer_type: string
+          answer?: string | null
+          answer_type?: string | null
           created_at?: string
           funnel_name: string
           id?: string
@@ -37,11 +37,11 @@ export type Database = {
           node_id: string
           question?: string | null
           user_agent?: string | null
-          user_session_id: string
+          user_session_id?: string | null
         }
         Update: {
-          answer?: string
-          answer_type?: string
+          answer?: string | null
+          answer_type?: string | null
           created_at?: string
           funnel_name?: string
           id?: string
@@ -49,90 +49,61 @@ export type Database = {
           node_id?: string
           question?: string | null
           user_agent?: string | null
-          user_session_id?: string
+          user_session_id?: string | null
         }
         Relationships: []
       }
       funnels: {
         Row: {
-          created_at: string | null
+          created_at: string
           is_public: boolean | null
           name: string
           structure: Json
+          updated_at: string
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           is_public?: boolean | null
           name: string
-          structure: Json
+          structure?: Json
+          updated_at?: string
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           is_public?: boolean | null
           name?: string
           structure?: Json
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
       }
-      lead_notes: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          id: string
-          lead_id: string
-          note: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          lead_id: string
-          note: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          lead_id?: string
-          note?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "lead_notes_lead_id_fkey"
-            columns: ["lead_id"]
-            isOneToOne: false
-            referencedRelation: "leads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       lead_status: {
         Row: {
           created_at: string
-          created_by: string | null
           id: string
-          lead_id: string
+          lead_id: string | null
           notes: string | null
           status: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          created_by?: string | null
           id?: string
-          lead_id: string
+          lead_id?: string | null
           notes?: string | null
           status?: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          created_by?: string | null
           id?: string
-          lead_id?: string
+          lead_id?: string | null
           notes?: string | null
           status?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -146,87 +117,72 @@ export type Database = {
       }
       leads: {
         Row: {
-          company: string | null
+          age: number | null
           created_at: string
           email: string | null
           first_name: string | null
           funnel_name: string
           id: string
-          ip_address: string | null
           last_name: string | null
-          lead_score: number | null
-          opt_in_marketing: boolean | null
+          opt_in: boolean | null
           phone: string | null
-          session_id: string
-          updated_at: string
-          user_agent: string | null
+          session_id: string | null
         }
         Insert: {
-          company?: string | null
+          age?: number | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           funnel_name: string
           id?: string
-          ip_address?: string | null
           last_name?: string | null
-          lead_score?: number | null
-          opt_in_marketing?: boolean | null
+          opt_in?: boolean | null
           phone?: string | null
-          session_id: string
-          updated_at?: string
-          user_agent?: string | null
+          session_id?: string | null
         }
         Update: {
-          company?: string | null
+          age?: number | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           funnel_name?: string
           id?: string
-          ip_address?: string | null
           last_name?: string | null
-          lead_score?: number | null
-          opt_in_marketing?: boolean | null
+          opt_in?: boolean | null
           phone?: string | null
-          session_id?: string
-          updated_at?: string
-          user_agent?: string | null
+          session_id?: string | null
         }
         Relationships: []
       }
       Videos: {
         Row: {
-          created_at: string | null
-          description: string | null
-          file_url: string
+          created_at: string
+          duration: number | null
+          file_path: string | null
+          file_url: string | null
           id: string
-          is_public: boolean | null
-          metadata: Json | null
           thumbnail_url: string | null
-          title: string | null
+          title: string
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
-          description?: string | null
-          file_url: string
+          created_at?: string
+          duration?: number | null
+          file_path?: string | null
+          file_url?: string | null
           id?: string
-          is_public?: boolean | null
-          metadata?: Json | null
           thumbnail_url?: string | null
-          title?: string | null
+          title: string
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
-          description?: string | null
-          file_url?: string
+          created_at?: string
+          duration?: number | null
+          file_path?: string | null
+          file_url?: string | null
           id?: string
-          is_public?: boolean | null
-          metadata?: Json | null
           thumbnail_url?: string | null
-          title?: string | null
+          title?: string
           user_id?: string | null
         }
         Relationships: []

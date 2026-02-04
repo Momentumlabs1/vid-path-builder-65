@@ -12,14 +12,13 @@ import { Users, TrendingUp, Download, Mail, Phone } from 'lucide-react';
 interface Lead {
   id: string;
   funnel_name: string;
-  session_id: string;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  lead_score: number;
-  opt_in_marketing: boolean;
+  session_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  age: number | null;
+  opt_in: boolean | null;
   created_at: string;
 }
 
@@ -100,7 +99,7 @@ const ClientDashboard = () => {
         lead.last_name || '',
         lead.email || '',
         lead.phone || '',
-        lead.company || '',
+        lead.age?.toString() || '',
         new Date(lead.created_at).toLocaleString('de-DE')
       ])
     ].map(row => row.join(',')).join('\n');
@@ -188,7 +187,7 @@ const ClientDashboard = () => {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-muted-foreground">Opt-ins</p>
                   <p className="text-2xl font-bold">
-                    {leads.filter(l => l.opt_in_marketing).length}
+                    {leads.filter(l => l.opt_in).length}
                   </p>
                 </div>
               </div>
@@ -238,8 +237,8 @@ const ClientDashboard = () => {
                             <p className="font-medium">
                               {lead.first_name} {lead.last_name}
                             </p>
-                            {lead.company && (
-                              <p className="text-sm text-muted-foreground">{lead.company}</p>
+                            {lead.age && (
+                              <p className="text-sm text-muted-foreground">Alter: {lead.age}</p>
                             )}
                           </div>
                         </div>
@@ -261,8 +260,8 @@ const ClientDashboard = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={lead.opt_in_marketing ? "default" : "secondary"}>
-                          {lead.opt_in_marketing ? 'Ja' : 'Nein'}
+                        <Badge variant={lead.opt_in ? "default" : "secondary"}>
+                          {lead.opt_in ? 'Ja' : 'Nein'}
                         </Badge>
                       </TableCell>
                       <TableCell>{formatDate(lead.created_at)}</TableCell>
