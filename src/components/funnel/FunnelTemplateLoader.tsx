@@ -3,7 +3,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileVideo, Check, Loader2 } from 'lucide-react';
-import { smartTradingFunnelStructure, SMART_TRADING_FUNNEL_NAME } from '@/data/smartTradingFunnel';
+import { smartTradingNodes, smartTradingEdges, SMART_TRADING_FUNNEL_NAME } from '@/data/smartTradingFunnel';
+
+// Build structure from nodes and edges
+const smartTradingFunnelStructure = {
+  nodes: smartTradingNodes.map(node => ({
+    id: node.id,
+    type: node.type,
+    position: node.position,
+    data: node.data
+  })),
+  edges: smartTradingEdges.map(edge => ({
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    type: edge.type,
+    label: edge.label
+  }))
+};
 import {
   Dialog,
   DialogContent,

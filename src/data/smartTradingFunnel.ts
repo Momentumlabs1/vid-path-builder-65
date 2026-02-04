@@ -1,15 +1,27 @@
 // Smart Trading Video Funnel V2.0 - Extended Version
 // Kompletter Funnel mit 3 Pfaden: Anfänger, Fortgeschritten, Profi
+// LAYOUT: Pfade sind horizontal getrennt um Überlappung zu vermeiden
 
 import { Node, Edge } from '@xyflow/react';
 
+// ============= LAYOUT KONSTANTEN =============
+// Horizontale Bereiche für jeden Pfad (verhindert Überlappung)
+const ANFAENGER_X = 0;        // 🟢 Anfänger: linke Spalte
+const FORTGESCHRITTEN_X = 700; // 🟡 Fortgeschritten: mittlere Spalte  
+const PROFI_X = 1400;          // 🔴 Profi: rechte Spalte
+const CENTER_X = 700;          // Gemeinsamer Start in der Mitte
+
+// Vertikale Abstände
+const ROW_HEIGHT = 220;        // Abstand zwischen Zeilen
+const SUB_ROW_HEIGHT = 180;    // Kleinerer Abstand für Unter-Varianten
+
 // ============= NODE DEFINITIONS =============
 
-// Gemeinsamer Start
+// Gemeinsamer Start (zentriert)
 const startNode: Node = {
   id: 'start',
   type: 'start',
-  position: { x: 600, y: 50 },
+  position: { x: CENTER_X, y: 50 },
   data: { label: 'Start' }
 };
 
@@ -17,10 +29,10 @@ const startNode: Node = {
 const video1Welcome: Node = {
   id: 'video-1-welcome',
   type: 'video',
-  position: { x: 600, y: 200 },
+  position: { x: CENTER_X, y: 50 + ROW_HEIGHT },
   data: {
     label: 'V1: Welcome',
-    videoUrl: '', // Placeholder - User muss Video hochladen
+    videoUrl: '',
     overlayText: 'Hey, schön dass du hier bist. Ich bin Saif...',
     answerType: 'button',
     buttonText: "Deal – Los geht's 👊",
@@ -36,7 +48,7 @@ const video1Welcome: Node = {
 const video2Level: Node = {
   id: 'video-2-level',
   type: 'video',
-  position: { x: 600, y: 400 },
+  position: { x: CENTER_X, y: 50 + ROW_HEIGHT * 2 },
   data: {
     label: 'V2: Wie lange tradest du?',
     videoUrl: '',
@@ -60,12 +72,13 @@ const video2Level: Node = {
   }
 };
 
-// ============= ANFÄNGER-PFAD (🟢) =============
+// ============= ANFÄNGER-PFAD (🟢) - LINKE SPALTE =============
+const ANFAENGER_START_Y = 50 + ROW_HEIGHT * 3;
 
 const videoA1: Node = {
   id: 'video-a1-welcome',
   type: 'video',
-  position: { x: 100, y: 650 },
+  position: { x: ANFAENGER_X, y: ANFAENGER_START_Y },
   data: {
     label: 'A1: Anfänger Willkommen',
     videoUrl: '',
@@ -83,7 +96,7 @@ const videoA1: Node = {
 const videoA2: Node = {
   id: 'video-a2-motivation',
   type: 'video',
-  position: { x: 100, y: 850 },
+  position: { x: ANFAENGER_X, y: ANFAENGER_START_Y + ROW_HEIGHT },
   data: {
     label: 'A2: Motivation',
     videoUrl: '',
@@ -106,11 +119,14 @@ const videoA2: Node = {
   }
 };
 
-// A3 Varianten basierend auf Motivation
+// A3 Varianten - horizontal nebeneinander unter A2
+const A3_Y = ANFAENGER_START_Y + ROW_HEIGHT * 2;
+const A3_SPACING = 160; // Horizontaler Abstand zwischen A3 Varianten
+
 const videoA3a: Node = {
   id: 'video-a3a-nebeneinkommen',
   type: 'video',
-  position: { x: -150, y: 1050 },
+  position: { x: ANFAENGER_X - A3_SPACING, y: A3_Y },
   data: {
     label: 'A3a: Nach Nebeneinkommen',
     videoUrl: '',
@@ -134,7 +150,7 @@ const videoA3a: Node = {
 const videoA3b: Node = {
   id: 'video-a3b-vollzeit',
   type: 'video',
-  position: { x: 50, y: 1050 },
+  position: { x: ANFAENGER_X, y: A3_Y },
   data: {
     label: 'A3b: Nach Vollzeit-Trader',
     videoUrl: '',
@@ -158,7 +174,7 @@ const videoA3b: Node = {
 const videoA3c: Node = {
   id: 'video-a3c-geld-vermehren',
   type: 'video',
-  position: { x: 250, y: 1050 },
+  position: { x: ANFAENGER_X + A3_SPACING, y: A3_Y },
   data: {
     label: 'A3c: Nach Geld vermehren',
     videoUrl: '',
@@ -182,7 +198,7 @@ const videoA3c: Node = {
 const videoA3d: Node = {
   id: 'video-a3d-neugierig',
   type: 'video',
-  position: { x: 450, y: 1050 },
+  position: { x: ANFAENGER_X + A3_SPACING * 2, y: A3_Y },
   data: {
     label: 'A3d: Nach Neugierig',
     videoUrl: '',
@@ -197,10 +213,11 @@ const videoA3d: Node = {
   }
 };
 
+// Weiter mit linearem Pfad
 const videoA4: Node = {
   id: 'video-a4-zeit',
   type: 'video',
-  position: { x: 100, y: 1300 },
+  position: { x: ANFAENGER_X, y: A3_Y + ROW_HEIGHT },
   data: {
     label: 'A4: Zeit & Ressourcen',
     videoUrl: '',
@@ -224,7 +241,7 @@ const videoA4: Node = {
 const videoA5: Node = {
   id: 'video-a5-startkapital',
   type: 'video',
-  position: { x: 100, y: 1500 },
+  position: { x: ANFAENGER_X, y: A3_Y + ROW_HEIGHT * 2 },
   data: {
     label: 'A5: Startkapital',
     videoUrl: '',
@@ -250,7 +267,7 @@ const videoA5: Node = {
 const videoA6: Node = {
   id: 'video-a6-angst',
   type: 'video',
-  position: { x: 100, y: 1700 },
+  position: { x: ANFAENGER_X, y: A3_Y + ROW_HEIGHT * 3 },
   data: {
     label: 'A6: Größte Angst',
     videoUrl: '',
@@ -273,10 +290,14 @@ const videoA6: Node = {
   }
 };
 
+// A7 Varianten - horizontal nebeneinander
+const A7_Y = A3_Y + ROW_HEIGHT * 4;
+const A7_SPACING = 200;
+
 const videoA7a: Node = {
   id: 'video-a7a-verluste',
   type: 'video',
-  position: { x: -100, y: 1900 },
+  position: { x: ANFAENGER_X - A7_SPACING / 2, y: A7_Y },
   data: {
     label: 'A7a: Angst vor Verlusten',
     videoUrl: '',
@@ -294,7 +315,7 @@ const videoA7a: Node = {
 const videoA7b: Node = {
   id: 'video-a7b-ueberfordert',
   type: 'video',
-  position: { x: 100, y: 1900 },
+  position: { x: ANFAENGER_X + A7_SPACING / 2, y: A7_Y },
   data: {
     label: 'A7b: Überfordert',
     videoUrl: '',
@@ -312,7 +333,7 @@ const videoA7b: Node = {
 const videoA7c: Node = {
   id: 'video-a7c-vertrauen',
   type: 'video',
-  position: { x: 300, y: 1900 },
+  position: { x: ANFAENGER_X + A7_SPACING * 1.5, y: A7_Y },
   data: {
     label: 'A7c: Vertrau keinem Coach',
     videoUrl: '',
@@ -327,10 +348,13 @@ const videoA7c: Node = {
   }
 };
 
+// Finale Anfänger-Nodes
+const A8_Y = A7_Y + ROW_HEIGHT;
+
 const videoA8: Node = {
   id: 'video-a8-empfehlung',
   type: 'video',
-  position: { x: 100, y: 2150 },
+  position: { x: ANFAENGER_X, y: A8_Y },
   data: {
     label: 'A8: Produkt-Empfehlung Anfänger',
     videoUrl: '',
@@ -351,11 +375,10 @@ const videoA8: Node = {
   }
 };
 
-// Lead Capture für Anfänger
 const leadCaptureAnfaenger: Node = {
   id: 'lead-capture-anfaenger',
   type: 'leadCapture',
-  position: { x: 100, y: 2400 },
+  position: { x: ANFAENGER_X, y: A8_Y + ROW_HEIGHT },
   data: {
     label: 'Lead Capture Anfänger',
     title: 'Deine Kontaktdaten',
@@ -368,7 +391,7 @@ const leadCaptureAnfaenger: Node = {
 const endAnfaenger: Node = {
   id: 'end-anfaenger',
   type: 'end',
-  position: { x: 100, y: 2600 },
+  position: { x: ANFAENGER_X, y: A8_Y + ROW_HEIGHT * 2 },
   data: {
     label: 'Ende Anfänger',
     title: 'Vielen Dank! 🎉',
@@ -377,12 +400,13 @@ const endAnfaenger: Node = {
   }
 };
 
-// ============= FORTGESCHRITTENEN-PFAD (🟡) =============
+// ============= FORTGESCHRITTENEN-PFAD (🟡) - MITTLERE SPALTE =============
+const FORTGESCHRITTEN_START_Y = 50 + ROW_HEIGHT * 3;
 
 const videoB1: Node = {
   id: 'video-b1-welcome',
   type: 'video',
-  position: { x: 600, y: 650 },
+  position: { x: FORTGESCHRITTEN_X, y: FORTGESCHRITTEN_START_Y },
   data: {
     label: 'B1: Fortgeschritten Willkommen',
     videoUrl: '',
@@ -400,7 +424,7 @@ const videoB1: Node = {
 const videoB2: Node = {
   id: 'video-b2-situation',
   type: 'video',
-  position: { x: 600, y: 850 },
+  position: { x: FORTGESCHRITTEN_X, y: FORTGESCHRITTEN_START_Y + ROW_HEIGHT },
   data: {
     label: 'B2: Aktuelle Situation',
     videoUrl: '',
@@ -423,10 +447,14 @@ const videoB2: Node = {
   }
 };
 
+// B3 Varianten - horizontal verteilt
+const B3_Y = FORTGESCHRITTEN_START_Y + ROW_HEIGHT * 2;
+const B3_SPACING = 170;
+
 const videoB3a: Node = {
   id: 'video-b3a-verluste',
   type: 'video',
-  position: { x: 400, y: 1100 },
+  position: { x: FORTGESCHRITTEN_X - B3_SPACING, y: B3_Y },
   data: {
     label: 'B3a: Verliert mehr',
     videoUrl: '',
@@ -450,7 +478,7 @@ const videoB3a: Node = {
 const videoB3b: Node = {
   id: 'video-b3b-breakeven',
   type: 'video',
-  position: { x: 600, y: 1100 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y },
   data: {
     label: 'B3b: Break-Even',
     videoUrl: '',
@@ -476,7 +504,7 @@ const videoB3b: Node = {
 const videoB3c: Node = {
   id: 'video-b3c-strategie',
   type: 'video',
-  position: { x: 800, y: 1100 },
+  position: { x: FORTGESCHRITTEN_X + B3_SPACING, y: B3_Y },
   data: {
     label: 'B3c: Keine Strategie',
     videoUrl: '',
@@ -502,7 +530,7 @@ const videoB3c: Node = {
 const videoB3d: Node = {
   id: 'video-b3d-emotional',
   type: 'video',
-  position: { x: 1000, y: 1100 },
+  position: { x: FORTGESCHRITTEN_X + B3_SPACING * 2, y: B3_Y },
   data: {
     label: 'B3d: Emotional',
     videoUrl: '',
@@ -525,10 +553,11 @@ const videoB3d: Node = {
   }
 };
 
+// Linearer Fortgeschrittenen-Pfad
 const videoB4: Node = {
   id: 'video-b4-lernquellen',
   type: 'video',
-  position: { x: 600, y: 1350 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT },
   data: {
     label: 'B4: Bisherige Lernquellen',
     videoUrl: '',
@@ -554,7 +583,7 @@ const videoB4: Node = {
 const videoB5: Node = {
   id: 'video-b5-zeit',
   type: 'video',
-  position: { x: 600, y: 1550 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 2 },
   data: {
     label: 'B5: Zeit & Commitment',
     videoUrl: '',
@@ -580,7 +609,7 @@ const videoB5: Node = {
 const videoB6: Node = {
   id: 'video-b6-konto',
   type: 'video',
-  position: { x: 600, y: 1750 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 3 },
   data: {
     label: 'B6: Kontogröße',
     videoUrl: '',
@@ -608,7 +637,7 @@ const videoB6: Node = {
 const videoB7: Node = {
   id: 'video-b7-ziel',
   type: 'video',
-  position: { x: 600, y: 1950 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 4 },
   data: {
     label: 'B7: Ziel in 12 Monaten',
     videoUrl: '',
@@ -634,7 +663,7 @@ const videoB7: Node = {
 const videoB8: Node = {
   id: 'video-b8-huerde',
   type: 'video',
-  position: { x: 600, y: 2150 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 5 },
   data: {
     label: 'B8: Größte Hürde',
     videoUrl: '',
@@ -662,7 +691,7 @@ const videoB8: Node = {
 const videoB9: Node = {
   id: 'video-b9-empfehlung',
   type: 'video',
-  position: { x: 600, y: 2400 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 6 },
   data: {
     label: 'B9: Produkt-Empfehlung',
     videoUrl: '',
@@ -686,7 +715,7 @@ const videoB9: Node = {
 const leadCaptureFortgeschritten: Node = {
   id: 'lead-capture-fortgeschritten',
   type: 'leadCapture',
-  position: { x: 600, y: 2650 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 7 },
   data: {
     label: 'Lead Capture Fortgeschritten',
     title: 'Deine Kontaktdaten',
@@ -699,7 +728,7 @@ const leadCaptureFortgeschritten: Node = {
 const endFortgeschritten: Node = {
   id: 'end-fortgeschritten',
   type: 'end',
-  position: { x: 600, y: 2850 },
+  position: { x: FORTGESCHRITTEN_X, y: B3_Y + ROW_HEIGHT * 8 },
   data: {
     label: 'Ende Fortgeschritten',
     title: 'Der Durchbruch kommt! 💪',
@@ -708,12 +737,13 @@ const endFortgeschritten: Node = {
   }
 };
 
-// ============= PROFI-PFAD (🔴) =============
+// ============= PROFI-PFAD (🔴) - RECHTE SPALTE =============
+const PROFI_START_Y = 50 + ROW_HEIGHT * 3;
 
 const videoC1: Node = {
   id: 'video-c1-welcome',
   type: 'video',
-  position: { x: 1100, y: 650 },
+  position: { x: PROFI_X, y: PROFI_START_Y },
   data: {
     label: 'C1: Profi Willkommen',
     videoUrl: '',
@@ -731,7 +761,7 @@ const videoC1: Node = {
 const videoC2: Node = {
   id: 'video-c2-profitabel',
   type: 'video',
-  position: { x: 1100, y: 850 },
+  position: { x: PROFI_X, y: PROFI_START_Y + ROW_HEIGHT },
   data: {
     label: 'C2: Profitabilität',
     videoUrl: '',
@@ -752,10 +782,14 @@ const videoC2: Node = {
   }
 };
 
+// C3 Varianten
+const C3_Y = PROFI_START_Y + ROW_HEIGHT * 2;
+const C3_SPACING = 200;
+
 const videoC3a: Node = {
   id: 'video-c3a-profitabel',
   type: 'video',
-  position: { x: 950, y: 1100 },
+  position: { x: PROFI_X - C3_SPACING, y: C3_Y },
   data: {
     label: 'C3a: Ja profitabel',
     videoUrl: '',
@@ -783,7 +817,7 @@ const videoC3a: Node = {
 const videoC3b: Node = {
   id: 'video-c3b-breakeven',
   type: 'video',
-  position: { x: 1100, y: 1100 },
+  position: { x: PROFI_X, y: C3_Y },
   data: {
     label: 'C3b: Break-Even',
     videoUrl: '',
@@ -807,7 +841,7 @@ const videoC3b: Node = {
 const videoC3c: Node = {
   id: 'video-c3c-nicht-profitabel',
   type: 'video',
-  position: { x: 1250, y: 1100 },
+  position: { x: PROFI_X + C3_SPACING, y: C3_Y },
   data: {
     label: 'C3c: Nicht profitabel',
     videoUrl: '',
@@ -830,10 +864,11 @@ const videoC3c: Node = {
   }
 };
 
+// Linearer Profi-Pfad
 const videoC4: Node = {
   id: 'video-c4-style',
   type: 'video',
-  position: { x: 1100, y: 1350 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT },
   data: {
     label: 'C4: Trading-Style',
     videoUrl: '',
@@ -859,7 +894,7 @@ const videoC4: Node = {
 const videoC5: Node = {
   id: 'video-c5-markt',
   type: 'video',
-  position: { x: 1100, y: 1550 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 2 },
   data: {
     label: 'C5: Hauptmarkt',
     videoUrl: '',
@@ -887,7 +922,7 @@ const videoC5: Node = {
 const videoC6: Node = {
   id: 'video-c6-kapital',
   type: 'video',
-  position: { x: 1100, y: 1750 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 3 },
   data: {
     label: 'C6: Kapitalsituation',
     videoUrl: '',
@@ -915,7 +950,7 @@ const videoC6: Node = {
 const videoC7: Node = {
   id: 'video-c7-zeithorizont',
   type: 'video',
-  position: { x: 1100, y: 1950 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 4 },
   data: {
     label: 'C7: Zeithorizont',
     videoUrl: '',
@@ -941,7 +976,7 @@ const videoC7: Node = {
 const videoC8: Node = {
   id: 'video-c8-herausforderung',
   type: 'video',
-  position: { x: 1100, y: 2150 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 5 },
   data: {
     label: 'C8: Größte Herausforderung',
     videoUrl: '',
@@ -971,7 +1006,7 @@ const videoC8: Node = {
 const videoC9: Node = {
   id: 'video-c9-empfehlung',
   type: 'video',
-  position: { x: 1100, y: 2400 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 6 },
   data: {
     label: 'C9: Produkt-Empfehlung Profi',
     videoUrl: '',
@@ -995,7 +1030,7 @@ const videoC9: Node = {
 const leadCaptureProfi: Node = {
   id: 'lead-capture-profi',
   type: 'leadCapture',
-  position: { x: 1100, y: 2650 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 7 },
   data: {
     label: 'Lead Capture Profi',
     title: 'Strategie-Gespräch buchen',
@@ -1008,7 +1043,7 @@ const leadCaptureProfi: Node = {
 const endProfi: Node = {
   id: 'end-profi',
   type: 'end',
-  position: { x: 1100, y: 2850 },
+  position: { x: PROFI_X, y: C3_Y + ROW_HEIGHT * 8 },
   data: {
     label: 'Ende Profi',
     title: 'Respekt! 🏆',
@@ -1170,22 +1205,5 @@ export const smartTradingEdges: Edge[] = [
   { id: 'e-lead-end-c', source: 'lead-capture-profi', target: 'end-profi', type: 'custom' }
 ];
 
-// ============= COMPLETE FUNNEL STRUCTURE =============
-
-export const smartTradingFunnelStructure = {
-  nodes: smartTradingNodes.map(node => ({
-    id: node.id,
-    type: node.type,
-    position: node.position,
-    data: node.data
-  })),
-  edges: smartTradingEdges.map(edge => ({
-    id: edge.id,
-    source: edge.source,
-    target: edge.target,
-    type: edge.type,
-    label: edge.label
-  }))
-};
-
+// ============= FUNNEL NAME =============
 export const SMART_TRADING_FUNNEL_NAME = 'smart-trading-v2';
