@@ -1029,20 +1029,39 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <Label className="text-white text-sm font-medium block">Layout Einstellungen</Label>
                     
                     <div className="grid grid-cols-2 gap-3">
-                      {/* Button Size */}
+                      {/* Button Height */}
                       <div>
-                        <Label className="text-white text-xs mb-2 block">Button Größe</Label>
+                        <Label className="text-white text-xs mb-2 block">Höhe</Label>
                         <Select
-                          value={(localData.mcButtonSize as string) || 'small'}
-                          onValueChange={(value) => updateLocalData({ mcButtonSize: value })}
+                          value={(localData.mcButtonHeight as string) || 'medium'}
+                          onValueChange={(value) => updateLocalData({ mcButtonHeight: value })}
                         >
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein</SelectItem>
-                            <SelectItem value="default" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Standard</SelectItem>
-                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß</SelectItem>
+                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein (28px)</SelectItem>
+                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (36px)</SelectItem>
+                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß (44px)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* Text Size */}
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Textgröße</Label>
+                        <Select
+                          value={(localData.mcTextSize as string) || 'small'}
+                          onValueChange={(value) => updateLocalData({ mcTextSize: value })}
+                        >
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                            <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (10px)</SelectItem>
+                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein (12px)</SelectItem>
+                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (14px)</SelectItem>
+                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß (16px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

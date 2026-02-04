@@ -185,7 +185,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       case 'multipleChoice':
         const answers = (data.answers as string[]) || [];
         const mcPosition = (data.mcPosition as string) || 'bottom-center';
-        const mcButtonSize = (data.mcButtonSize as string) || 'default';
+        const mcButtonHeight = (data.mcButtonHeight as string) || 'medium';
+        const mcTextSize = (data.mcTextSize as string) || 'small';
         const mcLayout = (data.mcLayout as string) || 'vertical';
         const mcButtonWidth = (data.mcButtonWidth as string) || 'auto';
         
@@ -202,6 +203,32 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               return 'w-full';
             default:
               return 'w-auto';
+          }
+        };
+        
+        // Height classes
+        const getHeightClasses = (height: string) => {
+          switch (height) {
+            case 'small':
+              return 'h-7 py-1';
+            case 'large':
+              return 'h-11 py-2.5';
+            default: // medium
+              return 'h-9 py-2';
+          }
+        };
+        
+        // Text size classes
+        const getTextSizeClasses = (size: string) => {
+          switch (size) {
+            case 'xs':
+              return 'text-[10px]';
+            case 'medium':
+              return 'text-sm';
+            case 'large':
+              return 'text-base';
+            default: // small
+              return 'text-xs';
           }
         };
         
@@ -234,6 +261,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 const color = (data[`mcColor_${index}`] as string) || 'purple';
                 const style = (data[`mcStyle_${index}`] as string) || 'glassmorphism';
                 const widthClass = getWidthClasses(mcButtonWidth);
+                const heightClass = getHeightClasses(mcButtonHeight);
+                const textSizeClass = getTextSizeClasses(mcTextSize);
                 
                 return (
                   <UniversalButton
@@ -241,9 +270,9 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                     text={`${String.fromCharCode(65 + index)}. ${answer}`}
                     color={color as any}
                     style={style as any}
-                    size={mcButtonSize as any}
+                    size="small"
                     onClick={() => handleAnswerClick(index, 'multipleChoice')}
-                    className={`${widthClass} ${mcLayout === 'horizontal' && mcButtonWidth === 'auto' ? 'flex-1' : ''}`}
+                    className={`${widthClass} ${heightClass} ${textSizeClass} ${mcLayout === 'horizontal' && mcButtonWidth === 'auto' ? 'flex-1' : ''}`}
                   />
                 );
               })}
