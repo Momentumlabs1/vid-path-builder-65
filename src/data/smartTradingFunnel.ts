@@ -7,18 +7,18 @@ import { Node, Edge } from '@xyflow/react';
 export const SMART_TRADING_FUNNEL_NAME = 'smart-trading-v4';
 
 // ============= LAYOUT KONSTANTEN =============
-const ANFAENGER_X = 0;
-const FORTGESCHRITTEN_X = 500;
-const PROFI_X = 1000;
-const CENTER_X = 500;
+const ANFAENGER_X = -600;
+const FORTGESCHRITTEN_X = 0;
+const PROFI_X = 600;
+const CENTER_X = 0;
 
-const ROW_HEIGHT = 200;
-const GEMEINSAM_Y = 100;
-const SOCIAL_PROOF_Y = 500;
-const PFAD_START_Y = 700;
-const ABSCHLUSS_Y = 1600;
-const LEAD_Y = 1800;
-const END_Y = 2000;
+const ROW_HEIGHT = 280;
+const GEMEINSAM_Y = 0;
+const SOCIAL_PROOF_Y = 900;
+const PFAD_START_Y = 1200;
+const ABSCHLUSS_Y = 2500;
+const LEAD_Y = 2800;
+const END_Y = 3100;
 
 // ============= NODE DEFINITIONS =============
 
