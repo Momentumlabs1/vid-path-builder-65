@@ -51,7 +51,7 @@ export function DragDropUpload({ onVideoUploaded, className = "" }: DragDropUplo
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${crypto.randomUUID()}${fileExt ? `.${fileExt}` : ''}`;
       const filePath = `videos/${fileName}`;
 
       // Simuliere Upload Progress
@@ -67,7 +67,10 @@ export function DragDropUpload({ onVideoUploaded, className = "" }: DragDropUplo
 
       const { error: uploadError } = await supabase.storage
         .from('videos')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false,
+        });
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -78,16 +81,18 @@ export function DragDropUpload({ onVideoUploaded, className = "" }: DragDropUplo
         .from('videos')
         .getPublicUrl(filePath);
 
+      // Save metadata in DB (best-effort). Table schema does not include description/is_public.
       const { error: dbError } = await supabase
         .from('Videos')
         .insert({
           title: file.name,
           file_url: publicUrl,
-          description: 'Uploaded from funnel builder',
-          is_public: true // Mark funnel videos as public for viewing
+          file_path: filePath,
         });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.warn('Video uploaded but DB insert failed:', dbError);
+      }
 
       setUploadedFile(file.name);
       onVideoUploaded(publicUrl, file.name);
@@ -103,11 +108,11 @@ export function DragDropUpload({ onVideoUploaded, className = "" }: DragDropUplo
         setUploadProgress(0);
       }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading video:', error);
       toast({
         title: "Upload-Fehler",
-        description: "Das Video konnte nicht hochgeladen werden.",
+        description: error?.message ? String(error.message) : "Das Video konnte nicht hochgeladen werden.",
         variant: "destructive",
       });
       setUploadProgress(0);
