@@ -20,15 +20,15 @@ export const UniversalButton = memo(({
   className = ''
 }: UniversalButtonProps) => {
   
-  // Size classes
+  // Size classes - optimized for mobile
   const getSizeClasses = (size: string) => {
     switch (size) {
       case 'small':
-        return 'px-4 py-2 text-sm';
+        return 'px-3 py-1.5 text-xs';
       case 'large':
-        return 'px-10 py-5 text-xl';
-      default:
-        return 'px-8 py-4 text-lg';
+        return 'px-6 py-3 text-base';
+      default: // medium
+        return 'px-4 py-2 text-sm';
     }
   };
   
