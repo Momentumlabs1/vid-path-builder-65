@@ -498,13 +498,13 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700">
-                    <SelectItem value="button">Single Button</SelectItem>
-                    <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
-                    <SelectItem value="yesno">Yes/No</SelectItem>
-                    <SelectItem value="text">Text Input</SelectItem>
-                    <SelectItem value="email">E-Mail</SelectItem>
-                    <SelectItem value="rating">Rating</SelectItem>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                    <SelectItem value="button" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Single Button</SelectItem>
+                    <SelectItem value="multipleChoice" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Multiple Choice</SelectItem>
+                    <SelectItem value="yesno" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Yes/No</SelectItem>
+                    <SelectItem value="text" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Text Input</SelectItem>
+                    <SelectItem value="email" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">E-Mail</SelectItem>
+                    <SelectItem value="rating" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Rating</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1033,16 +1033,16 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <div>
                         <Label className="text-white text-xs mb-2 block">Button Größe</Label>
                         <Select
-                          value={(localData.mcButtonSize as string) || 'default'}
+                          value={(localData.mcButtonSize as string) || 'small'}
                           onValueChange={(value) => updateLocalData({ mcButtonSize: value })}
                         >
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="small">Klein</SelectItem>
-                            <SelectItem value="default">Standard</SelectItem>
-                            <SelectItem value="large">Groß</SelectItem>
+                          <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein</SelectItem>
+                            <SelectItem value="default" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Standard</SelectItem>
+                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
