@@ -17,16 +17,14 @@ import { formatDate } from '@/lib/utils';
 interface Lead {
   id: string;
   funnel_name: string;
-  session_id: string;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  lead_score: number;
-  opt_in_marketing: boolean;
+  session_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  age: number | null;
+  opt_in: boolean | null;
   created_at: string;
-  updated_at: string;
 }
 
 interface LeadStatus {
@@ -259,8 +257,8 @@ const AdminDashboard = () => {
                               <p className="font-medium">
                                 {lead.first_name} {lead.last_name}
                               </p>
-                              {lead.company && (
-                                <p className="text-sm text-muted-foreground">{lead.company}</p>
+                              {lead.age && (
+                                <p className="text-sm text-muted-foreground">Alter: {lead.age}</p>
                               )}
                             </div>
                           </div>
@@ -392,8 +390,8 @@ const AdminDashboard = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>E-Mail: {selectedLead.email || 'N/A'}</div>
                     <div>Telefon: {selectedLead.phone || 'N/A'}</div>
-                    <div>Unternehmen: {selectedLead.company || 'N/A'}</div>
-                    <div>Marketing Opt-in: {selectedLead.opt_in_marketing ? 'Ja' : 'Nein'}</div>
+                    <div>Alter: {selectedLead.age || 'N/A'}</div>
+                    <div>Opt-in: {selectedLead.opt_in ? 'Ja' : 'Nein'}</div>
                   </div>
                 </div>
 
