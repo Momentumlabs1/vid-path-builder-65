@@ -26,7 +26,8 @@ export const EmbedCodeGenerator = ({ funnelName, isPublic = false }: EmbedCodeGe
   const [utmSource, setUtmSource] = useState('');
   const { toast } = useToast();
 
-  const baseUrl = window.location.origin;
+  // Always use production URL for embed codes
+  const baseUrl = 'https://vid-path-builder-65.lovable.app';
   const embedUrl = `${baseUrl}/embed/${encodeURIComponent(funnelName)}`;
 
   const generateEmbedCode = () => {

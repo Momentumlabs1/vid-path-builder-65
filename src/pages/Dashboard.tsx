@@ -101,8 +101,11 @@ const Dashboard = () => {
     return colors[index];
   };
 
+  // Production URL für Embed-Codes
+  const PRODUCTION_URL = 'https://vid-path-builder-65.lovable.app';
+
   const copyFunnelLink = async (funnelName: string) => {
-    const url = `${window.location.origin}/funnel/${funnelName}`;
+    const url = `${PRODUCTION_URL}/funnel/${funnelName}`;
     try {
       await navigator.clipboard.writeText(url);
       toast({
@@ -113,6 +116,33 @@ const Dashboard = () => {
       toast({
         title: "Fehler",
         description: "Link konnte nicht kopiert werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyEmbedCode = async (funnelName: string) => {
+    const embedCode = `<!-- Funnel Embed: ${funnelName} -->
+<script src="${PRODUCTION_URL}/embed.js"></script>
+<script>
+window.FUNNEL_EMBED_CONFIG = {
+  "funnelId": "${funnelName}",
+  "type": "widget",
+  "position": "bottom-right",
+  "autoOpen": false
+};
+</script>`;
+
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      toast({
+        title: "Embed Code kopiert!",
+        description: "Der Code kann jetzt auf deiner Website eingefügt werden.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fehler",
+        description: "Embed Code konnte nicht kopiert werden.",
         variant: "destructive",
       });
     }
@@ -360,6 +390,13 @@ const Dashboard = () => {
                                 <Link className="w-4 h-4 mr-2" />
                                 Link kopieren
                               </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => copyEmbedCode(funnel.name)}
+                                className="text-white hover:bg-white/10 cursor-pointer"
+                              >
+                                <Code className="w-4 h-4 mr-2" />
+                                Embed Code kopieren
+                              </DropdownMenuItem>
                                <DropdownMenuItem 
                                 onClick={() => duplicateFunnel(funnel)}
                                 className="text-white hover:bg-white/10 cursor-pointer"
@@ -507,6 +544,13 @@ const Dashboard = () => {
                               >
                                 <Link className="w-4 h-4 mr-2" />
                                 Link kopieren
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => copyEmbedCode(funnel.name)}
+                                className="text-white hover:bg-white/10 cursor-pointer"
+                              >
+                                <Code className="w-4 h-4 mr-2" />
+                                Embed Code kopieren
                               </DropdownMenuItem>
                                <DropdownMenuItem 
                                 onClick={() => duplicateFunnel(funnel)}
