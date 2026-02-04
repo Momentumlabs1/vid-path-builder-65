@@ -1,6 +1,6 @@
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Play, Star } from 'lucide-react';
+import { Play, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { UniversalButton } from './UniversalButton';
@@ -12,6 +12,9 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [rating, setRating] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [timedCountdown, setTimedCountdown] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Preview mode detection and state management
   const isPreview = data.isPreview;
@@ -20,9 +23,44 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   const selectedRating = isPreview ? data.selectedRating : rating;
   const setSelectedRating = isPreview ? data.setSelectedRating : setRating;
 
-  // Delay system for button visibility
+  // Timed visibility settings
+  const timedVisibility = data.timedVisibility as boolean;
+  const visibilityStartTime = Number(data.visibilityStartTime) || 0;
+  const visibilityDuration = Number(data.visibilityDuration) || 10;
+  const showCountdownTimer = data.showCountdownTimer !== false; // default true
+  const visibilityEndTime = visibilityStartTime + visibilityDuration;
+
+  // Video time tracking for timed visibility
   useEffect(() => {
-    if (isPreview) {
+    if (!isPreview || !timedVisibility) return;
+    
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      setVideoCurrentTime(currentTime);
+      
+      // Check if we're in the visibility window
+      const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
+      setShowButtons(isInWindow);
+      
+      // Update countdown
+      if (isInWindow && showCountdownTimer) {
+        const remaining = Math.ceil(visibilityEndTime - currentTime);
+        setTimedCountdown(remaining);
+      } else {
+        setTimedCountdown(null);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer]);
+
+  // Standard delay system for button visibility (when NOT using timed visibility)
+  useEffect(() => {
+    if (isPreview && !timedVisibility) {
       const delaySeconds = Number(data.delaySeconds) || 0;
       if (delaySeconds > 0) {
         setShowButtons(false);
@@ -34,15 +72,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       } else {
         setShowButtons(true);
       }
-    } else {
+    } else if (!isPreview) {
       // Always show in builder mode
       setShowButtons(true);
     }
-  }, [isPreview, data.delaySeconds]);
+  }, [isPreview, data.delaySeconds, timedVisibility]);
 
-  // Reset button visibility when node changes
+  // Reset button visibility when node changes (non-timed mode)
   useEffect(() => {
-    if (isPreview) {
+    if (isPreview && !timedVisibility) {
       setShowButtons(false);
       const delaySeconds = Number(data.delaySeconds) || 0;
       const timer = setTimeout(() => {
@@ -51,7 +89,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       
       return () => clearTimeout(timer);
     }
-  }, [data.videoUrl, isPreview]);
+  }, [data.videoUrl, isPreview, timedVisibility]);
 
   // 9-Positionen Grid System
   const getPositionClasses = (position: string) => {
@@ -82,6 +120,23 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     }
   };
 
+  // Countdown Timer UI Component
+  const renderCountdownTimer = () => {
+    if (!isPreview || !timedVisibility || !showCountdownTimer || timedCountdown === null) {
+      return null;
+    }
+    
+    return (
+      <div className="absolute top-2 right-2 z-50 pointer-events-none">
+        <div className="flex items-center gap-1.5 bg-black/70 backdrop-blur-sm rounded-full px-2.5 py-1 border border-orange-500/50">
+          <Clock className="w-3 h-3 text-orange-400 animate-pulse" />
+          <span className="text-orange-400 text-xs font-bold tabular-nums">
+            {timedCountdown}s
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   const renderAnswerButtons = () => {
     // Fallback to 'button' if no answerType is set
@@ -93,7 +148,6 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
     const buttonPosition = (data.buttonPosition as string) || 'bottom-center';
     const buttonStyle = (data.buttonStyle as string) || 'glassmorphism';
-    
     
 
     const containerClasses = `absolute ${getPositionClasses(buttonPosition)} z-50 pointer-events-auto`;
@@ -312,6 +366,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         {hasVideo ? (
           <>
             <video 
+              ref={videoRef}
               src={data.videoUrl as string}
               className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-in-out ${isPreview ? 'opacity-100' : 'opacity-100'}`}
               style={{ 
@@ -454,11 +509,24 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               </div>
             )}
 
+            {/* Countdown Timer for Timed Visibility */}
+            {renderCountdownTimer()}
+
             {/* Answer Buttons/Inputs Overlay */}
             {renderAnswerButtons()}
 
-            {/* Delay Indicator für debugging - nur im Builder */}
-            {!isPreview && Number(data.delaySeconds) > 0 && (
+            {/* Timed Visibility Indicator im Builder */}
+            {!isPreview && timedVisibility && (
+              <div className="absolute top-4 right-4 bg-orange-500/20 backdrop-blur-sm px-3 py-1 rounded-lg z-40 border border-orange-500/50">
+                <p className="text-orange-300 text-xs font-medium flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {visibilityStartTime}s - {visibilityEndTime}s
+                </p>
+              </div>
+            )}
+
+            {/* Delay Indicator für debugging - nur im Builder (non-timed mode) */}
+            {!isPreview && !timedVisibility && Number(data.delaySeconds) > 0 && (
               <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-lg z-40">
                 <p className="text-white text-sm font-medium">
                   Delay: {String(data.delaySeconds)}s

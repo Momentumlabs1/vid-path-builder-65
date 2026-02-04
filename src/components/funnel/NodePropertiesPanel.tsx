@@ -1254,6 +1254,65 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     {(localData.delaySeconds as number) || 0} Sekunden
                   </div>
                 </div>
+
+                {/* Timed Visibility Feature */}
+                <div className="space-y-3 border-t border-zinc-700/50 pt-4 mt-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-white text-sm flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-orange-400" />
+                      Zeitgesteuerte Sichtbarkeit
+                    </Label>
+                    <Switch
+                      checked={localData.timedVisibility as boolean}
+                      onCheckedChange={(checked) => updateLocalData({ timedVisibility: checked })}
+                    />
+                  </div>
+                  
+                  {localData.timedVisibility && (
+                    <div className="space-y-3 bg-zinc-800/50 rounded-lg p-3 border border-orange-500/30">
+                      <p className="text-xs text-zinc-400">
+                        Die Antwort-Optionen erscheinen nur in einem bestimmten Zeitfenster des Videos.
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-white text-xs mb-1 block">Start bei (Sek.)</Label>
+                          <Input
+                            type="number"
+                            value={(localData.visibilityStartTime as number) || 0}
+                            onChange={(e) => updateLocalData({ visibilityStartTime: parseInt(e.target.value) || 0 })}
+                            className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm"
+                            min={0}
+                            placeholder="5"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white text-xs mb-1 block">Sichtbar für (Sek.)</Label>
+                          <Input
+                            type="number"
+                            value={(localData.visibilityDuration as number) || 10}
+                            onChange={(e) => updateLocalData({ visibilityDuration: parseInt(e.target.value) || 10 })}
+                            className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm"
+                            min={1}
+                            placeholder="10"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <Label className="text-white text-xs">Countdown-Timer anzeigen</Label>
+                        <Switch
+                          checked={localData.showCountdownTimer as boolean ?? true}
+                          onCheckedChange={(checked) => updateLocalData({ showCountdownTimer: checked })}
+                        />
+                      </div>
+                      
+                      <div className="text-xs text-orange-400 bg-orange-500/10 p-2 rounded">
+                        ⏱️ Sichtbar: Sek. {(localData.visibilityStartTime as number) || 0} - {((localData.visibilityStartTime as number) || 0) + ((localData.visibilityDuration as number) || 10)}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </TabsContent>
 
