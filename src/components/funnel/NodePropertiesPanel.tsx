@@ -561,20 +561,60 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                   </div>
 
                   <div>
-                    <Label className="text-white text-sm font-medium mb-2 block">Button Größe</Label>
-                    <Select
-                      value={(localData.buttonSize as string) || 'medium'}
-                      onValueChange={(value) => updateLocalData({ buttonSize: value })}
-                    >
-                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
-                        <SelectItem value="small">Klein</SelectItem>
-                        <SelectItem value="medium">Mittel</SelectItem>
-                        <SelectItem value="large">Groß</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-white text-sm font-medium mb-2 block">Button Maße</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Höhe</Label>
+                        <Select
+                          value={(localData.buttonHeight as string) || 'medium'}
+                          onValueChange={(value) => updateLocalData({ buttonHeight: value })}
+                        >
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectItem value="small">Klein (28px)</SelectItem>
+                            <SelectItem value="medium">Mittel (36px)</SelectItem>
+                            <SelectItem value="large">Groß (44px)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Breite</Label>
+                        <Select
+                          value={(localData.buttonWidth as string) || 'auto'}
+                          onValueChange={(value) => updateLocalData({ buttonWidth: value })}
+                        >
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectItem value="auto">Auto</SelectItem>
+                            <SelectItem value="small">Schmal (120px)</SelectItem>
+                            <SelectItem value="medium">Mittel (180px)</SelectItem>
+                            <SelectItem value="large">Breit (240px)</SelectItem>
+                            <SelectItem value="full">Volle Breite</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <Label className="text-white text-xs mb-2 block">Textgröße</Label>
+                      <Select
+                        value={(localData.buttonTextSize as string) || 'small'}
+                        onValueChange={(value) => updateLocalData({ buttonTextSize: value })}
+                      >
+                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectItem value="xs">XS (10px)</SelectItem>
+                          <SelectItem value="small">Klein (12px)</SelectItem>
+                          <SelectItem value="medium">Mittel (14px)</SelectItem>
+                          <SelectItem value="large">Groß (16px)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div>
@@ -732,18 +772,56 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-white text-xs mb-2 block">Größe</Label>
+                        <Label className="text-white text-xs mb-2 block">Breite</Label>
                         <Select
-                          value={(localData.yesnoSize as string) || 'medium'}
-                          onValueChange={(value) => updateLocalData({ yesnoSize: value })}
+                          value={(localData.yesnoWidth as string) || 'full'}
+                          onValueChange={(value) => updateLocalData({ yesnoWidth: value })}
                         >
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="small">Klein</SelectItem>
-                            <SelectItem value="medium">Mittel</SelectItem>
-                            <SelectItem value="large">Groß</SelectItem>
+                            <SelectItem value="auto">Auto</SelectItem>
+                            <SelectItem value="small">Schmal (120px)</SelectItem>
+                            <SelectItem value="medium">Mittel (180px)</SelectItem>
+                            <SelectItem value="large">Breit (240px)</SelectItem>
+                            <SelectItem value="full">Volle Breite</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Höhe</Label>
+                        <Select
+                          value={(localData.yesnoHeight as string) || 'medium'}
+                          onValueChange={(value) => updateLocalData({ yesnoHeight: value })}
+                        >
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectItem value="small">Klein (28px)</SelectItem>
+                            <SelectItem value="medium">Mittel (36px)</SelectItem>
+                            <SelectItem value="large">Groß (44px)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Textgröße</Label>
+                        <Select
+                          value={(localData.yesnoTextSize as string) || 'small'}
+                          onValueChange={(value) => updateLocalData({ yesnoTextSize: value })}
+                        >
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectItem value="xs">XS (10px)</SelectItem>
+                            <SelectItem value="small">Klein (12px)</SelectItem>
+                            <SelectItem value="medium">Mittel (14px)</SelectItem>
+                            <SelectItem value="large">Groß (16px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -816,20 +894,58 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           </Select>
                         </div>
                       </div>
-                      
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-white text-xs mb-2 block">Höhe</Label>
+                          <Select
+                            value={(localData.submitButtonHeight as string) || 'medium'}
+                            onValueChange={(value) => updateLocalData({ submitButtonHeight: value })}
+                          >
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                              <SelectItem value="small">Klein (28px)</SelectItem>
+                              <SelectItem value="medium">Mittel (36px)</SelectItem>
+                              <SelectItem value="large">Groß (44px)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-white text-xs mb-2 block">Breite</Label>
+                          <Select
+                            value={(localData.submitButtonWidth as string) || 'full'}
+                            onValueChange={(value) => updateLocalData({ submitButtonWidth: value })}
+                          >
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                              <SelectItem value="auto">Auto</SelectItem>
+                              <SelectItem value="small">Schmal (120px)</SelectItem>
+                              <SelectItem value="medium">Mittel (180px)</SelectItem>
+                              <SelectItem value="large">Breit (240px)</SelectItem>
+                              <SelectItem value="full">Volle Breite</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
                       <div>
-                        <Label className="text-white text-xs mb-2 block">Größe</Label>
+                        <Label className="text-white text-xs mb-2 block">Textgröße</Label>
                         <Select
-                          value={(localData.submitButtonSize as string) || 'medium'}
-                          onValueChange={(value) => updateLocalData({ submitButtonSize: value })}
+                          value={(localData.submitButtonTextSize as string) || 'small'}
+                          onValueChange={(value) => updateLocalData({ submitButtonTextSize: value })}
                         >
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="small">Klein</SelectItem>
-                            <SelectItem value="medium">Mittel</SelectItem>
-                            <SelectItem value="large">Groß</SelectItem>
+                            <SelectItem value="xs">XS (10px)</SelectItem>
+                            <SelectItem value="small">Klein (12px)</SelectItem>
+                            <SelectItem value="medium">Mittel (14px)</SelectItem>
+                            <SelectItem value="large">Groß (16px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

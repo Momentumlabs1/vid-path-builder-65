@@ -152,11 +152,57 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
     const containerClasses = `absolute ${getPositionClasses(buttonPosition)} z-50 pointer-events-auto`;
 
+    // Shared dimension helpers (used across button types)
+    const getWidthClasses = (width: string) => {
+      switch (width) {
+        case 'small':
+          return 'w-[120px]';
+        case 'medium':
+          return 'w-[180px]';
+        case 'large':
+          return 'w-[240px]';
+        case 'full':
+          return 'w-full';
+        default:
+          return 'w-auto';
+      }
+    };
+
+    const getHeightClasses = (height: string) => {
+      switch (height) {
+        case 'small':
+          return 'h-7 py-1';
+        case 'large':
+          return 'h-11 py-2.5';
+        default: // medium
+          return 'h-9 py-2';
+      }
+    };
+
+    const getTextSizeClasses = (size: string) => {
+      switch (size) {
+        case 'xs':
+          return 'text-[10px]';
+        case 'medium':
+          return 'text-sm';
+        case 'large':
+          return 'text-base';
+        default: // small
+          return 'text-xs';
+      }
+    };
+
     switch (answerType) {
       case 'button':
         const buttonColor = (data.buttonColor as string) || 'purple';
         const buttonStyle = (data.buttonStyle as string) || 'glassmorphism';
-        const buttonSize = (data.buttonSize as string) || 'medium';
+        const buttonHeight = (data.buttonHeight as string) || 'medium';
+        const buttonWidth = (data.buttonWidth as string) || 'auto';
+        const buttonTextSize = (data.buttonTextSize as string) || 'small';
+
+        const widthClass = getWidthClasses(buttonWidth);
+        const heightClass = getHeightClasses(buttonHeight);
+        const textSizeClass = getTextSizeClasses(buttonTextSize);
         
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
@@ -175,8 +221,9 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 text={(data.buttonText as string) || 'Weiter'}
                 color={buttonColor as any}
                 style={buttonStyle as any}
-                size={buttonSize as any}
+                size="small"
                 onClick={() => handleAnswerClick('clicked', 'button')}
+                className={`${widthClass} ${heightClass} ${textSizeClass}`}
               />
             </div>
           </div>
@@ -189,48 +236,6 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const mcTextSize = (data.mcTextSize as string) || 'small';
         const mcLayout = (data.mcLayout as string) || 'vertical';
         const mcButtonWidth = (data.mcButtonWidth as string) || 'auto';
-        
-        // Width classes
-        const getWidthClasses = (width: string) => {
-          switch (width) {
-            case 'small':
-              return 'w-[120px]';
-            case 'medium':
-              return 'w-[180px]';
-            case 'large':
-              return 'w-[240px]';
-            case 'full':
-              return 'w-full';
-            default:
-              return 'w-auto';
-          }
-        };
-        
-        // Height classes
-        const getHeightClasses = (height: string) => {
-          switch (height) {
-            case 'small':
-              return 'h-7 py-1';
-            case 'large':
-              return 'h-11 py-2.5';
-            default: // medium
-              return 'h-9 py-2';
-          }
-        };
-        
-        // Text size classes
-        const getTextSizeClasses = (size: string) => {
-          switch (size) {
-            case 'xs':
-              return 'text-[10px]';
-            case 'medium':
-              return 'text-sm';
-            case 'large':
-              return 'text-base';
-            default: // small
-              return 'text-xs';
-          }
-        };
         
         // Layout classes
         const getLayoutClasses = (layout: string) => {
@@ -284,8 +289,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       case 'email':
         const submitButtonColor = (data.submitButtonColor as string) || 'purple';
         const submitButtonStyle = (data.submitButtonStyle as string) || 'glassmorphism';
-        const submitButtonSize = (data.submitButtonSize as string) || 'medium';
         const submitButtonText = (data.submitButtonText as string) || 'Senden';
+
+        const submitButtonHeight = (data.submitButtonHeight as string) || 'medium';
+        const submitButtonWidth = (data.submitButtonWidth as string) || 'full';
+        const submitButtonTextSize = (data.submitButtonTextSize as string) || 'small';
+
+        const submitWidthClass = getWidthClasses(submitButtonWidth);
+        const submitHeightClass = getHeightClasses(submitButtonHeight);
+        const submitTextSizeClass = getTextSizeClasses(submitButtonTextSize);
         
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
@@ -308,7 +320,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 size="small"
                 onClick={() => handleAnswerClick(textInput, data.answerType as string)}
                 disabled={!String(textInput).trim()}
-                className="w-full"
+                className={`${submitWidthClass} ${submitHeightClass} ${submitTextSizeClass}`}
               />
             </div>
           </div>
