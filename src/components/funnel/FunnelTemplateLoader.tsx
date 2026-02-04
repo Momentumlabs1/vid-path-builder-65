@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-// Build structure from nodes and edges - V4.0 FINAL (16 Videos, perfekte Psychologie)
+// Build structure from nodes and edges - V6.0 (39 Videos, 2 Pfade)
 const smartTradingFunnelStructure = {
   nodes: smartTradingNodes.map(node => ({
     id: node.id,
@@ -108,69 +108,67 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
           className="border-purple-500/50 text-purple-400 hover:bg-purple-500/20 bg-purple-500/10"
         >
           <FileVideo className="w-4 h-4 mr-2" />
-          Smart Trading Funnel V4.0 FINAL
+          Smart Trading Funnel V6.0
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-black/95 border border-white/10 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl">
-            🎬 Smart Trading Video Funnel V4.0 FINAL
+            🎬 Smart Trading Video Funnel V6.0
           </DialogTitle>
           <DialogDescription className="text-white/60">
-            Perfekter psychologischer Aufbau – 16 Videos, ~14 Min Content
+            39 Videos | 2 Pfade (Anfänger + Fortgeschritten) | ~17 Min Content
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Psychologie-Flow */}
+          {/* Struktur-Übersicht */}
           <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-            <div className="text-purple-400 text-sm font-medium mb-2">🧠 Psychologischer Flow:</div>
+            <div className="text-purple-400 text-sm font-medium mb-2">📹 Funnel-Struktur:</div>
             <div className="text-white/60 text-xs space-y-1">
-              <div>1. Hook → 2. Vertrauen → 3. Qualifizierung → 4. Traum</div>
-              <div>5. Schmerz → 6. Aha-Moment → 7. Social Proof → 8. Lösung</div>
-              <div>9. Urgency → 10. Doppel-CTA → 11. Open Loop</div>
+              <div>V1: Begrüßung → V2: Story/Direkt → V3: Überleitung → V4: Level-Frage</div>
+              <div>↓ Anfänger (16 Videos) | Fortgeschritten (16 Videos) ↓</div>
+              <div>→ Abschluss → Lead Capture → Ende</div>
             </div>
           </div>
 
           {/* Funnel Overview */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-              <div className="text-green-400 text-sm font-medium mb-2">🟢 Anfänger-Pfad</div>
+              <div className="text-green-400 text-sm font-medium mb-2">🟢 Anfänger-Pfad (16 Videos)</div>
               <div className="text-white/60 text-xs">
-                • 4 Videos<br />
-                • Traum → Schmerz → Aha → Lösung<br />
+                • A1: Level auffangen<br />
+                • A2-A3: Motivation (3 Optionen)<br />
+                • A4-A5: Blockade (4 Optionen)<br />
+                • A6-A7: Ressourcen (3 Optionen)<br />
+                • A8: Lösung → A9: Produkt<br />
                 • Starter Programm + E-Mail-Kurs
               </div>
             </div>
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
-              <div className="text-orange-400 text-sm font-medium mb-2">🟡 Fortgeschritten</div>
+              <div className="text-orange-400 text-sm font-medium mb-2">🟡 Fortgeschritten (16 Videos)</div>
               <div className="text-white/60 text-xs">
-                • 4 Videos<br />
-                • Situation → Traum → Problem → Lösung<br />
-                • Gruppen-Coaching + Workshop
-              </div>
-            </div>
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-              <div className="text-red-400 text-sm font-medium mb-2">🔴 Profi-Pfad</div>
-              <div className="text-white/60 text-xs">
-                • 4 Videos<br />
-                • Status → Engpass → Aha → Lösung<br />
-                • 1:1 Mentoring + Mastermind
+                • F1: Level auffangen<br />
+                • F2-F3: Situation (3 Optionen)<br />
+                • F4-F5: Problem (4 Optionen)<br />
+                • F6-F7: Ziel (3 Optionen)<br />
+                • F8: Lösung → F9: Produkt<br />
+                • 8-Wochen Coaching + Workshop
               </div>
             </div>
           </div>
 
           {/* Features */}
           <div className="bg-white/5 rounded-lg p-4">
-            <div className="text-white font-medium mb-3">Features V4.0 FINAL:</div>
+            <div className="text-white font-medium mb-3">Features V6.0:</div>
             <ul className="text-white/60 text-sm space-y-2">
-              <li>✓ 16 Video-Elemente (~14 Min Content)</li>
-              <li>✓ 3 gemeinsame Videos (Hook, Story, Abschluss)</li>
-              <li>✓ Social Proof Zwischenscreen</li>
-              <li>✓ Pattern Interrupt + Vulnerability</li>
-              <li>✓ Aha-Moment in jedem Pfad</li>
+              <li>✓ 39 Video-Elemente (~17 Min Content)</li>
+              <li>✓ 6 Intro-Videos (Begrüßung, Story, Weiche)</li>
+              <li>✓ 2 spezialisierte Pfade (ohne Profi)</li>
+              <li>✓ Personalisierte Auffang-Videos pro Antwort</li>
+              <li>✓ 9-11 Videos pro User-Journey (~3-4 Min)</li>
               <li>✓ Doppel-CTA: Bezahlt + Kostenlos</li>
-              <li>✓ Open Loop am Ende</li>
+              <li>✓ Profi-Hinweis am Ende: "Schreib mir direkt"</li>
             </ul>
           </div>
 
