@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, FileVideo, Check, Loader2 } from 'lucide-react';
 import { smartTradingNodes, smartTradingEdges, SMART_TRADING_FUNNEL_NAME } from '@/data/smartTradingFunnel';
 
-// Build structure from nodes and edges
+// Build structure from nodes and edges - V3.0 (12 Videos, 3 Pfade)
 const smartTradingFunnelStructure = {
   nodes: smartTradingNodes.map(node => ({
     id: node.id,
@@ -108,16 +108,16 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
           className="border-purple-500/50 text-purple-400 hover:bg-purple-500/20 bg-purple-500/10"
         >
           <FileVideo className="w-4 h-4 mr-2" />
-          Smart Trading Funnel V2.0
+          Smart Trading Funnel V3.0
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-black/95 border border-white/10 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl">
-            🎬 Smart Trading Video Funnel V2.0
+            🎬 Smart Trading Video Funnel V3.0
           </DialogTitle>
           <DialogDescription className="text-white/60">
-            Kompletter interaktiver Video-Funnel mit 3 getrennten Pfaden
+            Optimiert: 12 Videos, 3 klare Pfade, bessere Psychologie
           </DialogDescription>
         </DialogHeader>
 
@@ -127,24 +127,24 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
               <div className="text-green-400 text-sm font-medium mb-2">🟢 Anfänger-Pfad</div>
               <div className="text-white/60 text-xs">
-                • 8-10 Videos<br />
-                • Motivation erfragen<br />
+                • 3 Videos<br />
+                • Traum → Problem → Lösung<br />
                 • Starter Kurs anbieten
               </div>
             </div>
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
               <div className="text-orange-400 text-sm font-medium mb-2">🟡 Fortgeschritten</div>
               <div className="text-white/60 text-xs">
-                • 10-12 Videos<br />
-                • Situation analysieren<br />
+                • 4 Videos<br />
+                • Situation → Traum → Problem → Lösung<br />
                 • Gruppen-Coaching anbieten
               </div>
             </div>
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
               <div className="text-red-400 text-sm font-medium mb-2">🔴 Profi-Pfad</div>
               <div className="text-white/60 text-xs">
-                • 9-11 Videos<br />
-                • Skalierung fokussieren<br />
+                • 3 Videos<br />
+                • Status → Ziel → Lösung<br />
                 • 1:1 Mentoring anbieten
               </div>
             </div>
@@ -152,14 +152,14 @@ export function FunnelTemplateLoader({ onFunnelLoaded }: FunnelTemplateLoaderPro
 
           {/* Features */}
           <div className="bg-white/5 rounded-lg p-4">
-            <div className="text-white font-medium mb-3">Features:</div>
+            <div className="text-white font-medium mb-3">Features V3.0:</div>
             <ul className="text-white/60 text-sm space-y-2">
-              <li>✓ 35+ Video-Nodes mit komplettem Branching</li>
-              <li>✓ Multiple-Choice Fragen mit dynamischem Routing</li>
-              <li>✓ Lead-Capture am Ende jedes Pfads</li>
-              <li>✓ Personalisierte Produkt-Empfehlungen</li>
-              <li>✓ Alle Texte bereits eingetragen</li>
-              <li>✓ Nur noch Videos hochladen!</li>
+              <li>✓ 12 Videos total (statt 30+)</li>
+              <li>✓ 2 gemeinsame Videos (Welcome + Abschluss)</li>
+              <li>✓ Psychologie: Traum VOR Problem aktivieren</li>
+              <li>✓ Immer 2 CTAs: Bezahlt + Kostenlos</li>
+              <li>✓ Lead-Capture am Ende</li>
+              <li>✓ Aufnahmezeit: ~10 Minuten Content</li>
             </ul>
           </div>
 
