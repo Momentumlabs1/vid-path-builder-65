@@ -187,16 +187,33 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const mcPosition = (data.mcPosition as string) || 'bottom-center';
         const mcButtonSize = (data.mcButtonSize as string) || 'default';
         const mcLayout = (data.mcLayout as string) || 'vertical';
+        const mcButtonWidth = (data.mcButtonWidth as string) || 'auto';
+        
+        // Width classes
+        const getWidthClasses = (width: string) => {
+          switch (width) {
+            case 'small':
+              return 'w-[120px]';
+            case 'medium':
+              return 'w-[180px]';
+            case 'large':
+              return 'w-[240px]';
+            case 'full':
+              return 'w-full';
+            default:
+              return 'w-auto';
+          }
+        };
         
         // Layout classes
         const getLayoutClasses = (layout: string) => {
           switch (layout) {
             case 'horizontal':
-              return 'flex gap-3 flex-wrap justify-center';
+              return 'flex gap-2 flex-wrap justify-center';
             case 'grid':
-              return 'grid grid-cols-2 gap-3 max-w-md';
+              return 'grid grid-cols-2 gap-2 max-w-md';
             default:
-              return 'space-y-3';
+              return 'space-y-2';
           }
         };
         
@@ -216,6 +233,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               {answers.map((answer: string, index: number) => {
                 const color = (data[`mcColor_${index}`] as string) || 'purple';
                 const style = (data[`mcStyle_${index}`] as string) || 'glassmorphism';
+                const widthClass = getWidthClasses(mcButtonWidth);
                 
                 return (
                   <UniversalButton
@@ -225,7 +243,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                     style={style as any}
                     size={mcButtonSize as any}
                     onClick={() => handleAnswerClick(index, 'multipleChoice')}
-                    className={mcLayout === 'horizontal' ? 'flex-1' : 'w-full max-w-xs'}
+                    className={`${widthClass} ${mcLayout === 'horizontal' && mcButtonWidth === 'auto' ? 'flex-1' : ''}`}
                   />
                 );
               })}
