@@ -573,9 +573,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="small">Klein (28px)</SelectItem>
-                            <SelectItem value="medium">Mittel (36px)</SelectItem>
-                            <SelectItem value="large">Groß (44px)</SelectItem>
+                            <SelectItem value="xs">XS (24px)</SelectItem>
+                            <SelectItem value="small">S (28px)</SelectItem>
+                            <SelectItem value="medium">M (36px)</SelectItem>
+                            <SelectItem value="large">L (44px)</SelectItem>
+                            <SelectItem value="xl">XL (52px)</SelectItem>
+                            <SelectItem value="2xl">2XL (60px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -590,9 +593,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
                             <SelectItem value="auto">Auto</SelectItem>
-                            <SelectItem value="small">Schmal (120px)</SelectItem>
-                            <SelectItem value="medium">Mittel (180px)</SelectItem>
-                            <SelectItem value="large">Breit (240px)</SelectItem>
+                            <SelectItem value="xs">XS (80px)</SelectItem>
+                            <SelectItem value="small">S (120px)</SelectItem>
+                            <SelectItem value="medium">M (160px)</SelectItem>
+                            <SelectItem value="large">L (200px)</SelectItem>
+                            <SelectItem value="xl">XL (240px)</SelectItem>
+                            <SelectItem value="2xl">2XL (280px)</SelectItem>
                             <SelectItem value="full">Volle Breite</SelectItem>
                           </SelectContent>
                         </Select>
@@ -782,9 +788,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
                             <SelectItem value="auto">Auto</SelectItem>
-                            <SelectItem value="small">Schmal (120px)</SelectItem>
-                            <SelectItem value="medium">Mittel (180px)</SelectItem>
-                            <SelectItem value="large">Breit (240px)</SelectItem>
+                            <SelectItem value="xs">XS (80px)</SelectItem>
+                            <SelectItem value="small">S (120px)</SelectItem>
+                            <SelectItem value="medium">M (160px)</SelectItem>
+                            <SelectItem value="large">L (200px)</SelectItem>
+                            <SelectItem value="xl">XL (240px)</SelectItem>
+                            <SelectItem value="2xl">2XL (280px)</SelectItem>
                             <SelectItem value="full">Volle Breite</SelectItem>
                           </SelectContent>
                         </Select>
@@ -802,9 +811,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="small">Klein (28px)</SelectItem>
-                            <SelectItem value="medium">Mittel (36px)</SelectItem>
-                            <SelectItem value="large">Groß (44px)</SelectItem>
+                            <SelectItem value="xs">XS (24px)</SelectItem>
+                            <SelectItem value="small">S (28px)</SelectItem>
+                            <SelectItem value="medium">M (36px)</SelectItem>
+                            <SelectItem value="large">L (44px)</SelectItem>
+                            <SelectItem value="xl">XL (52px)</SelectItem>
+                            <SelectItem value="2xl">2XL (60px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -906,9 +918,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="bg-zinc-800 border-zinc-700">
-                              <SelectItem value="small">Klein (28px)</SelectItem>
-                              <SelectItem value="medium">Mittel (36px)</SelectItem>
-                              <SelectItem value="large">Groß (44px)</SelectItem>
+                              <SelectItem value="xs">XS (24px)</SelectItem>
+                              <SelectItem value="small">S (28px)</SelectItem>
+                              <SelectItem value="medium">M (36px)</SelectItem>
+                              <SelectItem value="large">L (44px)</SelectItem>
+                              <SelectItem value="xl">XL (52px)</SelectItem>
+                              <SelectItem value="2xl">2XL (60px)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -923,9 +938,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             </SelectTrigger>
                             <SelectContent className="bg-zinc-800 border-zinc-700">
                               <SelectItem value="auto">Auto</SelectItem>
-                              <SelectItem value="small">Schmal (120px)</SelectItem>
-                              <SelectItem value="medium">Mittel (180px)</SelectItem>
-                              <SelectItem value="large">Breit (240px)</SelectItem>
+                              <SelectItem value="xs">XS (80px)</SelectItem>
+                              <SelectItem value="small">S (120px)</SelectItem>
+                              <SelectItem value="medium">M (160px)</SelectItem>
+                              <SelectItem value="large">L (200px)</SelectItem>
+                              <SelectItem value="xl">XL (240px)</SelectItem>
+                              <SelectItem value="2xl">2XL (280px)</SelectItem>
                               <SelectItem value="full">Volle Breite</SelectItem>
                             </SelectContent>
                           </Select>
@@ -1156,9 +1174,12 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein (28px)</SelectItem>
-                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (36px)</SelectItem>
-                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß (44px)</SelectItem>
+                            <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (24px)</SelectItem>
+                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">S (28px)</SelectItem>
+                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">M (36px)</SelectItem>
+                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">L (44px)</SelectItem>
+                            <SelectItem value="xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XL (52px)</SelectItem>
+                            <SelectItem value="2xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">2XL (60px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1212,10 +1233,13 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                          <SelectItem value="auto" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Auto (Textbreite)</SelectItem>
-                          <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Schmal (120px)</SelectItem>
-                          <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (180px)</SelectItem>
-                          <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Breit (240px)</SelectItem>
+                          <SelectItem value="auto" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Auto</SelectItem>
+                          <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (80px)</SelectItem>
+                          <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">S (120px)</SelectItem>
+                          <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">M (160px)</SelectItem>
+                          <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">L (200px)</SelectItem>
+                          <SelectItem value="xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XL (240px)</SelectItem>
+                          <SelectItem value="2xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">2XL (280px)</SelectItem>
                           <SelectItem value="full" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Volle Breite</SelectItem>
                         </SelectContent>
                       </Select>

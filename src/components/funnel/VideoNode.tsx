@@ -155,12 +155,18 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     // Shared dimension helpers (used across button types)
     const getWidthClasses = (width: string) => {
       switch (width) {
+        case 'xs':
+          return 'w-[80px]';
         case 'small':
           return 'w-[120px]';
         case 'medium':
-          return 'w-[180px]';
+          return 'w-[160px]';
         case 'large':
+          return 'w-[200px]';
+        case 'xl':
           return 'w-[240px]';
+        case '2xl':
+          return 'w-[280px]';
         case 'full':
           return 'w-full';
         default:
@@ -170,11 +176,19 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
     const getHeightClasses = (height: string) => {
       switch (height) {
+        case 'xs':
+          return 'h-6 py-0.5';
         case 'small':
           return 'h-7 py-1';
+        case 'medium':
+          return 'h-9 py-2';
         case 'large':
           return 'h-11 py-2.5';
-        default: // medium
+        case 'xl':
+          return 'h-[52px] py-3';
+        case '2xl':
+          return 'h-[60px] py-3.5';
+        default:
           return 'h-9 py-2';
       }
     };
@@ -183,11 +197,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       switch (size) {
         case 'xs':
           return 'text-[10px]';
+        case 'small':
+          return 'text-xs';
         case 'medium':
           return 'text-sm';
         case 'large':
           return 'text-base';
-        default: // small
+        default:
           return 'text-xs';
       }
     };
