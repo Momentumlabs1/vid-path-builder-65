@@ -196,17 +196,17 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     const getWidthClasses = (width: string) => {
       switch (width) {
         case 'xs':
-          return 'w-[80px]';
+          return 'w-[60px]';
         case 'small':
-          return 'w-[120px]';
+          return 'w-[100px]';
         case 'medium':
-          return 'w-[160px]';
+          return 'w-[140px]';
         case 'large':
-          return 'w-[200px]';
+          return 'w-[180px]';
         case 'xl':
-          return 'w-[240px]';
+          return 'w-[220px]';
         case '2xl':
-          return 'w-[280px]';
+          return 'w-[260px]';
         case 'full':
           return 'w-full';
         default:
@@ -217,19 +217,19 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     const getHeightClasses = (height: string) => {
       switch (height) {
         case 'xs':
-          return 'h-6 py-0.5';
+          return 'h-5 py-0.5';
         case 'small':
-          return 'h-7 py-1';
+          return 'h-6 py-1';
         case 'medium':
-          return 'h-9 py-2';
+          return 'h-8 py-1.5';
         case 'large':
-          return 'h-11 py-2.5';
+          return 'h-10 py-2';
         case 'xl':
-          return 'h-[52px] py-3';
+          return 'h-12 py-2.5';
         case '2xl':
-          return 'h-[60px] py-3.5';
+          return 'h-14 py-3';
         default:
-          return 'h-9 py-2';
+          return 'h-8 py-1.5';
       }
     };
 
