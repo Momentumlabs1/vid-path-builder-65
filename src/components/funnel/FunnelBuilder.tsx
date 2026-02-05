@@ -27,7 +27,7 @@ import { VideoFunnelPreview } from './VideoFunnelPreview';
 import CustomEdge from './CustomEdge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users } from 'lucide-react';
+import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   placeNodeAvoidingOverlaps,
@@ -228,6 +228,59 @@ function FunnelBuilderInner() {
       toast({
         title: "❌ Fehler beim Speichern",
         description: "Funnel konnte nicht gespeichert werden. Versuchen Sie es erneut.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const publishFunnel = async () => {
+    let nameToSave = funnelName.trim();
+    
+    if (!nameToSave) {
+      nameToSave = `funnel-${Date.now()}`;
+      setFunnelName(nameToSave);
+    }
+
+    setSaving(true);
+    try {
+      const funnelStructure = {
+        nodes: nodes.map(node => ({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data
+        })),
+        edges: edges.map(edge => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: edge.type
+        }))
+      };
+
+      const { error } = await supabase
+        .from('funnels')
+        .upsert({
+          name: nameToSave,
+          structure: funnelStructure as any,
+          is_public: true,
+          user_id: null
+        });
+      
+      if (error) throw error;
+      setCurrentFunnelId(nameToSave);
+
+      toast({
+        title: "🚀 Veröffentlicht!",
+        description: `Funnel ist jetzt live unter: /embed/${nameToSave}`,
+      });
+    } catch (error) {
+      console.error('Error publishing funnel:', error);
+      toast({
+        title: "❌ Fehler beim Veröffentlichen",
+        description: "Funnel konnte nicht veröffentlicht werden.",
         variant: "destructive",
       });
     } finally {
@@ -437,6 +490,16 @@ function FunnelBuilderInner() {
           >
             <Copy className="w-4 h-4 mr-2" />
             URL kopieren
+          </Button>
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={publishFunnel}
+            disabled={saving}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Globe className="w-4 h-4 mr-2" />
+            {saving ? 'Veröffentlichen...' : 'Veröffentlichen'}
           </Button>
         </div>
       </div>
