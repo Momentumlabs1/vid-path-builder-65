@@ -1,75 +1,108 @@
 
-# Plan: "Unbekannter Node-Typ: start" Fehler beheben
 
-## Problem-Zusammenfassung
+# Plan: Smooth Video Transitions + Progress Bar + Gelbe Button-Farbe
 
-Der Funnel **"smart-trading-v6"** existiert und ist korrekt konfiguriert (is_public: true), aber:
+## Übersicht
 
-1. **Edges werden nicht geladen**: `EmbedViewer.tsx` und `FunnelViewer.tsx` laden nur `structure.nodes`, ignorieren aber `structure.edges`
-2. **Fehlende globale Variable**: `VideoFunnelPreview.tsx` erwartet Edges über `window.funnelEdges`, die nie gesetzt wird
-3. **Falscher Fallback**: Ohne Edges springt der Preview zum Start-Node statt zum ersten Video-Node
-4. **Kein Renderer für "start"**: Der `start` Node-Typ wird nicht gerendert, daher "Unbekannter Node-Typ"
+Du möchtest drei Verbesserungen:
+1. **Smoothere Übergänge** zwischen Videos
+2. **Video Progress Bar** oben, passend zur Videolänge und in der gleichen Farbe wie die Buttons
+3. **Gelb** als zusätzliche Button-Farbe
 
-## Technische Lösung
+## Technische Umsetzung
 
-### Datei 1: `src/pages/EmbedViewer.tsx`
+### 1. Smooth Video Transitions
 
-Edges aus der Struktur laden und global setzen:
+**Problem**: Beim Wechsel zwischen Videos gibt es einen kurzen "Flicker" weil das neue Video erst laden muss.
 
-```typescript
-// Nach dem Laden der Nodes (ca. Zeile 53)
-const loadedNodes = structure?.nodes || [];
-const loadedEdges = structure?.edges || [];
+**Lösung in `VideoFunnelPreview.tsx`**:
+- Crossfade-Animation beim Node-Wechsel implementieren
+- Das alte Video kurz ausblenden während das neue eingeblendet wird
+- CSS-Transition mit `opacity` und `transform` für einen eleganten Übergang
+- `preload="auto"` für schnelleres Laden
 
-// Edges global verfügbar machen für VideoFunnelPreview
-(window as any).funnelEdges = loadedEdges;
+**Neue CSS-Klassen in `index.css`**:
+```css
+.video-crossfade-enter {
+  animation: video-fade-in 0.5s ease-out forwards;
+}
+
+@keyframes video-fade-in {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
+}
 ```
 
-### Datei 2: `src/pages/FunnelViewer.tsx`
+### 2. Video Progress Bar
 
-Gleiche Änderung:
+**Implementation in `VideoNode.tsx`**:
+- Progress Bar am oberen Rand des Videos (während Preview)
+- Berechnung: `(currentTime / duration) * 100`
+- Farbe dynamisch basierend auf `data.buttonColor`
+- Höhe: 3px, abgerundete Ecken
+- Sanfte Animation beim Fortschritt
 
-```typescript
-// Nach dem Laden der Struktur (ca. Zeile 46)
-const structure = data.structure as any;
-setNodes(structure.nodes || []);
-
-// Edges global verfügbar machen
-(window as any).funnelEdges = structure.edges || [];
+```text
+┌────────────────────────────────────┐
+│ ████████████░░░░░░░░░░░ Progress   │  ← 3px hoch, Farbe = Button-Farbe
+│                                    │
+│          [VIDEO]                   │
+│                                    │
+│        [Button]                    │
+└────────────────────────────────────┘
 ```
 
-### Datei 3: `src/components/funnel/VideoFunnelPreview.tsx`
+**Farbzuordnung**:
+| Button Color | Progress Bar Color |
+|-------------|-------------------|
+| purple | bg-purple-500 |
+| blue | bg-blue-500 |
+| green | bg-green-500 |
+| orange | bg-orange-500 |
+| red | bg-red-500 |
+| white | bg-white |
+| yellow (NEU) | bg-yellow-500 |
 
-Start-Node überspringen und direkt zum verbundenen Video-Node navigieren:
+### 3. Gelb als Button-Farbe
 
+**Datei 1: `UniversalButton.tsx`**
+- TypeScript-Type erweitern: `'purple' | 'blue' | 'green' | 'orange' | 'red' | 'white' | 'yellow'`
+- Neue `colorClasses` für yellow:
 ```typescript
-// Verbesserte Logik in useEffect (ca. Zeile 36-78)
-// Wenn Start-Node gefunden UND Edges vorhanden:
-//   → Folge der ersten Edge zum verbundenen Node
-// Wenn Start-Node gefunden OHNE Edges:
-//   → Überspringe Start-Node, suche erstes Video
-// Fallback: Erstes Video oder erster nicht-start Node
+yellow: 'bg-yellow-500/30 border-yellow-400/50 text-white hover:bg-yellow-400/40 hover:border-yellow-300 shadow-lg shadow-yellow-500/25'
+```
+- Gradient-Variante für yellow hinzufügen
+
+**Datei 2: `NodePropertiesPanel.tsx`**
+- `<SelectItem value="yellow">Gelb</SelectItem>` an 4 Stellen hinzufügen:
+  1. Button-Farbe (Zeile ~540)
+  2. Submit-Button-Farbe (Zeile ~887)
+  3. Multiple Choice Button-Farbe (Zeile ~1123)
+  4. Rating Submit-Button-Farbe (falls vorhanden)
+
+**Datei 3: `index.css`**
+- Neue CSS-Klasse für Multiple Choice gelb:
+```css
+.mc-button-yellow {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(234, 179, 8, 0.2));
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+}
 ```
 
 ## Betroffene Dateien
 
 | Datei | Änderung |
 |-------|----------|
-| `src/pages/EmbedViewer.tsx` | Edges laden + `window.funnelEdges` setzen |
-| `src/pages/FunnelViewer.tsx` | Edges laden + `window.funnelEdges` setzen |
-| `src/components/funnel/VideoFunnelPreview.tsx` | Start-Node korrekt überspringen |
+| `src/components/funnel/VideoNode.tsx` | Progress Bar + video duration tracking + smoother transitions |
+| `src/components/funnel/VideoFunnelPreview.tsx` | Crossfade-Animation beim Node-Wechsel |
+| `src/components/funnel/UniversalButton.tsx` | Yellow color hinzufügen |
+| `src/components/funnel/NodePropertiesPanel.tsx` | "Gelb" zu allen Farb-Dropdowns |
+| `src/index.css` | Neue Animations-Klassen + .mc-button-yellow |
 
 ## Erwartetes Ergebnis
 
-Nach der Implementierung:
-- Der Funnel startet beim **ersten Video** (v1-begruessung), nicht beim Start-Node
-- Die Edge-Navigation funktioniert (z.B. "Erzähl mir mehr" → v2a-story)
-- Kein "Unbekannter Node-Typ" Fehler mehr
+1. **Transitions**: Videos faden smooth ineinander über (0.5s crossfade)
+2. **Progress Bar**: Zeigt Videofortschritt oben, passt sich der Button-Farbe an
+3. **Gelbe Buttons**: Verfügbar für alle Button-Typen im Builder
 
-## Funnel-Struktur Bestätigung
-
-Der Funnel `smart-trading-v6` enthält:
-- **55 Edges** (Verbindungen zwischen Nodes)
-- **Start-Node** → verbunden mit `v1-begruessung` (erstes Video)
-- **39+ Video-Nodes** mit korrekten Video-URLs
-- **Lead-Capture** und **End-Nodes** am Schluss
