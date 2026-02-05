@@ -1,128 +1,78 @@
 
 ## Ziel
-Zwei Probleme zuverlässig lösen:
-1) Änderungen am Funnel kommen auf der Website (Embed) nicht an (es bleibt “alt”).
-2) Progressbar im Video-Embed funktioniert nicht.
+Die Buttons sollen im Live-Embed “sauber ausgespielt” werden: Der schwarze/opacity Bereich (der Readability-Container) muss optisch zur tatsächlichen Button-Größe passen – ohne dass der Button optisch “über den Rand hinaus” skaliert.
 
----
+## Was du auf den Screenshots siehst (und warum das passiert)
+In deinem Funnel-Embed werden die Buttons **optisch skaliert/verschoben**, aber der Hintergrund-/Rand-Bereich richtet sich nach der **Layout-Größe** (nicht nach der optischen Transform-Größe).
 
-## Was ich im Code/Backend gefunden habe (harte Fakten)
-### 1) “Alt auf Website” ist sehr wahrscheinlich Caching + fehlende “Version/Updated”-Sichtbarkeit
-- Du bettest per **iFrame** ein.
-- Wenn du die **direkte Live-Embed-URL** öffnest, ist es ebenfalls “alt” → das ist nicht nur deine Website-Einbindung, sondern betrifft die Embed-Route selbst (sehr oft Browser/CDN Cache von `/embed/...` bzw. `index.html`).
-- Aktuell gibt es **keinen** sichtbaren “welche Version wurde geladen?”-Hinweis im Embed, dadurch wirkt es wie “er speichert nicht”, auch wenn Daten/Code ggf. schon anders sind.
+Konkret passieren aktuell zwei Dinge gleichzeitig:
 
-### 2) Progressbar: Video läuft im Embed nicht zuverlässig an → timeupdate feuert nicht → Progress bleibt 0
-In `src/components/funnel/VideoNode.tsx`:
-- `muted={!isPreview}` und `autoPlay={!isPreview}`
-- Im Embed ist `isPreview: true` (kommt aus `VideoFunnelPreview`)
-- Ergebnis: **im Embed ist das Video nicht muted und nicht autoplay**  
-  Browser blocken Autoplay mit Audio, und da das Video außerdem `pointer-events-none` + `controls={false}` hat, kann der Nutzer nicht sauber starten → dadurch läuft das Video nicht → Progressbar bleibt stehen.
+1) **`button-float` Animation skaliert den Button via `transform: ... scale(1.02)`**
+- Das ist in `src/index.css` definiert:
+  - `.button-float { animation: button-float ... }`
+  - `@keyframes button-float { ... scale(1.02) }`
+- Wichtig: `transform: scale(...)` macht den Button **visuell größer**, aber die “Box”, nach der sich andere Elemente ausrichten, bleibt gleich.
+- Ergebnis: Der Button wirkt “zu groß” für den opacity Rand/Container.
 
-Das ist sehr wahrscheinlich der Hauptgrund, warum die Progressbar “nicht funktioniert”.
+2) **Der schwarze/opacity Hintergrund nutzt eine fixe Erweiterung `-m-4`**
+- In `src/components/funnel/VideoNode.tsx` liegt hinter den Buttons ein Background-Overlay:
+  - `absolute inset-0 ... -m-4 ...`
+- Diese 16px “Puffer” sind fix und wirken bei größeren Buttons/Layouts proportional zu klein.
 
----
+Das ist genau der Effekt “Rand ist zu klein skaliert”, auch wenn Button + Hintergrund für sich “richtig” aussehen.
 
-## Lösung-Design (robust, damit du nicht mehr raten musst)
-Wir machen drei Dinge:
+## Lösung (robust, ohne Rumprobieren)
+Wir machen zwei gezielte Anpassungen:
 
-### A) “Immer neu laden” für Embeds (Cache-Busting)
-Damit alte Cached-Versionen nicht hängen bleiben:
-1. **EmbedCodeGenerator**: iFrame-Code bekommt automatisch einen `v=` Parameter (z.B. Timestamp oder Funnel-UpdatedAt), z.B.  
-   `.../embed/smart-trading-v6?v=1700000000000`
-2. **public/embed.js** (für Leute die JS-Widget nutzen): `createIframe()` hängt ebenfalls automatisch `v=` an (oder nutzt `config.version`).
+### A) Button darf nicht per Transform “größer” werden, wenn daneben ein fester Background sitzt
+Option 1 (empfohlen): **`button-float` so ändern, dass er NICHT skaliert**
+- Behalte nur das “Schweben” (translateY), entferne `scale(1.02)`.
+- Dadurch bleibt der Button optisch innerhalb seiner Layout-Box und der Rand passt.
 
-Zusätzlich:
-3. **EmbedViewer Debug-Overlay (optional per `?debug=1`)**: zeigt rechts oben:
-   - funnel name
-   - loaded `updated_at`
-   - node/edge count  
-   Damit ist sofort klar: “Welche Version sehe ich gerade?”
+Option 2: `button-float` ganz entfernen (auch möglich, wenn du lieber “statisch” willst)
 
-### B) Backend/DB: “updated_at” muss verlässlich mitlaufen + Upsert stabilisieren
-Aktuell gibt es eine DB-Funktion `update_updated_at_column()`, aber **keinen Trigger**.
-Wir ergänzen:
-1. Trigger auf `funnels`, damit `updated_at` bei jedem Update automatisch korrekt ist.
-2. Optional aber sehr empfohlen: **Unique-Constraint/Index** auf `funnels.name`, damit Upsert/Update nie in komische Zustände laufen kann und wir uns auf “genau 1 Funnel pro Name” verlassen können.
+Zusätzlich: In `UniversalButton` die **Hover/Active-Scale** Effekte reduzieren/entfernen (z.B. `hover:scale-105`, `active:scale-95`), weil sie denselben “Button wächst, Background nicht”-Effekt erzeugen können (besonders beim Hover am Desktop).
 
-Warum das hilft:
-- `updated_at` ist dann die echte “Version”. Perfekt für Cache-Busting und Debug.
-- Unique auf `name` verhindert doppelte Records (die später “alt” wirken können, je nachdem welcher zuerst gelesen wird).
+### B) Background/Rand nicht mit `absolute + -m-4`, sondern als “echter Container” mit Padding
+In `VideoNode.tsx` ersetzen wir das Overlay-Prinzip durch einen Container, der automatisch mit dem Inhalt skaliert:
+- Statt:
+  - Background als `absolute inset-0 -m-4`
+- Neu:
+  - Eine “Card” um die Interaktionen: `relative rounded-2xl p-4 (oder p-5/p-6 je nach Bedarf) bg-gradient-...`
+  - Innen drin erst die Buttons/Inputs
+- Vorteil: Egal ob 1 Button, 5 Buttons, Grid-Layout, 260px Breite – der Background passt immer.
 
-### C) Video/Progressbar fix (Autoplay-kompatibel, mit Unmute)
-1. Im Embed/Preview-Mode:
-   - `autoPlay` muss **true** sein
-   - `muted` muss initial **true** sein (sonst blockt der Browser)
-   - Danach bieten wir einen kleinen “Ton an”-Button (Unmute) an, wenn der User tippt/klickt.
-2. Progressbar-Update nicht nur über `timeupdate`, sondern zusätzlich:
-   - `loadedmetadata` / `durationchange` setzt Duration
-   - `timeupdate` + optional `requestAnimationFrame` fallback während “playing”
-3. `pointer-events-none` am Video im Preview entfernen oder mindestens einen Overlay-Play/Unmute CTA hinzufügen, damit es auf Mobile sicher startet.
+## Konkrete Änderungen (Dateien)
+### 1) `src/index.css`
+- `@keyframes button-float` anpassen:
+  - `scale(1.02)` entfernen
+  - optional: translate etwas reduzieren (z.B. -4px statt -6px), damit es ruhiger ist
 
----
+### 2) `src/components/funnel/UniversalButton.tsx`
+- Transform-basierte Scale-Effekte entschärfen:
+  - `hover:scale-105` entfernen
+  - `active:scale-95` entfernen (oder durch reine Schatten/Color-Änderung ersetzen)
+- Optional (falls du Animation behalten willst): `button-float` als optionalen Modus implementieren (Prop), damit man im Builder “show-off” haben kann, aber im Embed “sauber”.
 
-## Konkrete Umsetzungsschritte (Dateien + Änderungen)
-### 1) Datenbank-Migration (Lovable Cloud)
-- Trigger für `updated_at` auf `public.funnels`
-- Unique constraint/index auf `public.funnels(name)` (wenn noch nicht vorhanden)
+### 3) `src/components/funnel/VideoNode.tsx`
+- Für `button`, `multipleChoice`, `text/email`, `rating`:
+  - Entferne das `absolute ... -m-4` Background-Div
+  - Baue einen Wrapper:
+    - `div` mit `relative`, `rounded-2xl`, `p-4/p-5/p-6`, `backdrop-blur`, und dem passenden `bg-gradient-to-*` abhängig von Position
+  - Der Wrapper umschließt die Interaktionen (Buttons/Inputs) vollständig.
 
-SQL (Konzept):
-- `create trigger set_timestamp before update on public.funnels for each row execute function public.update_updated_at_column();`
-- `create unique index if not exists funnels_name_unique on public.funnels(name);`
-
-### 2) EmbedViewer: Debug + “Version” laden
-Datei: `src/pages/EmbedViewer.tsx`
-- Query erweitert: `select('structure, is_public, updated_at')`
-- State: `updatedAt`
-- Wenn URL `?debug=1`: kleines Overlay rendern mit `updatedAt`, nodes/edges count
-
-### 3) Cache-Busting in Embed Codes (wichtig für iFrame)
-Datei: `src/components/funnel/EmbedCodeGenerator.tsx`
-- iFrame URL: immer `v=` anhängen (z.B. `Date.now()` oder später `updated_at` aus Builder)
-- Optional: Toggle “Cache-Busting aktiv” im UI
-
-### 4) Cache-Busting im JS-Widget
-Datei: `public/embed.js`
-- In `createIframe()`:
-  - `params.append('v', config.version || Date.now())` (ohne etwas kaputt zu machen)
-- Damit werden auch JS-Embeds automatisch “frisch” geladen.
-
-### 5) Video/Progressbar Fix
-Datei: `src/components/funnel/VideoNode.tsx`
-- Video props im Preview:
-  - `muted={true}` (initial)
-  - `autoPlay={true}`
-  - `playsInline` beibehalten
-- Fortschritt:
-  - Duration in `onLoadedMetadata`/`onDurationChange` setzen
-  - `timeupdate` bleibt, aber nicht ausschließlich davon abhängig sein
-- Optional UI:
-  - kleiner “Ton an”-Button (setzt `video.muted=false` nach User-Interaktion)
-  - wenn Play fehlschlägt: Overlay “Tippe zum Starten”
-
----
-
-## Testplan (End-to-End, ohne Ratespiel)
-1. Im Builder: Funnel veröffentlichen.
-2. Direkt öffnen:
-   - `https://.../embed/smart-trading-v6?debug=1&v=123`
-   - Prüfen, ob Overlay `updated_at` aktuell ist und Button-Design stimmt.
-3. Deine Website iFrame aktualisieren:
-   - iFrame `src` um `?v=...` ergänzen (oder neuen Code aus Generator kopieren).
-4. Progressbar:
-   - Embed auf Mobile + Desktop testen
-   - Prüfen: Video startet (muted) automatisch, Progressbar läuft
-   - Ton optional per Klick aktivierbar
-
----
-
-## Risiken / Edge Cases
-- Falls du aktuell auf deiner Website ein fixes iFrame ohne `v=` nutzt, kann der Browser die Seite sehr aggressiv cachen. Cache-Busting löst das dauerhaft.
-- Autoplay mit Ton ist auf iOS/Chrome fast immer blockiert. Muted-Autoplay + Unmute-Button ist der Standard-Fix.
-
----
+## Testplan (schnell & eindeutig)
+1) Direkt im Live-Embed öffnen (mit Cache-Bust):
+   - `/embed/<dein-funnel>?v=123`
+2) Beobachten:
+   - Der opacity Rand bleibt immer “größer” als die Buttons
+   - Kein Moment mehr, wo Buttons optisch über den Rand hinauswachsen (auch nicht “pulsierend”)
+3) Desktop: über Buttons hovern / klicken:
+   - Keine Skalierung, die den Rand “sprengt”
+4) Mobile:
+   - Layout stabil, keine abgeschnittenen Ränder
 
 ## Ergebnis
-- Funnel-Änderungen erscheinen zuverlässig, auch bei aggressivem Cache.
-- Du kannst jederzeit sehen, welche Version/`updated_at` du im Embed wirklich lädst.
-- Video startet im Embed stabil, Progressbar funktioniert sauber.
+- Buttons und Background sind visuell 1:1 “gekoppelt”
+- Kein “Rand ist zu klein skaliert” mehr
+- Live-Embed wirkt konsistent und professionell, unabhängig von Button-Größen/Layouts
