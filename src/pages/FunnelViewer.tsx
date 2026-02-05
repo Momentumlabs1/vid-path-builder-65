@@ -45,6 +45,10 @@ const FunnelViewer = () => {
         if (data?.structure && typeof data.structure === 'object') {
           const structure = data.structure as any;
           setNodes(structure.nodes || []);
+          
+          // Make edges globally available for VideoFunnelPreview
+          (window as any).funnelEdges = structure.edges || [];
+          console.log('Loaded edges for funnel:', (structure.edges || []).length);
         } else {
           setError('Funnel wurde nicht gefunden. Überprüfen Sie die URL.');
         }
