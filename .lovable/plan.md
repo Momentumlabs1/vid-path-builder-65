@@ -1,108 +1,131 @@
 
+# Plan: Veröffentlichen-Button im FunnelBuilder hinzufügen
 
-# Plan: Smooth Video Transitions + Progress Bar + Gelbe Button-Farbe
+## Problem-Zusammenfassung
 
-## Übersicht
+Der Builder hat nur einen "Speichern"-Button, aber keinen "Veröffentlichen"-Button. Das führt dazu, dass:
+1. Änderungen gespeichert werden (in die Datenbank)
+2. ABER der Funnel bleibt auf "privat" (`is_public: false`)
+3. Der EmbedViewer lädt nur öffentliche Funnels (`is_public: true`)
+4. Externe Websites sehen daher keine Änderungen
 
-Du möchtest drei Verbesserungen:
-1. **Smoothere Übergänge** zwischen Videos
-2. **Video Progress Bar** oben, passend zur Videolänge und in der gleichen Farbe wie die Buttons
-3. **Gelb** als zusätzliche Button-Farbe
+## Lösung
 
-## Technische Umsetzung
+### Neue "Veröffentlichen"-Funktion im FunnelBuilder
 
-### 1. Smooth Video Transitions
+**Datei: `src/components/funnel/FunnelBuilder.tsx`**
 
-**Problem**: Beim Wechsel zwischen Videos gibt es einen kurzen "Flicker" weil das neue Video erst laden muss.
+1. **Neuer Button "Veröffentlichen"** neben dem Speichern-Button
+2. Die Funktion `publishFunnel` wird:
+   - Den Funnel speichern (structure update)
+   - `is_public: true` setzen
+   - Erfolgsmeldung mit der öffentlichen URL anzeigen
 
-**Lösung in `VideoFunnelPreview.tsx`**:
-- Crossfade-Animation beim Node-Wechsel implementieren
-- Das alte Video kurz ausblenden während das neue eingeblendet wird
-- CSS-Transition mit `opacity` und `transform` für einen eleganten Übergang
-- `preload="auto"` für schnelleres Laden
-
-**Neue CSS-Klassen in `index.css`**:
-```css
-.video-crossfade-enter {
-  animation: video-fade-in 0.5s ease-out forwards;
-}
-
-@keyframes video-fade-in {
-  from { opacity: 0; transform: scale(1.02); }
-  to { opacity: 1; transform: scale(1); }
-}
-```
-
-### 2. Video Progress Bar
-
-**Implementation in `VideoNode.tsx`**:
-- Progress Bar am oberen Rand des Videos (während Preview)
-- Berechnung: `(currentTime / duration) * 100`
-- Farbe dynamisch basierend auf `data.buttonColor`
-- Höhe: 3px, abgerundete Ecken
-- Sanfte Animation beim Fortschritt
-
-```text
-┌────────────────────────────────────┐
-│ ████████████░░░░░░░░░░░ Progress   │  ← 3px hoch, Farbe = Button-Farbe
-│                                    │
-│          [VIDEO]                   │
-│                                    │
-│        [Button]                    │
-└────────────────────────────────────┘
-```
-
-**Farbzuordnung**:
-| Button Color | Progress Bar Color |
-|-------------|-------------------|
-| purple | bg-purple-500 |
-| blue | bg-blue-500 |
-| green | bg-green-500 |
-| orange | bg-orange-500 |
-| red | bg-red-500 |
-| white | bg-white |
-| yellow (NEU) | bg-yellow-500 |
-
-### 3. Gelb als Button-Farbe
-
-**Datei 1: `UniversalButton.tsx`**
-- TypeScript-Type erweitern: `'purple' | 'blue' | 'green' | 'orange' | 'red' | 'white' | 'yellow'`
-- Neue `colorClasses` für yellow:
 ```typescript
-yellow: 'bg-yellow-500/30 border-yellow-400/50 text-white hover:bg-yellow-400/40 hover:border-yellow-300 shadow-lg shadow-yellow-500/25'
-```
-- Gradient-Variante für yellow hinzufügen
+const publishFunnel = async () => {
+  let nameToSave = funnelName.trim();
+  
+  if (!nameToSave) {
+    nameToSave = `funnel-${Date.now()}`;
+    setFunnelName(nameToSave);
+  }
 
-**Datei 2: `NodePropertiesPanel.tsx`**
-- `<SelectItem value="yellow">Gelb</SelectItem>` an 4 Stellen hinzufügen:
-  1. Button-Farbe (Zeile ~540)
-  2. Submit-Button-Farbe (Zeile ~887)
-  3. Multiple Choice Button-Farbe (Zeile ~1123)
-  4. Rating Submit-Button-Farbe (falls vorhanden)
+  setSaving(true);
+  try {
+    const funnelStructure = {
+      nodes: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: node.data
+      })),
+      edges: edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type
+      }))
+    };
 
-**Datei 3: `index.css`**
-- Neue CSS-Klasse für Multiple Choice gelb:
-```css
-.mc-button-yellow {
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(234, 179, 8, 0.2));
-  border: 1px solid rgba(234, 179, 8, 0.4);
-  color: rgba(255, 255, 255, 0.95);
-}
+    // Upsert mit is_public: true
+    const { error } = await supabase
+      .from('funnels')
+      .upsert({
+        name: nameToSave,
+        structure: funnelStructure as any,
+        is_public: true,
+        user_id: null
+      });
+    
+    if (error) throw error;
+    setCurrentFunnelId(nameToSave);
+
+    toast({
+      title: "🚀 Veröffentlicht!",
+      description: `Funnel ist jetzt live unter: /embed/${nameToSave}`,
+    });
+  } catch (error) {
+    console.error('Error publishing funnel:', error);
+    toast({
+      title: "❌ Fehler beim Veröffentlichen",
+      description: "Funnel konnte nicht veröffentlicht werden.",
+      variant: "destructive",
+    });
+  } finally {
+    setSaving(false);
+  }
+};
 ```
+
+3. **Neuer Button im Header** (nach "URL kopieren"):
+
+```typescript
+<Button 
+  variant="default" 
+  size="sm" 
+  onClick={publishFunnel}
+  disabled={saving}
+  className="bg-green-600 hover:bg-green-700 text-white"
+>
+  <Globe className="w-4 h-4 mr-2" />
+  {saving ? 'Veröffentlichen...' : 'Veröffentlichen'}
+</Button>
+```
+
+4. **Import hinzufügen**: `Globe` von lucide-react
 
 ## Betroffene Dateien
 
 | Datei | Änderung |
 |-------|----------|
-| `src/components/funnel/VideoNode.tsx` | Progress Bar + video duration tracking + smoother transitions |
-| `src/components/funnel/VideoFunnelPreview.tsx` | Crossfade-Animation beim Node-Wechsel |
-| `src/components/funnel/UniversalButton.tsx` | Yellow color hinzufügen |
-| `src/components/funnel/NodePropertiesPanel.tsx` | "Gelb" zu allen Farb-Dropdowns |
-| `src/index.css` | Neue Animations-Klassen + .mc-button-yellow |
+| `src/components/funnel/FunnelBuilder.tsx` | Neue `publishFunnel` Funktion + Button |
 
 ## Erwartetes Ergebnis
 
-1. **Transitions**: Videos faden smooth ineinander über (0.5s crossfade)
-2. **Progress Bar**: Zeigt Videofortschritt oben, passt sich der Button-Farbe an
-3. **Gelbe Buttons**: Verfügbar für alle Button-Typen im Builder
+Nach der Implementierung:
+- **Speichern**: Speichert nur die Struktur (bleibt privat oder behält aktuellen Status)
+- **Veröffentlichen**: Speichert die Struktur UND setzt `is_public: true`
+- Externe Websites sehen sofort die Änderungen nach dem Klick auf "Veröffentlichen"
 
+## Workflow für Benutzer
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                      FunnelBuilder Header                    │
+├─────────────────────────────────────────────────────────────┤
+│ [Dashboard] [Funnel Name...] [● Gespeichert]                │
+│                                                              │
+│         [Speichern] [Vorschau] [URL kopieren] [Veröffentlichen] │
+│                                              ↑               │
+│                                              │               │
+│                                    NEU: Grüner Button        │
+│                                    → Speichert + is_public   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Hinweis: Lovable "Publish" vs. Funnel "Veröffentlichen"
+
+- **Lovable Publish** (oben rechts): Deployed den CODE auf die Production-URL
+- **Funnel Veröffentlichen** (im Builder): Setzt `is_public: true` in der DATENBANK
+
+Beide sind unabhängig voneinander. Die Datenbank wird automatisch synchronisiert - du musst nur den Funnel im Builder veröffentlichen.
