@@ -190,19 +190,6 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
     const containerClasses = `absolute ${getPositionClasses(buttonPosition)} z-50 pointer-events-auto`;
 
-    // Shared: readability gradient based on 9-position
-    const getReadabilityGradient = (position: string) => {
-      return position.includes('bottom')
-        ? 'bg-gradient-to-t from-black/80 via-black/40 to-transparent'
-        : position.includes('top')
-          ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent'
-          : position.includes('left')
-            ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent'
-            : position.includes('right')
-              ? 'bg-gradient-to-l from-black/80 via-black/40 to-transparent'
-              : 'bg-gradient-to-t from-black/80 via-black/40 to-transparent';
-    };
-
     // Shared dimension helpers (used across button types)
     // IMPORTANT: In Builder the node container is ~240px wide. In Preview/Embed it's much larger.
     // If we keep fixed px widths everywhere, buttons look "zu klein" in Preview/Live.
@@ -250,7 +237,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       }
     };
 
-    const getWidthClasses = (width: string) => (isPreview ? getWidthClassesPreview(width) : getWidthClassesBuilder(width));
+    const getWidthClasses = (width: string) =>
+      isPreview ? getWidthClassesPreview(width) : getWidthClassesBuilder(width);
 
     const getHeightClasses = (height: string) => {
       switch (height) {
@@ -297,13 +285,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const widthClass = getWidthClasses(buttonWidth);
         const heightClass = getHeightClasses(buttonHeight);
         const textSizeClass = getTextSizeClasses(buttonTextSize);
-        
-        const readabilityPadding = isPreview ? 'p-5' : 'p-4';
 
         return (
-          <div className={`${containerClasses} transition-all duration-500 ease-out ${
-            showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          } rounded-2xl ${readabilityPadding} backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+          <div
+            className={`${containerClasses} transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             <UniversalButton
               text={(data.buttonText as string) || 'Weiter'}
               color={buttonColor as any}
@@ -323,7 +311,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const mcTextSize = (data.mcTextSize as string) || 'small';
         const mcLayout = (data.mcLayout as string) || 'vertical';
         const mcButtonWidth = (data.mcButtonWidth as string) || 'auto';
-        
+
         // Layout classes
         const getLayoutClasses = (layout: string) => {
           switch (layout) {
@@ -335,13 +323,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               return 'space-y-2';
           }
         };
-        
-        const readabilityPadding = isPreview ? 'p-5' : 'p-4';
 
         return (
-          <div className={`absolute ${getPositionClasses(mcPosition)} z-50 pointer-events-auto transition-all duration-500 ease-out ${
-            showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          } rounded-2xl ${readabilityPadding} backdrop-blur-sm ${getReadabilityGradient(mcPosition)}`}>
+          <div
+            className={`absolute ${getPositionClasses(mcPosition)} z-50 pointer-events-auto transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             <div className={getLayoutClasses(mcLayout)}>
               {answers.map((answer: string, index: number) => {
                 const color = (data[`mcColor_${index}`] as string) || 'purple';
@@ -358,7 +346,9 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                     style={style as any}
                     size="small"
                     onClick={() => handleAnswerClick(index, 'multipleChoice')}
-                    className={`${widthClass} ${heightClass} ${textSizeClass} ${mcLayout === 'horizontal' && mcButtonWidth === 'auto' ? 'flex-1' : ''}`}
+                    className={`${widthClass} ${heightClass} ${textSizeClass} ${
+                      mcLayout === 'horizontal' && mcButtonWidth === 'auto' ? 'flex-1' : ''
+                    }`}
                   />
                 );
               })}
@@ -380,15 +370,16 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const submitWidthClass = getWidthClasses(submitButtonWidth);
         const submitHeightClass = getHeightClasses(submitButtonHeight);
         const submitTextSizeClass = getTextSizeClasses(submitButtonTextSize);
-        
-        const readabilityPadding = isPreview ? 'p-5' : 'p-4';
+
         const formWidthClass = isPreview ? 'max-w-[min(92vw,400px)]' : 'max-w-xs';
 
         return (
-          <div className={`${containerClasses} transition-all duration-500 ease-out ${
-            showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          } rounded-2xl ${readabilityPadding} backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
-            <div className={`space-y-2 w-full ${formWidthClass}`}>
+          <div
+            className={`${containerClasses} transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            <div className={`space-y-2 w-full ${formWidthClass}`}> 
               <input
                 type={data.answerType === 'email' ? 'email' : 'text'}
                 placeholder={(data.placeholder as string) || 'Hier eingeben...'}
@@ -415,13 +406,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const ratingSubmitColor = (data.ratingSubmitColor as string) || 'purple';
         const ratingSubmitStyle = (data.ratingSubmitStyle as string) || 'glassmorphism';
         const ratingSubmitText = (data.ratingSubmitText as string) || 'Bewertung abgeben';
-        
-        const readabilityPadding = isPreview ? 'p-5' : 'p-4';
 
         return (
-          <div className={`${containerClasses} transition-all duration-500 ease-out ${
-            showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          } rounded-2xl ${readabilityPadding} backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+          <div
+            className={`${containerClasses} transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             <div className="space-y-4">
               <div className="flex justify-center space-x-2">
                 {Array.from({ length: maxRating }, (_, i) => i + 1).map((star) => (
@@ -458,11 +449,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const fallbackColor = (data.buttonColor as string) || 'purple';
         const fallbackStyle = (data.buttonStyle as string) || 'glassmorphism';
         const fallbackSize = (data.buttonSize as string) || 'medium';
-        
+
         return (
-          <div className={`${containerClasses} transition-all duration-500 ease-out ${
-            showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+          <div
+            className={`${containerClasses} transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
             <UniversalButton
               text={(data.buttonText as string) || 'Weiter'}
               color={fallbackColor as any}
