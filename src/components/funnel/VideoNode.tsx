@@ -187,10 +187,21 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     if (isPreview && !showButtons) return null;
 
     const buttonPosition = (data.buttonPosition as string) || 'bottom-center';
-    const buttonStyle = (data.buttonStyle as string) || 'glassmorphism';
-    
 
     const containerClasses = `absolute ${getPositionClasses(buttonPosition)} z-50 pointer-events-auto`;
+
+    // Shared: readability gradient based on 9-position
+    const getReadabilityGradient = (position: string) => {
+      return position.includes('bottom')
+        ? 'bg-gradient-to-t from-black/80 via-black/40 to-transparent'
+        : position.includes('top')
+          ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent'
+          : position.includes('left')
+            ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent'
+            : position.includes('right')
+              ? 'bg-gradient-to-l from-black/80 via-black/40 to-transparent'
+              : 'bg-gradient-to-t from-black/80 via-black/40 to-transparent';
+    };
 
     // Shared dimension helpers (used across button types)
     const getWidthClasses = (width: string) => {
@@ -263,25 +274,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
             showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            {/* Dynamic Gradient Background for better readability */}
-            <div className={`absolute inset-0 rounded-xl -m-4 pointer-events-none ${
-              buttonPosition.includes('bottom') ? 'bg-gradient-to-t from-black/80 via-black/40 to-transparent' :
-              buttonPosition.includes('top') ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent' :
-              buttonPosition.includes('left') ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent' :
-              buttonPosition.includes('right') ? 'bg-gradient-to-l from-black/80 via-black/40 to-transparent' :
-              'bg-gradient-to-t from-black/80 via-black/40 to-transparent'
-            }`}></div>
-            <div className="relative z-10">
-              <UniversalButton
-                text={(data.buttonText as string) || 'Weiter'}
-                color={buttonColor as any}
-                style={buttonStyle as any}
-                size="small"
-                onClick={() => handleAnswerClick('clicked', 'button')}
-                className={`${widthClass} ${heightClass} ${textSizeClass}`}
-              />
-            </div>
+          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+            <UniversalButton
+              text={(data.buttonText as string) || 'Weiter'}
+              color={buttonColor as any}
+              style={buttonStyle as any}
+              size="small"
+              onClick={() => handleAnswerClick('clicked', 'button')}
+              className={`${widthClass} ${heightClass} ${textSizeClass}`}
+            />
           </div>
         );
 
@@ -308,23 +309,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         return (
           <div className={`absolute ${getPositionClasses(mcPosition)} z-50 pointer-events-auto transition-all duration-500 ease-out ${
             showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            {/* Dynamic Gradient Background for better readability */}
-            <div className={`absolute inset-0 rounded-xl -m-4 pointer-events-none ${
-              mcPosition.includes('bottom') ? 'bg-gradient-to-t from-black/80 via-black/40 to-transparent' :
-              mcPosition.includes('top') ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent' :
-              mcPosition.includes('left') ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent' :
-              mcPosition.includes('right') ? 'bg-gradient-to-l from-black/80 via-black/40 to-transparent' :
-              'bg-gradient-to-t from-black/80 via-black/40 to-transparent'
-            }`}></div>
-            <div className={`relative z-10 ${getLayoutClasses(mcLayout)}`}>
+          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(mcPosition)}`}>
+            <div className={getLayoutClasses(mcLayout)}>
               {answers.map((answer: string, index: number) => {
                 const color = (data[`mcColor_${index}`] as string) || 'purple';
                 const style = (data[`mcStyle_${index}`] as string) || 'glassmorphism';
                 const widthClass = getWidthClasses(mcButtonWidth);
                 const heightClass = getHeightClasses(mcButtonHeight);
                 const textSizeClass = getTextSizeClasses(mcTextSize);
-                
+
                 return (
                   <UniversalButton
                     key={index}
@@ -358,10 +351,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
             showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            {/* Gradient Background for better readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-xl -m-4 pointer-events-none"></div>
-            <div className="relative z-10 space-y-2 w-full max-w-xs">
+          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+            <div className="space-y-2 w-full max-w-xs">
               <input
                 type={data.answerType === 'email' ? 'email' : 'text'}
                 placeholder={(data.placeholder as string) || 'Hier eingeben...'}
@@ -391,10 +382,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
             showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            {/* Gradient Background for better readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-xl -m-4 pointer-events-none"></div>
-            <div className="relative z-10 space-y-4">
+          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+            <div className="space-y-4">
               <div className="flex justify-center space-x-2">
                 {Array.from({ length: maxRating }, (_, i) => i + 1).map((star) => (
                   <button
@@ -433,18 +422,14 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         return (
           <div className={`${containerClasses} transition-all duration-500 ease-out ${
             showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            {/* Gradient Background for better readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-xl -m-4 pointer-events-none"></div>
-            <div className="relative z-10">
-              <UniversalButton
-                text={(data.buttonText as string) || 'Weiter'}
-                color={fallbackColor as any}
-                style={fallbackStyle as any}
-                size={fallbackSize as any}
-                onClick={() => handleAnswerClick('clicked', 'button')}
-              />
-            </div>
+          } rounded-2xl p-4 backdrop-blur-sm ${getReadabilityGradient(buttonPosition)}`}>
+            <UniversalButton
+              text={(data.buttonText as string) || 'Weiter'}
+              color={fallbackColor as any}
+              style={fallbackStyle as any}
+              size={fallbackSize as any}
+              onClick={() => handleAnswerClick('clicked', 'button')}
+            />
           </div>
         );
     }

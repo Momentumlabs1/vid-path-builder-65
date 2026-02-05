@@ -34,7 +34,9 @@ export const UniversalButton = memo(({
   
   // Get button classes based on color and style
   const getButtonClasses = (color: string, style: string) => {
-    const baseClasses = 'font-figtree font-semibold transition-all duration-500 hover:scale-105 hover:shadow-xl border-2 min-w-0 flex items-center justify-center rounded-xl backdrop-blur-md transform-gpu hover:-translate-y-1 active:scale-95 active:translate-y-0 button-float';
+    // IMPORTANT: Avoid scale() transforms here because they change the visual size
+    // without changing the layout box (causes mismatch with readability containers in embeds).
+    const baseClasses = 'font-figtree font-semibold transition-all duration-500 hover:shadow-xl border-2 min-w-0 flex items-center justify-center rounded-xl backdrop-blur-md transform-gpu hover:-translate-y-1 active:translate-y-0 button-float';
     
     // Color variations
     const colorClasses = {
