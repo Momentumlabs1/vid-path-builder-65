@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 interface UniversalButtonProps {
   text: string;
-  color: 'purple' | 'blue' | 'green' | 'orange' | 'red' | 'white';
+  color: 'purple' | 'blue' | 'green' | 'orange' | 'red' | 'white' | 'yellow';
   style: 'glassmorphism' | 'solid' | 'outline' | 'gradient';
   size: 'small' | 'medium' | 'large';
   onClick: () => void;
@@ -43,7 +43,8 @@ export const UniversalButton = memo(({
       green: 'bg-green-600/30 border-green-400/50 text-white hover:bg-green-500/40 hover:border-green-300 shadow-lg shadow-green-500/25',
       orange: 'bg-orange-600/30 border-orange-400/50 text-white hover:bg-orange-500/40 hover:border-orange-300 shadow-lg shadow-orange-500/25',
       red: 'bg-red-600/30 border-red-400/50 text-white hover:bg-red-500/40 hover:border-red-300 shadow-lg shadow-red-500/25',
-      white: 'bg-white/20 border-white/50 text-white hover:bg-white/30 hover:border-white/70 shadow-lg shadow-white/25'
+      white: 'bg-white/20 border-white/50 text-white hover:bg-white/30 hover:border-white/70 shadow-lg shadow-white/25',
+      yellow: 'bg-yellow-500/30 border-yellow-400/50 text-white hover:bg-yellow-400/40 hover:border-yellow-300 shadow-lg shadow-yellow-500/25'
     };
     
     // Style modifications
@@ -63,7 +64,8 @@ export const UniversalButton = memo(({
           green: 'bg-gradient-to-r from-green-600/40 to-green-500/60',
           orange: 'bg-gradient-to-r from-orange-600/40 to-orange-500/60',
           red: 'bg-gradient-to-r from-red-600/40 to-red-500/60',
-          white: 'bg-gradient-to-r from-white/40 to-white/60'
+          white: 'bg-gradient-to-r from-white/40 to-white/60',
+          yellow: 'bg-gradient-to-r from-yellow-500/40 to-yellow-400/60'
         };
         finalClasses = finalClasses.replace(/bg-\w+-\d+\/\d+/, gradientColors[color as keyof typeof gradientColors] || gradientColors.purple);
         break;

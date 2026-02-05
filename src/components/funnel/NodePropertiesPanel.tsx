@@ -538,6 +538,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectItem value="orange">Orange</SelectItem>
                         <SelectItem value="red">Rot</SelectItem>
                         <SelectItem value="white">Weiß</SelectItem>
+                        <SelectItem value="yellow">Gelb</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -694,6 +695,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectItem value="orange">Orange</SelectItem>
                             <SelectItem value="red">Rot</SelectItem>
                             <SelectItem value="white">Weiß</SelectItem>
+                            <SelectItem value="yellow">Gelb</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -736,6 +738,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectItem value="orange">Orange</SelectItem>
                             <SelectItem value="red">Rot</SelectItem>
                             <SelectItem value="white">Weiß</SelectItem>
+                            <SelectItem value="yellow">Gelb</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -885,6 +888,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                               <SelectItem value="orange">Orange</SelectItem>
                               <SelectItem value="red">Rot</SelectItem>
                               <SelectItem value="white">Weiß</SelectItem>
+                              <SelectItem value="yellow">Gelb</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1121,6 +1125,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                     <SelectItem value="orange">Orange</SelectItem>
                                     <SelectItem value="red">Rot</SelectItem>
                                     <SelectItem value="white">Weiß</SelectItem>
+                                    <SelectItem value="yellow">Gelb</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
