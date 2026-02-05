@@ -51,6 +51,11 @@ const EmbedViewer = () => {
         
         const structure = funnelData.structure;
         const loadedNodes = structure?.nodes || [];
+        const loadedEdges = structure?.edges || [];
+        
+        // Make edges globally available for VideoFunnelPreview
+        (window as any).funnelEdges = loadedEdges;
+        console.log('Loaded edges for funnel:', loadedEdges.length);
         
         // Inject URL parameters into lead capture nodes
         const enhancedNodes = loadedNodes.map((node: any) => {

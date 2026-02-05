@@ -55,16 +55,16 @@ export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) 
       }
     }
     
-    // Fallback 1: Direct start node if no edges
-    if (!initialNode && startNode) {
-      initialNode = startNode;
-      console.log('Using start node directly:', startNode);
-    }
-    
-    // Fallback 2: First video node
+    // Fallback 1: Skip start node, find first video node
     if (!initialNode) {
       initialNode = nodes.find(node => node.type === 'video');
       console.log('Fallback to first video node:', initialNode);
+    }
+    
+    // Fallback 2: First non-start node
+    if (!initialNode) {
+      initialNode = nodes.find(node => node.type !== 'start');
+      console.log('Fallback to first non-start node:', initialNode);
     }
     
     // Final fallback: first node
