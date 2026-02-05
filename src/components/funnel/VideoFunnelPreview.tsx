@@ -15,6 +15,8 @@ interface VideoFunnelPreviewProps {
 
 export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) {
   const [currentNodeId, setCurrentNodeId] = useState<string>('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [nodeKey, setNodeKey] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, any>>({});
   const [textInput, setTextInput] = useState('');
   const [selectedRating, setSelectedRating] = useState(0);
@@ -158,11 +160,17 @@ export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) 
         setShowLeadCapture(true);
         setCurrentNodeId(nextNodeId);
       } else {
+        // Smooth transition with crossfade
+        setIsTransitioning(true);
         setTimeout(() => {
           setCurrentNodeId(nextNodeId);
+          setNodeKey(prev => prev + 1);
           setTextInput('');
           setSelectedRating(0);
-        }, 300);
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 100);
+        }, 200);
       }
     } else {
       setIsCompleted(true);
@@ -366,8 +374,9 @@ export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) 
         </div>
 
         {/* Video Node Component - Responsive Container */}
-        <div className={`${isMobile ? 'w-full h-full' : 'w-[400px] h-[711px] max-w-[90vw] max-h-[90vh]'} relative`}>
+        <div className={`${isMobile ? 'w-full h-full' : 'w-[400px] h-[711px] max-w-[90vw] max-h-[90vh]'} relative transition-opacity duration-300 ease-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           <VideoNode
+            key={nodeKey}
             id={currentNode.id}
             data={{
               ...currentNode.data,

@@ -13,6 +13,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   const [rating, setRating] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [videoProgress, setVideoProgress] = useState(0);
   const [timedCountdown, setTimedCountdown] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -32,31 +34,40 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
   // Video time tracking for timed visibility
   useEffect(() => {
-    if (!isPreview || !timedVisibility) return;
+    if (!isPreview) return;
     
     const video = videoRef.current;
     if (!video) return;
 
     const handleTimeUpdate = () => {
       const currentTime = video.currentTime;
+      const duration = video.duration || 0;
       setVideoCurrentTime(currentTime);
+      setVideoDuration(duration);
+      
+      // Update progress bar
+      if (duration > 0) {
+        setVideoProgress((currentTime / duration) * 100);
+      }
       
       // Check if we're in the visibility window
-      const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
-      setShowButtons(isInWindow);
-      
-      // Update countdown
-      if (isInWindow && showCountdownTimer) {
-        const remaining = Math.ceil(visibilityEndTime - currentTime);
-        setTimedCountdown(remaining);
-      } else {
-        setTimedCountdown(null);
+      if (timedVisibility) {
+        const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
+        setShowButtons(isInWindow);
+        
+        // Update countdown
+        if (isInWindow && showCountdownTimer) {
+          const remaining = Math.ceil(visibilityEndTime - currentTime);
+          setTimedCountdown(remaining);
+        } else {
+          setTimedCountdown(null);
+        }
       }
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer]);
+  }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer, data.videoUrl]);
 
   // Standard delay system for button visibility (when NOT using timed visibility)
   useEffect(() => {
@@ -134,6 +145,35 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
             {timedCountdown}s
           </span>
         </div>
+      </div>
+    );
+  };
+
+  // Get progress bar color based on button color
+  const getProgressBarColor = () => {
+    const buttonColor = (data.buttonColor as string) || 'purple';
+    const colorMap: Record<string, string> = {
+      purple: 'progress-purple',
+      blue: 'progress-blue',
+      green: 'progress-green',
+      orange: 'progress-orange',
+      red: 'progress-red',
+      white: 'progress-white',
+      yellow: 'progress-yellow'
+    };
+    return colorMap[buttonColor] || 'progress-purple';
+  };
+
+  // Render progress bar for preview mode
+  const renderProgressBar = () => {
+    if (!isPreview || videoDuration === 0) return null;
+    
+    return (
+      <div className="absolute top-0 left-0 right-0 z-50 h-1 bg-black/30">
+        <div 
+          className={`h-full ${getProgressBarColor()} transition-all duration-300 ease-linear rounded-r-full`}
+          style={{ width: `${videoProgress}%` }}
+        />
       </div>
     );
   };
@@ -437,17 +477,20 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       )}
       
       {/* Video Preview */}
-      <div className={`relative w-full h-full bg-black ${isPreview && !isDesktopPreview ? 'aspect-video md:aspect-auto' : ''}`} style={{ touchAction: 'manipulation' }}>
+      <div className={`relative w-full h-full bg-black ${isPreview && !isDesktopPreview ? 'aspect-video md:aspect-auto' : ''}`} style={{ touchAction: 'manipulation' }}>        
+        {/* Progress Bar */}
+        {renderProgressBar()}
+        
         {hasVideo ? (
           <>
             <video 
               ref={videoRef}
               src={data.videoUrl as string}
-              className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-in-out ${isPreview ? 'opacity-100' : 'opacity-100'}`}
+              className={`w-full h-full object-cover pointer-events-none ${isPreview ? 'video-crossfade-enter' : ''}`}
               style={{ 
                 touchAction: 'manipulation', 
                 willChange: 'transform, opacity',
-                transition: 'opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
+                transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
               }}
               muted={!isPreview}
               loop
