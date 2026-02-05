@@ -75,6 +75,21 @@ function FunnelBuilderInner() {
   const reactFlowInstance = useReactFlow();
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // NOTE: Embed codes are generated against the published URL.
+  // Preview (lovableproject.com / id-preview) and Published (lovable.app) use separate environments.
+  const PRODUCTION_BASE_URL = 'https://vid-path-builder-65.lovable.app';
+  const isPreviewEnvironment =
+    typeof window !== 'undefined' &&
+    (window.location.hostname.includes('lovableproject.com') || window.location.hostname.startsWith('id-preview--'));
+
+  const effectiveFunnelName = (currentFunnelId || funnelName).trim();
+  const liveBuilderUrl = effectiveFunnelName
+    ? `${PRODUCTION_BASE_URL}/builder?funnel=${encodeURIComponent(effectiveFunnelName)}`
+    : `${PRODUCTION_BASE_URL}/builder`;
+  const liveEmbedUrl = effectiveFunnelName
+    ? `${PRODUCTION_BASE_URL}/embed/${encodeURIComponent(effectiveFunnelName)}`
+    : `${PRODUCTION_BASE_URL}/embed`;
+
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
@@ -273,8 +288,10 @@ function FunnelBuilderInner() {
       setCurrentFunnelId(nameToSave);
 
       toast({
-        title: "🚀 Veröffentlicht!",
-        description: `Funnel ist jetzt live unter: /embed/${nameToSave}`,
+        title: isPreviewEnvironment ? '✅ Veröffentlicht (Preview)' : '🚀 Veröffentlicht!',
+        description: isPreviewEnvironment
+          ? `Für deine Website musst du im Live-Builder veröffentlichen: ${PRODUCTION_BASE_URL}/builder?funnel=${encodeURIComponent(nameToSave)}`
+          : `Funnel ist jetzt live unter: ${PRODUCTION_BASE_URL}/embed/${encodeURIComponent(nameToSave)}`,
       });
     } catch (error) {
       console.error('Error publishing funnel:', error);
@@ -440,68 +457,94 @@ function FunnelBuilderInner() {
   return (
     <div className="h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 text-white flex flex-col">
       {/* Header with Glassmorphism */}
-      <div className="bg-black/80 backdrop-blur-xl border-b border-zinc-800/50 p-4 flex justify-between items-center relative">
+      <div className="bg-black/80 backdrop-blur-xl border-b border-zinc-800/50 p-4 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10"></div>
-        <div className="flex items-center gap-4 relative z-10">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')}
-            className="text-white hover:bg-white/10 transition-all duration-300"
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Dashboard
-          </Button>
-          <Input
-            value={funnelName}
-            onChange={(e) => setFunnelName(e.target.value)}
-            className="bg-white/10 backdrop-blur-sm border-white/20 text-white text-xl font-semibold placeholder:text-white/50 focus:bg-white/15"
-            placeholder="Funnel Name eingeben..."
-          />
-          {currentFunnelId && (
-            <span className="text-xs text-green-400 bg-green-400/20 px-2 py-1 rounded-full">● Gespeichert</span>
-          )}
+        <div className="flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/')}
+              className="text-white hover:bg-white/10 transition-all duration-300"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+            <Input
+              value={funnelName}
+              onChange={(e) => setFunnelName(e.target.value)}
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white text-xl font-semibold placeholder:text-white/50 focus:bg-white/15"
+              placeholder="Funnel Name eingeben..."
+            />
+            {currentFunnelId && (
+              <span className="text-xs text-green-400 bg-green-400/20 px-2 py-1 rounded-full">● Gespeichert</span>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={saveFunnel}
+              disabled={saving}
+              className="text-white hover:bg-white/10 transition-all duration-300"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? 'Speichern...' : 'Speichern'}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowPreview(true)}
+              className="text-white hover:bg-white/10 transition-all duration-300"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Vorschau
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={generatePublicUrl}
+              className="text-white hover:bg-white/10 transition-all duration-300"
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              URL kopieren
+            </Button>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={publishFunnel}
+              disabled={saving}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              {saving ? 'Veröffentlichen...' : 'Veröffentlichen'}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2 relative z-10">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={saveFunnel}
-            disabled={saving}
-            className="text-white hover:bg-white/10 transition-all duration-300"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Speichern...' : 'Speichern'}
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowPreview(true)}
-            className="text-white hover:bg-white/10 transition-all duration-300"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Vorschau
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={generatePublicUrl}
-            className="text-white hover:bg-white/10 transition-all duration-300"
-          >
-            <Copy className="w-4 h-4 mr-2" />
-            URL kopieren
-          </Button>
-          <Button 
-            variant="default" 
-            size="sm" 
-            onClick={publishFunnel}
-            disabled={saving}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            <Globe className="w-4 h-4 mr-2" />
-            {saving ? 'Veröffentlichen...' : 'Veröffentlichen'}
-          </Button>
-        </div>
+
+        {isPreviewEnvironment && (
+          <div className="relative z-10 mt-3 rounded-lg border border-border/40 bg-muted/30 px-3 py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="text-sm text-muted-foreground">
+              Du bist im <span className="font-semibold text-foreground">Preview/Test</span>. Deine externe Website lädt aber den <span className="font-semibold text-foreground">Live</span>-Funnel von <span className="font-mono text-foreground">{PRODUCTION_BASE_URL}</span>.
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => window.open(liveBuilderUrl, '_blank')}
+              >
+                Live-Builder öffnen
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(liveEmbedUrl, '_blank')}
+              >
+                Live-Embed öffnen
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 overflow-hidden">
