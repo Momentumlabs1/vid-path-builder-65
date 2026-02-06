@@ -1,171 +1,174 @@
 
 
-# Export: Funnel-Code für externes Projekt vorbereiten
+# Smart Trading Video Funnel V11 - Implementierungsplan
 
 ## Zusammenfassung
 
-Du willst den fertigen Funnel-Player-Code nehmen und ihn dem anderen Projekt geben. Das andere Projekt baut dann ihren **eigenen "Funnel starten"-Button** - und DIESER Klick ist dann die User-Interaktion, die Sound erlaubt.
-
-**JA - das ist umsetzbar!**
+Komplett neue Funnel-Version mit 24 Videos, optimierter Struktur und einem neuen **Budget-Slider** Interaktionstyp. Die alte V6 (39 Videos) wird ersetzt.
 
 ---
 
-## Was das andere Projekt bekommt
+## Hauptänderungen
 
-Der Code besteht aus **3 Teilen**, die ich hier aus `src/lib/export/playerTemplate.ts` ziehe:
-
-### 1. CSS Styles (`generatePlayerStyles`)
-- Zeilen 50-475
-- Enthält: `.funnel-player`, `.video-container`, `.funnel-button`, Animationen, etc.
-
-### 2. JavaScript Player (`generatePlayerScript`)  
-- Zeilen 478-1130
-- Die komplette `FunnelPlayer` Klasse mit:
-  - `startFunnel()` - Startet den Funnel
-  - `goToNode()` - Navigation zwischen Videos
-  - `renderVideoNode()` - Video-Rendering
-  - `handleAnswer()` - Button-Klick Handling
-  - `sendToWebhook()` - Daten an Webhook senden
-
-### 3. Funnel-Daten (`smartTradingFunnel.ts`)
-- 791 Zeilen mit allen Nodes, Edges, Video-URLs
-- 39 Videos strukturiert in Intro + Anfänger + Fortgeschritten Pfade
+| Aspekt | V6 (alt) | V11 (neu) |
+|--------|----------|-----------|
+| Videos gesamt | 39 | 24 |
+| Intro | 6 Videos | 3 Videos |
+| Anfänger | 16 Videos | 10 Videos |
+| Fortgeschritten | 16 Videos | 10 Videos |
+| Abschluss | 1 Video | 1 Video |
+| Budget-Frage | Keine | Slider (€0-€10.000) |
 
 ---
 
-## Wie das andere Projekt es integriert
+## Neue Funktion: Budget-Slider
+
+Es wird ein neuer `answerType: 'budgetSlider'` implementiert mit:
+- Slider von €0 bis €10.000
+- 5 Farbbereiche mit Labels:
+  - €0-500: Wenig (rot)
+  - €500-1.500: Starter (orange)  
+  - €1.500-4.000: Solide (grün)
+  - €4.000-7.000: Platin (cyan)
+  - €7.000-10.000: Gold (gold)
+- Anzeige des aktuellen Wertes
+- "Weiter"-Button
+
+---
+
+## Technische Änderungen
+
+### 1. Neue Datei: `src/data/smartTradingFunnel.ts`
+
+Kompletter Neubau mit 24 Nodes:
+
+**Intro (3 Videos):**
+- V1: Begrüßung + Weiche (Erzähl mir mehr / Direkt los)
+- V2a: Story + Level-Frage
+- V2b: Direkt + Level-Frage
+
+**Anfänger-Pfad (10 Videos):**
+- A1: Anfänger auffangen + Frage Auslöser (3 Antworten)
+- A2a/A2b/A2c: 3 Auffang-Videos + Frage Ziel
+- A3a/A3b/A3c: 3 Auffang-Videos + Frage Blockade
+- A4a/A4b: 2 Auffang-Videos + Budget-Slider
+- A5: Resümee + Call-Buchung
+
+**Fortgeschritten-Pfad (10 Videos):**
+- F1: Fortgeschritten auffangen + Frage Situation (3 Antworten)
+- F2a/F2b/F2c: 3 Auffang-Videos + Frage Problem
+- F3a/F3b: 2 Auffang-Videos + Frage Ziel
+- F4a/F4b/F4c: 3 Auffang-Videos + Budget-Slider
+- F5: Resümee + Call-Buchung
+
+**Abschluss (1 Video):**
+- V-END: Bestätigung nach Call
+
+### 2. VideoNode.tsx erweitern
+
+Neuer `case 'budgetSlider':` im `renderAnswerButtons()`:
 
 ```text
-Externe Website                    Der Code den sie bekommen
-=================                  =========================
-
-<button id="start-btn">            styles.css
-  Funnel starten                   player.js
-</button>                          funnel-data.json
-                                   
-<div id="funnel-container">        
-</div>
+- Slider-Element (€0-€10.000)
+- Dynamische Farbänderung basierend auf Wert
+- Label-Anzeige (Wenig/Starter/Solide/Platin/Gold)
+- Aktueller Wert in €
+- "Weiter"-Button
 ```
 
-### Der wichtige Punkt: DEREN Start-Button
+### 3. NodePropertiesPanel.tsx erweitern
 
-```javascript
-// Im anderen Projekt:
-document.getElementById('start-btn').addEventListener('click', () => {
-  // 1. Container sichtbar machen
-  document.getElementById('funnel-container').style.display = 'block';
-  
-  // 2. Player initialisieren
-  const player = new FunnelPlayer('#funnel-container');
-  
-  // 3. DIREKT starten (kein zweiter Klick nötig)
-  // Hier ist der Klick = User Gesture = Sound erlaubt!
-  player.startFunnel();
-});
-```
+- SelectItem für "budgetSlider" hinzufügen
+- Konfigurationsoptionen:
+  - Min/Max Wert
+  - Schrittweite
+  - Submit-Button Styling
+
+### 4. playerTemplate.ts aktualisieren
+
+Budget-Slider im Standalone-Export unterstützen mit:
+- CSS für Slider-Styling
+- JavaScript für Wertberechnung und Farbänderung
 
 ---
 
-## Anpassung am Export-Code (kleine Änderung)
-
-Damit das funktioniert, braucht `startFunnel()` eine kleine Änderung:
-
-### Aktuell (Zeile 555-561):
-```javascript
-startFunnel() {
-  const startNode = this.nodes.find(n => n.type === 'start');
-  const nextNode = this.findNextNode(startNode?.id);
-  if (nextNode) {
-    this.goToNode(nextNode.id);  // <- Hat 300ms Delay (verliert User Gesture!)
-  }
-}
-```
-
-### Neu:
-```javascript
-startFunnel() {
-  // Sound aktivieren (User hat geklickt)
-  this.isMuted = false;
-  
-  const startNode = this.nodes.find(n => n.type === 'start');
-  const nextNode = this.findNextNode(startNode?.id);
-  
-  if (nextNode) {
-    // SOFORT rendern (ohne 300ms Delay für erste Node!)
-    this.currentNodeId = nextNode.id;
-    this.buttonsVisible = false;
-    this.selectedRating = 0;
-    
-    if (nextNode.type === 'video') {
-      this.renderVideoNode(nextNode);
-    } else {
-      this.goToNode(nextNode.id);
-    }
-  }
-}
-```
-
-### Zusätzlich in `renderVideoNode()` (Zeile 678-680):
-```javascript
-// Play video mit Fallback
-if (this.videoElement && videoUrl) {
-  this.videoElement.muted = this.isMuted;
-  
-  this.videoElement.play().catch(e => {
-    console.log('Sound blocked, fallback to muted:', e);
-    this.isMuted = true;
-    this.videoElement.muted = true;
-    this.videoElement.play();
-  });
-}
-```
-
----
-
-## Was ich jetzt mache
-
-1. **`playerTemplate.ts` fixen** - Die zwei kleinen Änderungen oben einbauen
-2. **Export-Funktion bleibt** - Du kannst weiterhin "Exportieren" im Builder klicken
-3. **Der exportierte Code funktioniert dann sofort** - Anderes Projekt bekommt fertigen, funktionierenden Code
-
----
-
-## Ablauf danach
+## Flow-Diagramm
 
 ```text
-1. Du gehst in den Funnel-Builder
-2. Du klickst "Exportieren" → "Standalone HTML" oder "Separate Dateien"
-3. Du bekommst den fertigen Code
-4. Du schickst den Code ans andere Projekt
-5. Das andere Projekt baut ihren eigenen Start-Button
-6. Deren Button ruft player.startFunnel() auf
-7. Video startet MIT SOUND (weil deren Klick = User Gesture)
+                    V1 (Begrüßung)
+                         │
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+    V2a (Story)                   V2b (Direkt)
+          │                             │
+          └──────────────┬──────────────┘
+                         │
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+   A1 (Anfänger)               F1 (Fortgeschr.)
+       │                             │
+   ┌───┼───┐                    ┌───┼───┐
+   ▼   ▼   ▼                    ▼   ▼   ▼
+  A2a A2b A2c                  F2a F2b F2c
+   └───┼───┘                    └───┼───┘
+       │                            │
+   ┌───┼───┐                    ┌───┴───┐
+   ▼   ▼   ▼                    ▼       ▼
+  A3a A3b A3c                  F3a     F3b
+   └───┼───┘                    └───┬───┘
+       │                            │
+   ┌───┴───┐                ┌───────┼───────┐
+   ▼       ▼                ▼       ▼       ▼
+  A4a     A4b              F4a     F4b     F4c
+   └───┬───┘                └───────┼───────┘
+       │                            │
+       ▼                            ▼
+  A5 (Resümee)              F5 (Resümee)
+       │                            │
+       └────────────┬───────────────┘
+                    ▼
+               V-END (Bestätigung)
 ```
 
 ---
 
-## Ergebnis
+## Layout im Builder
 
-| Vorher | Nachher |
-|--------|---------|
-| iframe mit internem Start-Button | Direkter Code ohne iframe |
-| 2 Klicks nötig (öffnen + starten) | 1 Klick reicht |
-| Sound funktioniert nicht zuverlässig | Sound funktioniert (User Gesture erhalten) |
-| Daten gehen über komplizierte Brücke | Webhook direkt im Player-Code |
+| Bereich | X-Position | Y-Start |
+|---------|------------|---------|
+| Intro | CENTER (0) | 0-400 |
+| Anfänger | LEFT (-500) | 600+ |
+| Fortgeschritten | RIGHT (+500) | 600+ |
+| Abschluss | CENTER (0) | 3000+ |
 
 ---
 
-## Technische Änderungen (für Entwickler)
+## Dateien die geändert werden
 
-### Datei: `src/lib/export/playerTemplate.ts`
+1. **`src/data/smartTradingFunnel.ts`** - Komplett neu schreiben
+2. **`src/components/funnel/VideoNode.tsx`** - Budget-Slider hinzufügen
+3. **`src/components/funnel/NodePropertiesPanel.tsx`** - Slider-Konfiguration
+4. **`src/lib/export/playerTemplate.ts`** - Slider im Export
 
-| Zeile | Änderung |
-|-------|----------|
-| 555-561 | `startFunnel()` mit `isMuted = false` und sofortigem Rendern |
-| 678-680 | `renderVideoNode()` mit dynamischem `video.muted` und Fallback |
+---
 
-### Keine Änderung an:
-- `smartTradingFunnel.ts` (Daten bleiben gleich)
-- `generateStandalonePlayer.ts` (Export-Logik bleibt gleich)
-- `FunnelExporter.tsx` (UI bleibt gleich)
+## Daten die gesammelt werden
+
+**Anfänger:**
+- Auslöser (Zeit/Unzufriedenheit/Inspiration)
+- Ziel (Nebeneinkommen/Freiheit/Verstehen)
+- Blockade (Angst/Überforderung)
+- Budget (€0-€10.000)
+
+**Fortgeschritten:**
+- Situation (Verlust/Break-Even/Random)
+- Problem (Strategie/Emotionen)
+- Ziel (Profitabel/Prop-Firm/Vollzeit)
+- Budget (€0-€10.000)
+
+---
+
+## Resümee-Anzeige
+
+Am Ende jedes Pfades (A5/F5) werden die gesammelten Antworten als Overlay angezeigt, bevor zur Call-Buchung weitergeleitet wird.
 
