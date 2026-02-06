@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { X, ChevronLeft, Star, Users, Flag } from 'lucide-react';
+import { X, ChevronLeft, Star, Users, Flag, Play } from 'lucide-react';
 import { VideoNode } from './VideoNode';
 import { LeadCapture } from './LeadCapture';
 
@@ -26,17 +26,16 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Find the start node and follow the connected video node
+  // Find the start node - in embed mode show it, otherwise skip to video
   useEffect(() => {
     console.log('VideoFunnelPreview nodes:', nodes);
     
     if (nodes.length === 0) return;
     
-    // Get edges from global context or props
     const edges = (window as any).funnelEdges || [];
     console.log('Available edges:', edges);
     
-    // First try to find start node
+    // Find start node
     const startNode = nodes.find(node => 
       node.type === 'start' || 
       node.id.toLowerCase().includes('start')
@@ -44,13 +43,15 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
     
     let initialNode = null;
     
-    if (startNode && edges.length > 0) {
-      console.log('Found start node:', startNode);
-      
-      // Find the edge that connects from start node
+    // In EMBED mode: Show start node so user clicks INSIDE iframe (iOS fix)
+    if (mode === 'embed' && startNode) {
+      initialNode = startNode;
+      console.log('Embed mode: showing start node for user gesture:', startNode);
+    } 
+    // In builder preview or no start node: skip to video
+    else if (startNode && edges.length > 0) {
       const startEdge = edges.find((edge: any) => edge.source === startNode.id);
       if (startEdge) {
-        // Find the connected node
         const connectedNode = nodes.find(node => node.id === startEdge.target);
         if (connectedNode) {
           initialNode = connectedNode;
@@ -59,28 +60,21 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
       }
     }
     
-    // Fallback 1: Skip start node, find first video node
+    // Fallbacks
     if (!initialNode) {
       initialNode = nodes.find(node => node.type === 'video');
-      console.log('Fallback to first video node:', initialNode);
     }
-    
-    // Fallback 2: First non-start node
     if (!initialNode) {
       initialNode = nodes.find(node => node.type !== 'start');
-      console.log('Fallback to first non-start node:', initialNode);
     }
-    
-    // Final fallback: first node
     if (!initialNode && nodes.length > 0) {
       initialNode = nodes[0];
-      console.log('Final fallback to first node:', initialNode);
     }
     
     if (initialNode) {
       setCurrentNodeId(initialNode.id);
     }
-  }, [nodes]);
+  }, [nodes, mode]);
 
   const currentNode = nodes.find(node => node.id === currentNodeId);
   const totalNodes = nodes.length;
@@ -288,6 +282,41 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   // Detect mobile vs desktop for responsive preview
   const isMobile = window.innerWidth < 768;
   const isEmbedMode = mode === 'embed';
+
+  // Handle START nodes in embed mode - show clickable start screen
+  if (currentNode.type === 'start') {
+    const handleStartClick = () => {
+      const edges = (window as any).funnelEdges || [];
+      const startEdge = edges.find((edge: any) => edge.source === currentNode.id);
+      
+      if (startEdge) {
+        setCurrentNodeId(startEdge.target);
+      } else {
+        // Fallback: first video node
+        const videoNode = nodes.find(n => n.type === 'video');
+        if (videoNode) setCurrentNodeId(videoNode.id);
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-900 z-50 flex items-center justify-center">
+        <div className="text-center p-8">
+          <button
+            onClick={handleStartClick}
+            className="w-24 h-24 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-500/40 transition-all hover:scale-105 active:scale-95"
+          >
+            <Play className="w-12 h-12 text-white ml-1" fill="white" />
+          </button>
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {(currentNode.data.label as string) || 'Bereit?'}
+          </h1>
+          <p className="text-zinc-400 text-sm">
+            Tippe um zu starten
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Handle leadCapture nodes
   if (currentNode.type === 'leadCapture') {
