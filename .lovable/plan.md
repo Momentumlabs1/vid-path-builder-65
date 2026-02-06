@@ -1,32 +1,57 @@
 
-## ✅ ERLEDIGT: Fix Schwarzes Video + Button/Input Größen
 
-### Problem 1: Erstes Video war schwarz ✅ GELÖST
-**Änderungen in `VideoNode.tsx`:**
-- Entfernt: `onLoadStart` mit dem problematischen `document.querySelector('video')` Hack
-- Hinzugefügt: `onError` Handler der opacity auf 1 setzt bei Fehlern
-- Geändert: Initial opacity ist jetzt `100` statt Crossfade-Animation
+## Plan: Start-Button ins iFrame verlagern
 
-### Problem 2: Button/Input-Größen ✅ GELÖST
-**Neue Presets hinzugefügt:**
-- Höhe: XS(24px), S(28px), M(36px), L(44px), XL(52px), 2XL(60px), **3XL(72px)**, **4XL(84px)**
-- Breite: Auto, XS(80px), S(120px), M(160px), L(200px), XL(240px), 2XL(280px), **3XL(320px)**, **4XL(360px)**, Full
-- Textgröße: XS(10px), S(12px), M(14px), L(16px), **XL(18px)**, **2XL(20px)**
+### Ziel
+Der "Jetzt starten"-Button kommt aus dem Funnel (im iFrame), nicht von der externen Website. Damit zählt der Klick als User-Geste im iFrame und iOS erlaubt das Video.
 
-### Problem 3: Input-Felder Controls ✅ GELÖST
-**Neue Sektion "Eingabefeld Größe" in NodePropertiesPanel:**
-- Input-Höhe: XS bis 4XL
-- Input-Breite: S(200px), M(280px), L(320px), XL(400px), Full
-- Input-Textgröße: XS bis 2XL
+### Ablauf NEU
+1. Externe Website: Zeigt nur Placeholder/Thumbnail für den iFrame
+2. iFrame lädt Funnel → zeigt Start-Screen mit "Jetzt starten" Button
+3. User klickt 1x (IM iFrame) → Video 1 startet sofort
 
----
+### Technische Umsetzung
 
-## Betroffene Dateien
-1. `src/components/funnel/VideoNode.tsx` - Video-Opacity Fix + Input-Sizing
-2. `src/components/funnel/NodePropertiesPanel.tsx` - Neue Size-Presets + Input-Controls
+#### Datei: `src/components/funnel/VideoFunnelPreview.tsx`
 
-## Erwartetes Ergebnis
-1. **Erstes Video lädt sichtbar** - kein schwarzer Bildschirm mehr
-2. **Größere Presets** - 3XL/4XL für Desktop-Websites
-3. **Input-Felder kontrollierbar** - eigene Größenoptionen
-4. **WYSIWYG** - Editor = Preview = Live Website
+**1. Start-Node nicht mehr überspringen**
+
+Aktuell (Zeile 40-60): Der Code findet den Start-Node und springt sofort zum ersten Video-Node.
+
+Änderung: Im Embed-Modus den Start-Node als echten Screen anzeigen.
+
+**2. Start-Screen rendern (vor dem Video-Render-Block)**
+
+Wenn `currentNode.type === 'start'` und `mode === 'embed'`:
+- Fullscreen-Overlay mit Gradient-Hintergrund
+- Play-Icon (grün, groß)
+- "Jetzt starten" Button
+- Klick auf Button → `setCurrentNodeId(nächsterVideoNode)`
+
+```text
+┌─────────────────────────────┐
+│                             │
+│         [▶ Play]            │
+│                             │
+│      "Jetzt starten"        │
+│                             │
+└─────────────────────────────┘
+```
+
+**3. Navigation zum ersten Video**
+
+Beim Klick auf "Jetzt starten":
+- Hole Edges aus `window.funnelEdges`
+- Finde Edge die vom Start-Node ausgeht
+- Navigiere zu `edge.target` (= erstes Video)
+
+### Externe Website (deine Seite)
+
+Du entfernst den "Jetzt starten" Button und lässt nur den Placeholder/Thumbnail. Der iFrame übernimmt ab da.
+
+### Ergebnis
+- 1 Klick total (nicht 2)
+- Klick passiert IM iFrame
+- iOS akzeptiert die Geste
+- Video 1 startet sofort sichtbar
+
