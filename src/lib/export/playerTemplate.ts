@@ -469,6 +469,11 @@ export function generatePlayerStyles(): string {
       to { opacity: 1; }
     }
     
+    @keyframes pulse {
+      0%, 100% { transform: scale(1.2); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.8; }
+    }
+    
     .fade-in {
       animation: fadeIn 0.5s ease;
     }
@@ -553,10 +558,27 @@ class FunnelPlayer {
   }
   
   startFunnel() {
+    // User hat geklickt = Browser erlaubt Sound (User Gesture)
+    this.isMuted = false;
+    
     const startNode = this.nodes.find(n => n.type === 'start');
     const nextNode = this.findNextNode(startNode?.id);
+    
     if (nextNode) {
-      this.goToNode(nextNode.id);
+      // SOFORT rendern ohne 300ms Delay (User Gesture bleibt erhalten!)
+      this.currentNodeId = nextNode.id;
+      this.buttonsVisible = false;
+      this.selectedRating = 0;
+      
+      if (nextNode.type === 'video') {
+        this.renderVideoNode(nextNode);
+      } else if (nextNode.type === 'leadCapture') {
+        this.renderLeadCaptureNode(nextNode);
+      } else if (nextNode.type === 'end') {
+        this.renderEndNode(nextNode);
+      } else {
+        this.goToNode(nextNode.id);
+      }
     }
   }
   
@@ -674,9 +696,26 @@ class FunnelPlayer {
     const buttonsContainer = this.playerEl.querySelector('#buttons-container');
     const unmuteBtn = this.playerEl.querySelector('#unmute-btn');
     
-    // Play video
+    // Play video mit dynamischem Mute-Status und Fallback
     if (this.videoElement && videoUrl) {
-      this.videoElement.play().catch(e => console.log('Autoplay blocked:', e));
+      this.videoElement.muted = this.isMuted;
+      
+      this.videoElement.play().catch(e => {
+        console.log('Sound blocked, fallback to muted:', e);
+        // Fallback: Stumm starten wenn Sound blockiert wird
+        this.isMuted = true;
+        this.videoElement.muted = true;
+        this.videoElement.play().catch(err => {
+          console.log('Even muted play blocked:', err);
+        });
+        
+        // Zeige visuellen Hinweis auf Unmute-Button
+        const unmuteBtn = this.playerEl.querySelector('#unmute-btn');
+        if (unmuteBtn) {
+          unmuteBtn.style.animation = 'pulse 1.5s infinite';
+          unmuteBtn.style.transform = 'scale(1.2)';
+        }
+      });
     }
     
     // Determine if this node needs user interaction
