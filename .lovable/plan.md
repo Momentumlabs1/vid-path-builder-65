@@ -1,236 +1,118 @@
 
-# Funnel-Export Feature implementieren
+## Was gerade passiert (warum du nur 1 Video siehst)
+Der aktuelle Standalone-Export ist im Player-Template noch “zu simpel” im Vergleich zur echten Funnel-Logik im Builder.
 
-## Überblick
+Konkret:
+- In deinem Builder sind Video-Nodes oft **`answerType: "button"`** (ein einzelner CTA-Button) und die Weiterleitung läuft über **`nextNodes.default`** oder andere Keys.
+- Das exportierte Template rendert Buttons aktuell aber fast nur, wenn **`answers[]`** gefüllt ist – bei `answerType: "button"` ist `answers` normalerweise leer → **kein Button sichtbar**.
+- Beim Video-Ende springt der Export nur dann weiter, wenn es eine **Edge** gibt. Viele Funnels haben aber **keine Edges**, sondern nur `nextNodes` → dann bleibt er nach dem ersten Video stehen.
 
-Erstelle eine Export-Funktion im Builder, die den aktuellen Funnel als eigenständigen Code generiert. Der Code greift auf die öffentlich gehosteten Videos zu und sendet Lead-Daten per Webhook an dein Backend.
+Ergebnis: Du siehst ein Video, und danach passiert nichts.
 
----
+## Ziel
+Der exportierte Standalone-Player soll die **gleiche Funnel-Logik** unterstützen wie eure Preview:
+- `answerType`: `button`, `multipleChoice`, `yesno`, `text`, `email`, `rating`, `none`
+- Routing:
+  - primär über `nextNodes` (z.B. `default`, `yes`, `no`, `0`, `1`, …, `low/medium/high`)
+  - sekundär über Edges
+  - letzter Fallback: “nächstes Video” anhand einer stabilen Reihenfolge (Positionen)
 
-## Technische Details
+## Umsetzung (Änderungen)
+### 1) `src/lib/export/playerTemplate.ts` (Hauptfix)
+#### A) Button-Rendering vollständig machen
+Erweitern von `renderButtons(...)` bzw. Umbau zu `renderInteraction(node)`:
+- **answerType = "button"**
+  - Button-Text: `node.data.buttonText || "Weiter"`
+  - Klick ruft `handleAnswer("continue", "button")` auf
+  - Keine Abhängigkeit von `answers[]`
 
-### Neue Dateien
+- **answerType = "multipleChoice"**
+  - Buttons aus `node.data.answers[]`
+  - Klick übergibt **Index** (0,1,2…) wie im echten Funnel
+  - Routing nutzt `nextNodes[index]`
 
-#### 1. `src/components/funnel/FunnelExporter.tsx`
-Export-Dialog mit folgenden Features:
-- Button "Als Code exportieren" im Builder
-- Eingabefeld für Webhook-URL (wohin Leads gesendet werden)
-- Auswahl: Standalone HTML oder separate Dateien
-- Download-Generierung
+- **answerType = "yesno"**
+  - Zwei Buttons: Text aus `yesText/noText` (Fallback “Ja/Nein”)
+  - Klick übergibt boolean `true/false`
+  - Routing nutzt `nextNodes["yes"]` oder `nextNodes["no"]`
 
-#### 2. `src/lib/export/generateStandalonePlayer.ts`
-Generator-Funktion die:
-- Nodes und Edges des Funnels sammelt
-- Video-URLs extrahiert (bleiben die öffentlichen Supabase-URLs)
-- Player-Logik als Vanilla JS/React generiert
-- Tailwind-Styles inline einbettet
-- Webhook-Integration für Lead-Erfassung hinzufügt
+- **answerType = "text" | "email"**
+  - Input + Submit
+  - Submit übergibt den tatsächlichen Text
+  - Routing nutzt `nextNodes.default` (oder Edge/Fallback)
 
-#### 3. `src/lib/export/playerTemplate.ts`
-HTML/JS Template das enthält:
-- Minimaler Video-Player (basierend auf VideoNode-Logik)
-- Button-Rendering (Multiple Choice, Yes/No, etc.)
-- Lead-Capture-Formular
-- Webhook-Sender für Daten
+- **answerType = "rating"**
+  - Sterne + Submit
+  - Routing unterstützt `nextNodes.low` (1–2), `nextNodes.medium` (3–4), `nextNodes.high` (5) – sonst `default`
 
-### Änderungen an bestehenden Dateien
+- **answerType = "none"**
+  - Keine Buttons. Video soll am Ende automatisch weiter.
 
-#### `src/components/funnel/FunnelBuilder.tsx`
-- Import FunnelExporter Komponente
-- "Export"-Button in der Toolbar hinzufügen
-- Props für aktuelle Nodes/Edges weitergeben
+#### B) Routing-Algorithmus “wie im Builder”
+Ersetzen/Erweitern von `handleAnswer()`:
+1. Bestimme `nextNodeId` über `nextNodes` passend zum `answerType`:
+   - multipleChoice: `nextNodes[index]`
+   - yesno: `nextNodes[answer ? "yes" : "no"]`
+   - rating: `low/medium/high` oder `default`
+   - sonst: `default`
+2. Wenn nicht gefunden: nimm **Edge** (erste outgoing Edge)
+3. Wenn immer noch nicht gefunden: nimm **sequenziellen Fallback** (nächster Node in einer sortierten Reihenfolge)
+4. Wenn gar nichts: zeige End-Screen/Completed
 
----
+#### C) Autoadvance korrekt machen
+Aktuell: Autoadvance passiert, wenn `answers[]` leer ist – das ist falsch bei `answerType="button"` (da will man klicken).
+Neu:
+- Autoadvance nur, wenn `answerType === "none"` (oder wenn wirklich keine Interaktion konfiguriert ist, z.B. multipleChoice ohne answers).
+- Bei `button/multipleChoice/yesno/text/email/rating`: **nicht** automatisch weiterlaufen, außer du willst optional eine “auto-advance after end” Option.
 
-## Export-Ablauf
+#### D) Button-Timing (wichtig bei dir)
+Im Builder gibt es:
+- `delaySeconds`
+- `timedVisibility + visibilityStartTime + visibilityDuration`
 
-```text
-1. User klickt "Als Code exportieren"
-        ↓
-2. Dialog öffnet sich
-   - Webhook-URL eingeben (optional)
-   - Format wählen (HTML oder ZIP)
-        ↓
-3. Generator sammelt:
-   - Alle Nodes mit Video-URLs
-   - Alle Edges (Verbindungen)
-   - Button-Konfigurationen
-        ↓
-4. Template wird gefüllt:
-   - Player-Code (JS)
-   - Styles (CSS)
-   - Funnel-Daten (JSON inline)
-        ↓
-5. Download startet
-```
+Der Export nutzt aktuell `delayBeforeButtons` (anderer Key).
+Neu:
+- Player liest vorrangig `delaySeconds`
+- Unterstützt zusätzlich `timedVisibility`-Fenster
+- `delayBeforeButtons` bleibt als Fallback kompatibel
 
----
+### 2) `src/lib/export/generateStandalonePlayer.ts` (Stabilere Reihenfolge für Fallback)
+Damit der sequenzielle Fallback sinnvoll ist, definieren wir eine robuste Reihenfolge:
+- `nodeOrder = nodes ohne start`, sortiert nach `position.y` dann `position.x`
+- Im Player wird “nächster Node” über diese Reihenfolge bestimmt (nicht über zufällige Array-Reihenfolge)
 
-## Datenfluss im exportierten Code
+(Keine Änderungen an Funnel-Daten nötig – Positionen sind ja bereits drin.)
 
-```text
-Deine Website                    Supabase Storage
-     │                                  │
-     │  1. Player lädt                  │
-     ├──────────────────────────────────┤
-     │                                  │
-     │  2. Video-URLs werden geladen    │
-     │     (public URLs, kein Auth)     │
-     │◄─────────────────────────────────┤
-     │                                  │
-     │  3. User interagiert             │
-     │                                  │
-     │  4. Lead-Daten per Webhook       │
-     ├─────────────────────────────────►│ Dein Backend
-     │                                  │
-```
+### 3) Optional: bessere Kompatibilität für Farben/Styles
+Viele Nodes nutzen Farbnamen (purple/green/blue…) oder pro-Option Keys (`mcColor_0`, …).
+Minimal (funktional): Standardfarben wie jetzt.
+Optional Upgrade:
+- Mapping Farbnamen → Hex
+- multipleChoice: pro-Option background setzen
 
----
+## Test-Checkliste (End-to-End)
+1. Funnel mit `answerType="button"` exportieren:
+   - CTA-Button erscheint
+   - Klick geht zum nächsten Video (über `nextNodes.default` oder Edge)
+2. Funnel mit `multipleChoice`:
+   - Buttons erscheinen
+   - Klick auf Option A/B führt korrekt in unterschiedliche Nodes
+3. Funnel mit `yesno`:
+   - Ja/Nein führt zu den konfigurierten Nodes
+4. `delaySeconds`:
+   - Buttons erscheinen erst nach der eingestellten Zeit
+5. `timedVisibility`:
+   - Buttons erscheinen nur im Zeitfenster + optional Countdown (kann später ergänzt werden)
+6. Ohne Edges (nur nextNodes):
+   - Funnel läuft trotzdem vollständig durch
+7. Webhook:
+   - Bei jedem Klick kommt ein `type: "answer"` Event
+   - Bei LeadCapture ein `type: "lead"`
+   - Am Ende `type: "completed"`
 
-## Exportierter Code - Struktur
-
-### Option A: Standalone HTML (eine Datei)
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    /* Tailwind-Subset + Custom Styles */
-  </style>
-</head>
-<body>
-  <div id="funnel-root"></div>
-  
-  <script>
-    // Funnel-Daten (Nodes, Edges, Video-URLs)
-    const FUNNEL_DATA = {...};
-    
-    // Webhook-URL für Lead-Daten
-    const WEBHOOK_URL = 'https://deine-website.com/api/leads';
-    
-    // Player-Logik
-    class FunnelPlayer {
-      // Video-Rendering
-      // Button-Handling
-      // Lead-Capture
-      // Webhook-Sender
-    }
-    
-    // Start
-    new FunnelPlayer('#funnel-root', FUNNEL_DATA);
-  </script>
-</body>
-</html>
-```
-
-### Option B: Separate Dateien (ZIP)
-
-```text
-funnel-export/
-├── index.html      (Beispiel-Integration)
-├── player.js       (Player-Logik, ~40KB)
-├── styles.css      (Styles)
-└── funnel.json     (Nodes, Edges, Video-URLs)
-```
-
----
-
-## Video-URL Handling
-
-Die Video-URLs im Export sind die originalen öffentlichen URLs:
-
-```javascript
-// So sieht ein Node im Export aus:
-{
-  id: 'video-intro',
-  type: 'video',
-  data: {
-    videoUrl: 'https://rqjwroreqihyqyktucvj.supabase.co/storage/v1/object/public/videos/intro.mp4',
-    overlayText: 'Willkommen!',
-    buttons: [...]
-  }
-}
-```
-
-Der Browser lädt die Videos direkt von der öffentlichen URL - kein Supabase-Client nötig.
-
----
-
-## Webhook-Integration
-
-```javascript
-// Im exportierten Code:
-async function sendToWebhook(data) {
-  if (!WEBHOOK_URL) return;
-  
-  await fetch(WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      type: data.type, // 'answer' oder 'lead'
-      funnel_name: 'smart-trading-v6',
-      session_id: sessionId,
-      timestamp: new Date().toISOString(),
-      payload: data.payload
-    })
-  });
-}
-
-// Bei jeder Antwort:
-sendToWebhook({ type: 'answer', payload: { nodeId, answer, answerType } });
-
-// Bei Lead-Erfassung:
-sendToWebhook({ type: 'lead', payload: { first_name, last_name, email, phone } });
-```
-
----
-
-## UI im Builder
-
-```text
-┌─────────────────────────────────────────────────┐
-│  Funnel Builder - smart-trading-v6              │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  [Save] [Preview] [Export als Code ▾]           │
-│                                                 │
-│  ┌─────────────────────────────────────────┐   │
-│  │                                         │   │
-│  │        Funnel-Canvas                    │   │
-│  │                                         │   │
-│  └─────────────────────────────────────────┘   │
-│                                                 │
-└─────────────────────────────────────────────────┘
-
-Klick auf "Export als Code":
-
-┌──────────────────────────────────────┐
-│  Funnel exportieren                  │
-├──────────────────────────────────────┤
-│                                      │
-│  Webhook-URL (optional):             │
-│  ┌──────────────────────────────┐   │
-│  │ https://...                  │   │
-│  └──────────────────────────────┘   │
-│                                      │
-│  Format:                             │
-│  ○ Standalone HTML (eine Datei)     │
-│  ○ Separate Dateien (ZIP)           │
-│                                      │
-│  [Abbrechen]  [Exportieren]         │
-│                                      │
-└──────────────────────────────────────┘
-```
-
----
-
-## Zusammenfassung
-
-| Aspekt | Lösung |
-|--------|--------|
-| Videos | Bleiben in Supabase Storage, öffentliche URLs im Export |
-| Player-Code | Wird als eigenständiges JS generiert |
-| Lead-Daten | Per Webhook an dein Backend |
-| Integration | Eine HTML-Datei oder separate Dateien |
-| Audio-Problem | Gelöst, da kein iFrame mehr nötig |
+## Ergebnis danach
+Du kannst den Funnel wirklich “fertig als Code” exportieren, einfügen – und er verhält sich wie hier im Builder:
+- gleiche Buttons
+- gleiche Verzweigungen
+- gleiche Delay/Timing-Logik
+- Daten gehen sauber per Webhook raus
