@@ -243,8 +243,6 @@
         overflow: hidden;
         position: relative;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
       `;
       
       // Create close button
@@ -293,7 +291,6 @@
       // Animate in
       requestAnimationFrame(() => {
         overlay.style.opacity = '1';
-        modal.style.transform = 'scale(1)';
       });
       
       this.modal = overlay;
@@ -335,7 +332,6 @@
       const modal = overlay.querySelector('div');
       
       overlay.style.opacity = '0';
-      modal.style.transform = 'scale(0.9)';
       
       setTimeout(() => {
         document.body.removeChild(overlay);
