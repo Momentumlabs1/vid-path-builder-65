@@ -341,6 +341,80 @@ export function SynchronizedPreview({
         return showOverlay ? <div className={wrapperBase}>{ui}</div> : <div className="mt-4">{ui}</div>;
       }
 
+      case 'budgetSlider': {
+        const sliderMin = Number(nodeData?.sliderMin) || 0;
+        const sliderMax = Number(nodeData?.sliderMax) || 10000;
+        const sliderSubmitText = (nodeData?.sliderSubmitText as string) || 'Weiter';
+        const sliderSubmitColor = (nodeData?.sliderSubmitColor as string) || 'purple';
+        const sliderSubmitStyle = (nodeData?.sliderSubmitStyle as string) || 'glassmorphism';
+
+        // Static preview value
+        const sliderValue = 2500;
+
+        const getBudgetZone = (value: number) => {
+          if (value <= 500) return { label: 'Wenig', emoji: '⚠️', color: '#FF4444', bg: 'from-red-500/30 to-red-600/20' };
+          if (value <= 1500) return { label: 'Starter', emoji: '🌱', color: '#FFAA00', bg: 'from-orange-500/30 to-orange-600/20' };
+          if (value <= 4000) return { label: 'Solide', emoji: '✅', color: '#44DD44', bg: 'from-green-500/30 to-green-600/20' };
+          if (value <= 7000) return { label: 'Platin', emoji: '💎', color: '#00D4FF', bg: 'from-cyan-500/30 to-cyan-600/20' };
+          return { label: 'Gold', emoji: '👑', color: '#FFD700', bg: 'from-yellow-500/30 to-yellow-600/20' };
+        };
+
+        const zone = getBudgetZone(sliderValue);
+        const percentage = ((sliderValue - sliderMin) / (sliderMax - sliderMin)) * 100;
+
+        const ui = (
+          <div className={`w-full max-w-[280px] p-3 rounded-xl bg-gradient-to-br ${zone.bg} backdrop-blur-md border border-white/20`}>
+            <div className="text-center mb-3">
+              <p className="text-white/70 text-[10px] mb-1">Dein Budget</p>
+              <div className="text-2xl font-bold" style={{ color: zone.color }}>
+                €{sliderValue.toLocaleString('de-DE')}
+              </div>
+              <div className="flex items-center justify-center gap-1 mt-0.5">
+                <span className="text-sm">{zone.emoji}</span>
+                <span className="text-xs font-semibold" style={{ color: zone.color }}>{zone.label}</span>
+              </div>
+            </div>
+            
+            <div className="relative mb-3">
+              <div className="h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-500 via-green-500 via-cyan-500 to-yellow-500 opacity-40" />
+              <div 
+                className="absolute top-0 h-2 rounded-full"
+                style={{ 
+                  width: `${percentage}%`,
+                  background: `linear-gradient(90deg, #FF4444, #FFAA00, #44DD44, #00D4FF, #FFD700)`,
+                  backgroundSize: '500% 100%'
+                }}
+              />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white pointer-events-none"
+                style={{ 
+                  left: `calc(${percentage}% - 8px)`,
+                  backgroundColor: zone.color,
+                  boxShadow: `0 0 8px ${zone.color}80`
+                }}
+              />
+            </div>
+            
+            <div className="flex justify-between text-[8px] text-white/50 mb-3">
+              <span>€0</span>
+              <span>€5k</span>
+              <span>€10k</span>
+            </div>
+
+            <UniversalButton
+              text={sliderSubmitText}
+              color={sliderSubmitColor as any}
+              style={sliderSubmitStyle as any}
+              size="small"
+              onClick={() => {}}
+              className="w-full h-[36px] text-[12px]"
+            />
+          </div>
+        );
+
+        return showOverlay ? <div className={wrapperBase}>{ui}</div> : <div className="mt-4">{ui}</div>;
+      }
+
       default:
         return null;
     }

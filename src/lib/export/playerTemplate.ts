@@ -477,6 +477,107 @@ export function generatePlayerStyles(): string {
     .fade-in {
       animation: fadeIn 0.5s ease;
     }
+    
+    /* Budget Slider */
+    .budget-slider-container {
+      width: 100%;
+      max-width: 320px;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .budget-value-display {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    .budget-label {
+      display: block;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0.25rem;
+    }
+    
+    .budget-amount {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #44DD44;
+      transition: color 0.3s ease;
+    }
+    
+    .budget-zone {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #44DD44;
+      margin-top: 0.25rem;
+      transition: color 0.3s ease;
+    }
+    
+    .slider-track-container {
+      position: relative;
+      height: 12px;
+      margin-bottom: 1rem;
+    }
+    
+    .slider-track-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #FF4444, #FFAA00, #44DD44, #00D4FF, #FFD700);
+      opacity: 0.4;
+    }
+    
+    .slider-track-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #FF4444, #FFAA00, #44DD44, #00D4FF, #FFD700);
+      background-size: 500% 100%;
+      transition: width 0.1s ease;
+    }
+    
+    .slider-track-container input[type="range"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    
+    .slider-thumb {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #44DD44;
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px rgba(68, 221, 68, 0.5);
+      pointer-events: none;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .slider-scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1rem;
+    }
   `;
 }
 
@@ -797,7 +898,7 @@ class FunnelPlayer {
     if (!answerType) return false;
     
     // These types always need interaction
-    if (['button', 'yesno', 'text', 'email', 'rating'].includes(answerType)) {
+    if (['button', 'yesno', 'text', 'email', 'rating', 'budgetSlider'].includes(answerType)) {
       return true;
     }
     
@@ -886,6 +987,46 @@ class FunnelPlayer {
       \`;
     }
     
+    // answerType: budgetSlider
+    if (answerType === 'budgetSlider') {
+      const sliderMin = node.data.sliderMin || 0;
+      const sliderMax = node.data.sliderMax || 10000;
+      const sliderStep = node.data.sliderStep || 100;
+      const sliderSubmitText = node.data.sliderSubmitText || 'Weiter';
+      
+      return \`
+        <div class="budget-slider-container" id="budget-slider-container">
+          <div class="budget-value-display">
+            <span class="budget-label">Dein Budget für Trading</span>
+            <span class="budget-amount" id="budget-amount">€2.500</span>
+            <span class="budget-zone" id="budget-zone">✅ Solide</span>
+          </div>
+          <div class="slider-track-container">
+            <div class="slider-track-bg"></div>
+            <div class="slider-track-fill" id="slider-fill"></div>
+            <input type="range" 
+                   id="budget-slider" 
+                   min="\${sliderMin}" 
+                   max="\${sliderMax}" 
+                   step="\${sliderStep}" 
+                   value="2500"
+                   oninput="window.funnelPlayer.updateBudgetSlider(this.value)">
+            <div class="slider-thumb" id="slider-thumb"></div>
+          </div>
+          <div class="slider-scale">
+            <span>€0</span>
+            <span>€2.5k</span>
+            <span>€5k</span>
+            <span>€7.5k</span>
+            <span>€10k</span>
+          </div>
+          <button class="funnel-button primary \${sizeClass}" onclick="window.funnelPlayer.handleBudgetSubmit()">
+            \${sliderSubmitText} →
+          </button>
+        </div>
+      \`;
+    }
+    
     // answerType: none or default - no buttons
     return '';
   }
@@ -952,6 +1093,66 @@ class FunnelPlayer {
     if (this.selectedRating > 0) {
       this.handleAnswer(this.selectedRating, 'rating');
     }
+  }
+  
+  // Budget Slider methods
+  budgetValue = 2500;
+  
+  getBudgetZone(value) {
+    if (value <= 500) return { label: 'Wenig', emoji: '⚠️', color: '#FF4444' };
+    if (value <= 1500) return { label: 'Starter', emoji: '🌱', color: '#FFAA00' };
+    if (value <= 4000) return { label: 'Solide', emoji: '✅', color: '#44DD44' };
+    if (value <= 7000) return { label: 'Platin', emoji: '💎', color: '#00D4FF' };
+    return { label: 'Gold', emoji: '👑', color: '#FFD700' };
+  }
+  
+  updateBudgetSlider(value) {
+    this.budgetValue = parseInt(value);
+    const zone = this.getBudgetZone(this.budgetValue);
+    
+    const amountEl = this.playerEl.querySelector('#budget-amount');
+    const zoneEl = this.playerEl.querySelector('#budget-zone');
+    const fillEl = this.playerEl.querySelector('#slider-fill');
+    const thumbEl = this.playerEl.querySelector('#slider-thumb');
+    const container = this.playerEl.querySelector('.budget-slider-container');
+    
+    if (amountEl) {
+      amountEl.textContent = '€' + this.budgetValue.toLocaleString('de-DE');
+      amountEl.style.color = zone.color;
+    }
+    
+    if (zoneEl) {
+      zoneEl.textContent = zone.emoji + ' ' + zone.label;
+      zoneEl.style.color = zone.color;
+    }
+    
+    const percentage = (this.budgetValue / 10000) * 100;
+    
+    if (fillEl) {
+      fillEl.style.width = percentage + '%';
+    }
+    
+    if (thumbEl) {
+      thumbEl.style.left = 'calc(' + percentage + '% - 12px)';
+      thumbEl.style.background = zone.color;
+      thumbEl.style.boxShadow = '0 0 12px ' + zone.color + '80';
+    }
+    
+    // Update container gradient based on zone
+    if (container) {
+      const gradients = {
+        '#FF4444': 'linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(255, 68, 68, 0.1))',
+        '#FFAA00': 'linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1))',
+        '#44DD44': 'linear-gradient(135deg, rgba(68, 221, 68, 0.2), rgba(68, 221, 68, 0.1))',
+        '#00D4FF': 'linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1))',
+        '#FFD700': 'linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1))'
+      };
+      container.style.background = gradients[zone.color] || gradients['#44DD44'];
+    }
+  }
+  
+  handleBudgetSubmit() {
+    this.handleAnswer(this.budgetValue, 'budgetSlider');
   }
   
   handleAnswer(answer, answerType) {
