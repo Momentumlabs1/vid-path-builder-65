@@ -11,9 +11,11 @@ import { LeadCapture } from './LeadCapture';
 interface VideoFunnelPreviewProps {
   nodes: Node[];
   onClose: () => void;
+  /** 'builderPreview' = fixed 400x711 device sim, 'embed' = fill available space */
+  mode?: 'builderPreview' | 'embed';
 }
 
-export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) {
+export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: VideoFunnelPreviewProps) {
   const [currentNodeId, setCurrentNodeId] = useState<string>('');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nodeKey, setNodeKey] = useState(0);
@@ -285,6 +287,7 @@ export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) 
 
   // Detect mobile vs desktop for responsive preview
   const isMobile = window.innerWidth < 768;
+  const isEmbedMode = mode === 'embed';
 
   // Handle leadCapture nodes
   if (currentNode.type === 'leadCapture') {
@@ -374,7 +377,15 @@ export function VideoFunnelPreview({ nodes, onClose }: VideoFunnelPreviewProps) 
         </div>
 
         {/* Video Node Component - Responsive Container */}
-        <div className={`${isMobile ? 'w-full h-full' : 'w-[400px] h-[711px] max-w-[90vw] max-h-[90vh]'} relative transition-opacity duration-300 ease-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+        {/* In embed mode: fill the available space (100% width/height, aspect-ratio optional) */}
+        {/* In builderPreview mode: fixed 400x711 "phone" simulation */}
+        <div className={`${
+          isEmbedMode
+            ? 'w-full h-full max-w-[100vw]'
+            : isMobile 
+              ? 'w-full h-full' 
+              : 'w-[400px] h-[711px] max-w-[90vw] max-h-[90vh]'
+        } relative transition-opacity duration-300 ease-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           <VideoNode
             key={nodeKey}
             id={currentNode.id}

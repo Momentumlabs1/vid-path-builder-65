@@ -160,6 +160,7 @@ const EmbedViewer = () => {
       <VideoFunnelPreview 
         nodes={nodes} 
         onClose={handleClose}
+        mode="embed"
       />
     </div>
   );

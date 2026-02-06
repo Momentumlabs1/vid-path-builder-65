@@ -87,6 +87,7 @@ const FunnelViewer = () => {
     <VideoFunnelPreview
       nodes={nodes}
       onClose={() => window.close()}
+      mode="embed"
     />
   );
 };
