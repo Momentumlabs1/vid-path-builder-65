@@ -1,57 +1,36 @@
 
 
-## Plan: Start-Button ins iFrame verlagern
+## Änderung: postMessage beim Start senden
 
-### Ziel
-Der "Jetzt starten"-Button kommt aus dem Funnel (im iFrame), nicht von der externen Website. Damit zählt der Klick als User-Geste im iFrame und iOS erlaubt das Video.
+### Was wird gemacht
+Im bestehenden `handleStartClick` (Zeile 284-296) wird ein Event an die Parent-Website gesendet.
 
-### Ablauf NEU
-1. Externe Website: Zeigt nur Placeholder/Thumbnail für den iFrame
-2. iFrame lädt Funnel → zeigt Start-Screen mit "Jetzt starten" Button
-3. User klickt 1x (IM iFrame) → Video 1 startet sofort
+### Code-Änderung in `VideoFunnelPreview.tsx`
 
-### Technische Umsetzung
-
-#### Datei: `src/components/funnel/VideoFunnelPreview.tsx`
-
-**1. Start-Node nicht mehr überspringen**
-
-Aktuell (Zeile 40-60): Der Code findet den Start-Node und springt sofort zum ersten Video-Node.
-
-Änderung: Im Embed-Modus den Start-Node als echten Screen anzeigen.
-
-**2. Start-Screen rendern (vor dem Video-Render-Block)**
-
-Wenn `currentNode.type === 'start'` und `mode === 'embed'`:
-- Fullscreen-Overlay mit Gradient-Hintergrund
-- Play-Icon (grün, groß)
-- "Jetzt starten" Button
-- Klick auf Button → `setCurrentNodeId(nächsterVideoNode)`
-
-```text
-┌─────────────────────────────┐
-│                             │
-│         [▶ Play]            │
-│                             │
-│      "Jetzt starten"        │
-│                             │
-└─────────────────────────────┘
+```tsx
+const handleStartClick = () => {
+  // NEU: Event an Parent-Website senden
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'funnel_started' }, '*');
+  }
+  
+  // Bestehende Navigation...
+  const edges = (window as any).funnelEdges || [];
+  // ...
+};
 ```
 
-**3. Navigation zum ersten Video**
+### Deine Website empfängt das Event
 
-Beim Klick auf "Jetzt starten":
-- Hole Edges aus `window.funnelEdges`
-- Finde Edge die vom Start-Node ausgeht
-- Navigiere zu `edge.target` (= erstes Video)
-
-### Externe Website (deine Seite)
-
-Du entfernst den "Jetzt starten" Button und lässt nur den Placeholder/Thumbnail. Der iFrame übernimmt ab da.
+```javascript
+window.addEventListener('message', (e) => {
+  if (e.data.type === 'funnel_started') {
+    // Zoom-Animation starten
+  }
+});
+```
 
 ### Ergebnis
-- 1 Klick total (nicht 2)
-- Klick passiert IM iFrame
-- iOS akzeptiert die Geste
-- Video 1 startet sofort sichtbar
+- User klickt im iFrame → Video mit Ton startet
+- Deine Website bekommt Event → kann Zoom-Animation machen
 
