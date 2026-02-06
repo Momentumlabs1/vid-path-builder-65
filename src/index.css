@@ -221,6 +221,11 @@ All colors MUST be HSL.
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
+    /* Funnel Start CTA */
+    --start: 45 96% 56%;
+    --start-hover: 45 96% 62%;
+    --start-foreground: 222.2 84% 4.9%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
@@ -268,6 +273,11 @@ All colors MUST be HSL.
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
+
+    /* Funnel Start CTA */
+    --start: 45 96% 56%;
+    --start-hover: 45 96% 62%;
+    --start-foreground: 222.2 84% 4.9%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;

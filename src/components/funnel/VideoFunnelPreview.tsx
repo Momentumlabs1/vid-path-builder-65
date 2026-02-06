@@ -294,16 +294,15 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
     const videoUrl = firstVideoNode?.data?.videoUrl as string | undefined;
 
     const handleStartClick = () => {
-      // Event an Parent-Website senden für Zoom-Animation
-      if (window.parent !== window) {
-        window.parent.postMessage({ type: 'funnel_started' }, '*');
-      }
-      
-      if (startEdge) {
-        setCurrentNodeId(startEdge.target);
-      } else if (firstVideoNode) {
-        setCurrentNodeId(firstVideoNode.id);
-      }
+      // IMPORTANT: Do NOT notify parent for any zoom/scale behavior.
+      // The start tap should only advance the funnel inside the iframe.
+      const targetId =
+        startEdge?.target ||
+        firstVideoNode?.id ||
+        nodes.find((n) => n.type === 'video')?.id ||
+        nodes.find((n) => n.type !== 'start')?.id;
+
+      if (targetId) setCurrentNodeId(targetId);
     };
 
     return (
@@ -325,9 +324,9 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
         <div className="relative z-10 flex flex-col items-center justify-center text-center">
           <button
             onClick={handleStartClick}
-            className="w-16 h-16 bg-yellow-500 hover:bg-yellow-400 rounded-full flex items-center justify-center shadow-xl shadow-yellow-500/30 transition-all duration-300 hover:scale-105 active:scale-95 mb-5"
+            className="w-16 h-16 bg-start hover:bg-start-hover rounded-full flex items-center justify-center shadow-xl shadow-start/30 transition-all duration-300 hover:scale-105 active:scale-95 mb-5"
           >
-            <Play className="w-7 h-7 text-black ml-0.5" fill="black" />
+            <Play className="w-7 h-7 text-start-foreground fill-current ml-0.5" fill="currentColor" />
           </button>
           <h1 className="text-xl font-semibold text-white mb-1 tracking-wide">
             {(currentNode.data.label as string) || 'Start'}
