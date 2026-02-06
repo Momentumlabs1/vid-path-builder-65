@@ -463,7 +463,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         : 'group bg-zinc-900 border-2 rounded-xl overflow-hidden transition-all duration-300'
     } ${
       !isPreview && selected 
-        ? 'border-purple-500 shadow-xl shadow-purple-500/30 scale-105' 
+        ? 'border-purple-500 shadow-xl shadow-purple-500/30' 
         : !isPreview ? 'border-zinc-700 hover:border-zinc-600 hover:shadow-lg' : ''
     }`} style={!isPreview ? { width: '240px', height: '426px' } : undefined}>
       {/* Handles - only show in builder mode */}
