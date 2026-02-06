@@ -1,118 +1,171 @@
 
-## Was gerade passiert (warum du nur 1 Video siehst)
-Der aktuelle Standalone-Export ist im Player-Template noch “zu simpel” im Vergleich zur echten Funnel-Logik im Builder.
 
-Konkret:
-- In deinem Builder sind Video-Nodes oft **`answerType: "button"`** (ein einzelner CTA-Button) und die Weiterleitung läuft über **`nextNodes.default`** oder andere Keys.
-- Das exportierte Template rendert Buttons aktuell aber fast nur, wenn **`answers[]`** gefüllt ist – bei `answerType: "button"` ist `answers` normalerweise leer → **kein Button sichtbar**.
-- Beim Video-Ende springt der Export nur dann weiter, wenn es eine **Edge** gibt. Viele Funnels haben aber **keine Edges**, sondern nur `nextNodes` → dann bleibt er nach dem ersten Video stehen.
+# Export: Funnel-Code für externes Projekt vorbereiten
 
-Ergebnis: Du siehst ein Video, und danach passiert nichts.
+## Zusammenfassung
 
-## Ziel
-Der exportierte Standalone-Player soll die **gleiche Funnel-Logik** unterstützen wie eure Preview:
-- `answerType`: `button`, `multipleChoice`, `yesno`, `text`, `email`, `rating`, `none`
-- Routing:
-  - primär über `nextNodes` (z.B. `default`, `yes`, `no`, `0`, `1`, …, `low/medium/high`)
-  - sekundär über Edges
-  - letzter Fallback: “nächstes Video” anhand einer stabilen Reihenfolge (Positionen)
+Du willst den fertigen Funnel-Player-Code nehmen und ihn dem anderen Projekt geben. Das andere Projekt baut dann ihren **eigenen "Funnel starten"-Button** - und DIESER Klick ist dann die User-Interaktion, die Sound erlaubt.
 
-## Umsetzung (Änderungen)
-### 1) `src/lib/export/playerTemplate.ts` (Hauptfix)
-#### A) Button-Rendering vollständig machen
-Erweitern von `renderButtons(...)` bzw. Umbau zu `renderInteraction(node)`:
-- **answerType = "button"**
-  - Button-Text: `node.data.buttonText || "Weiter"`
-  - Klick ruft `handleAnswer("continue", "button")` auf
-  - Keine Abhängigkeit von `answers[]`
+**JA - das ist umsetzbar!**
 
-- **answerType = "multipleChoice"**
-  - Buttons aus `node.data.answers[]`
-  - Klick übergibt **Index** (0,1,2…) wie im echten Funnel
-  - Routing nutzt `nextNodes[index]`
+---
 
-- **answerType = "yesno"**
-  - Zwei Buttons: Text aus `yesText/noText` (Fallback “Ja/Nein”)
-  - Klick übergibt boolean `true/false`
-  - Routing nutzt `nextNodes["yes"]` oder `nextNodes["no"]`
+## Was das andere Projekt bekommt
 
-- **answerType = "text" | "email"**
-  - Input + Submit
-  - Submit übergibt den tatsächlichen Text
-  - Routing nutzt `nextNodes.default` (oder Edge/Fallback)
+Der Code besteht aus **3 Teilen**, die ich hier aus `src/lib/export/playerTemplate.ts` ziehe:
 
-- **answerType = "rating"**
-  - Sterne + Submit
-  - Routing unterstützt `nextNodes.low` (1–2), `nextNodes.medium` (3–4), `nextNodes.high` (5) – sonst `default`
+### 1. CSS Styles (`generatePlayerStyles`)
+- Zeilen 50-475
+- Enthält: `.funnel-player`, `.video-container`, `.funnel-button`, Animationen, etc.
 
-- **answerType = "none"**
-  - Keine Buttons. Video soll am Ende automatisch weiter.
+### 2. JavaScript Player (`generatePlayerScript`)  
+- Zeilen 478-1130
+- Die komplette `FunnelPlayer` Klasse mit:
+  - `startFunnel()` - Startet den Funnel
+  - `goToNode()` - Navigation zwischen Videos
+  - `renderVideoNode()` - Video-Rendering
+  - `handleAnswer()` - Button-Klick Handling
+  - `sendToWebhook()` - Daten an Webhook senden
 
-#### B) Routing-Algorithmus “wie im Builder”
-Ersetzen/Erweitern von `handleAnswer()`:
-1. Bestimme `nextNodeId` über `nextNodes` passend zum `answerType`:
-   - multipleChoice: `nextNodes[index]`
-   - yesno: `nextNodes[answer ? "yes" : "no"]`
-   - rating: `low/medium/high` oder `default`
-   - sonst: `default`
-2. Wenn nicht gefunden: nimm **Edge** (erste outgoing Edge)
-3. Wenn immer noch nicht gefunden: nimm **sequenziellen Fallback** (nächster Node in einer sortierten Reihenfolge)
-4. Wenn gar nichts: zeige End-Screen/Completed
+### 3. Funnel-Daten (`smartTradingFunnel.ts`)
+- 791 Zeilen mit allen Nodes, Edges, Video-URLs
+- 39 Videos strukturiert in Intro + Anfänger + Fortgeschritten Pfade
 
-#### C) Autoadvance korrekt machen
-Aktuell: Autoadvance passiert, wenn `answers[]` leer ist – das ist falsch bei `answerType="button"` (da will man klicken).
-Neu:
-- Autoadvance nur, wenn `answerType === "none"` (oder wenn wirklich keine Interaktion konfiguriert ist, z.B. multipleChoice ohne answers).
-- Bei `button/multipleChoice/yesno/text/email/rating`: **nicht** automatisch weiterlaufen, außer du willst optional eine “auto-advance after end” Option.
+---
 
-#### D) Button-Timing (wichtig bei dir)
-Im Builder gibt es:
-- `delaySeconds`
-- `timedVisibility + visibilityStartTime + visibilityDuration`
+## Wie das andere Projekt es integriert
 
-Der Export nutzt aktuell `delayBeforeButtons` (anderer Key).
-Neu:
-- Player liest vorrangig `delaySeconds`
-- Unterstützt zusätzlich `timedVisibility`-Fenster
-- `delayBeforeButtons` bleibt als Fallback kompatibel
+```text
+Externe Website                    Der Code den sie bekommen
+=================                  =========================
 
-### 2) `src/lib/export/generateStandalonePlayer.ts` (Stabilere Reihenfolge für Fallback)
-Damit der sequenzielle Fallback sinnvoll ist, definieren wir eine robuste Reihenfolge:
-- `nodeOrder = nodes ohne start`, sortiert nach `position.y` dann `position.x`
-- Im Player wird “nächster Node” über diese Reihenfolge bestimmt (nicht über zufällige Array-Reihenfolge)
+<button id="start-btn">            styles.css
+  Funnel starten                   player.js
+</button>                          funnel-data.json
+                                   
+<div id="funnel-container">        
+</div>
+```
 
-(Keine Änderungen an Funnel-Daten nötig – Positionen sind ja bereits drin.)
+### Der wichtige Punkt: DEREN Start-Button
 
-### 3) Optional: bessere Kompatibilität für Farben/Styles
-Viele Nodes nutzen Farbnamen (purple/green/blue…) oder pro-Option Keys (`mcColor_0`, …).
-Minimal (funktional): Standardfarben wie jetzt.
-Optional Upgrade:
-- Mapping Farbnamen → Hex
-- multipleChoice: pro-Option background setzen
+```javascript
+// Im anderen Projekt:
+document.getElementById('start-btn').addEventListener('click', () => {
+  // 1. Container sichtbar machen
+  document.getElementById('funnel-container').style.display = 'block';
+  
+  // 2. Player initialisieren
+  const player = new FunnelPlayer('#funnel-container');
+  
+  // 3. DIREKT starten (kein zweiter Klick nötig)
+  // Hier ist der Klick = User Gesture = Sound erlaubt!
+  player.startFunnel();
+});
+```
 
-## Test-Checkliste (End-to-End)
-1. Funnel mit `answerType="button"` exportieren:
-   - CTA-Button erscheint
-   - Klick geht zum nächsten Video (über `nextNodes.default` oder Edge)
-2. Funnel mit `multipleChoice`:
-   - Buttons erscheinen
-   - Klick auf Option A/B führt korrekt in unterschiedliche Nodes
-3. Funnel mit `yesno`:
-   - Ja/Nein führt zu den konfigurierten Nodes
-4. `delaySeconds`:
-   - Buttons erscheinen erst nach der eingestellten Zeit
-5. `timedVisibility`:
-   - Buttons erscheinen nur im Zeitfenster + optional Countdown (kann später ergänzt werden)
-6. Ohne Edges (nur nextNodes):
-   - Funnel läuft trotzdem vollständig durch
-7. Webhook:
-   - Bei jedem Klick kommt ein `type: "answer"` Event
-   - Bei LeadCapture ein `type: "lead"`
-   - Am Ende `type: "completed"`
+---
 
-## Ergebnis danach
-Du kannst den Funnel wirklich “fertig als Code” exportieren, einfügen – und er verhält sich wie hier im Builder:
-- gleiche Buttons
-- gleiche Verzweigungen
-- gleiche Delay/Timing-Logik
-- Daten gehen sauber per Webhook raus
+## Anpassung am Export-Code (kleine Änderung)
+
+Damit das funktioniert, braucht `startFunnel()` eine kleine Änderung:
+
+### Aktuell (Zeile 555-561):
+```javascript
+startFunnel() {
+  const startNode = this.nodes.find(n => n.type === 'start');
+  const nextNode = this.findNextNode(startNode?.id);
+  if (nextNode) {
+    this.goToNode(nextNode.id);  // <- Hat 300ms Delay (verliert User Gesture!)
+  }
+}
+```
+
+### Neu:
+```javascript
+startFunnel() {
+  // Sound aktivieren (User hat geklickt)
+  this.isMuted = false;
+  
+  const startNode = this.nodes.find(n => n.type === 'start');
+  const nextNode = this.findNextNode(startNode?.id);
+  
+  if (nextNode) {
+    // SOFORT rendern (ohne 300ms Delay für erste Node!)
+    this.currentNodeId = nextNode.id;
+    this.buttonsVisible = false;
+    this.selectedRating = 0;
+    
+    if (nextNode.type === 'video') {
+      this.renderVideoNode(nextNode);
+    } else {
+      this.goToNode(nextNode.id);
+    }
+  }
+}
+```
+
+### Zusätzlich in `renderVideoNode()` (Zeile 678-680):
+```javascript
+// Play video mit Fallback
+if (this.videoElement && videoUrl) {
+  this.videoElement.muted = this.isMuted;
+  
+  this.videoElement.play().catch(e => {
+    console.log('Sound blocked, fallback to muted:', e);
+    this.isMuted = true;
+    this.videoElement.muted = true;
+    this.videoElement.play();
+  });
+}
+```
+
+---
+
+## Was ich jetzt mache
+
+1. **`playerTemplate.ts` fixen** - Die zwei kleinen Änderungen oben einbauen
+2. **Export-Funktion bleibt** - Du kannst weiterhin "Exportieren" im Builder klicken
+3. **Der exportierte Code funktioniert dann sofort** - Anderes Projekt bekommt fertigen, funktionierenden Code
+
+---
+
+## Ablauf danach
+
+```text
+1. Du gehst in den Funnel-Builder
+2. Du klickst "Exportieren" → "Standalone HTML" oder "Separate Dateien"
+3. Du bekommst den fertigen Code
+4. Du schickst den Code ans andere Projekt
+5. Das andere Projekt baut ihren eigenen Start-Button
+6. Deren Button ruft player.startFunnel() auf
+7. Video startet MIT SOUND (weil deren Klick = User Gesture)
+```
+
+---
+
+## Ergebnis
+
+| Vorher | Nachher |
+|--------|---------|
+| iframe mit internem Start-Button | Direkter Code ohne iframe |
+| 2 Klicks nötig (öffnen + starten) | 1 Klick reicht |
+| Sound funktioniert nicht zuverlässig | Sound funktioniert (User Gesture erhalten) |
+| Daten gehen über komplizierte Brücke | Webhook direkt im Player-Code |
+
+---
+
+## Technische Änderungen (für Entwickler)
+
+### Datei: `src/lib/export/playerTemplate.ts`
+
+| Zeile | Änderung |
+|-------|----------|
+| 555-561 | `startFunnel()` mit `isMuted = false` und sofortigem Rendern |
+| 678-680 | `renderVideoNode()` mit dynamischem `video.muted` und Fallback |
+
+### Keine Änderung an:
+- `smartTradingFunnel.ts` (Daten bleiben gleich)
+- `generateStandalonePlayer.ts` (Export-Logik bleibt gleich)
+- `FunnelExporter.tsx` (UI bleibt gleich)
+
