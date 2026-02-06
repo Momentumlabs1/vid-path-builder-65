@@ -27,7 +27,7 @@ import { VideoFunnelPreview } from './VideoFunnelPreview';
 import CustomEdge from './CustomEdge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe } from 'lucide-react';
+import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   placeNodeAvoidingOverlaps,
@@ -95,18 +95,29 @@ function FunnelBuilderInner() {
     [setEdges]
   );
 
+  const [currentZoom, setCurrentZoom] = useState(1);
+
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
     
-    // Auto-zoom to node with smooth animation
+    // Center on node without zooming beyond 100% (WYSIWYG)
     setTimeout(() => {
       reactFlowInstance.fitView({ 
         nodes: [{ id: node.id }], 
         duration: 800,
-        padding: 0.3,
-        maxZoom: 1.2
+        padding: 0.5,
+        maxZoom: 1.0,
+        minZoom: 1.0
       });
     }, 100);
+  }, [reactFlowInstance]);
+
+  const resetZoomTo100 = useCallback(() => {
+    reactFlowInstance.zoomTo(1.0, { duration: 300 });
+  }, [reactFlowInstance]);
+
+  const onMoveEnd = useCallback(() => {
+    setCurrentZoom(reactFlowInstance.getZoom());
   }, [reactFlowInstance]);
 
   const updateNodeData = useCallback((nodeId: string, newData: any) => {
@@ -597,6 +608,7 @@ function FunnelBuilderInner() {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
+            onMoveEnd={onMoveEnd}
             onNodeDragStop={(_, node) =>
               setNodes((nds) => resolveOverlapsForNode(nds, node.id))
             }
@@ -608,6 +620,24 @@ function FunnelBuilderInner() {
             className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
           >
             <Controls className="bg-zinc-800/80 backdrop-blur-sm border-zinc-700" />
+            {/* Zoom Indicator */}
+            <div className="absolute bottom-4 left-16 bg-zinc-800/90 backdrop-blur-sm border border-zinc-700 rounded-lg px-3 py-1.5 flex items-center gap-2">
+              <span className="text-xs text-zinc-400">Zoom:</span>
+              <span className={`text-sm font-mono ${Math.abs(currentZoom - 1) < 0.01 ? 'text-green-400' : 'text-yellow-400'}`}>
+                {Math.round(currentZoom * 100)}%
+              </span>
+              {Math.abs(currentZoom - 1) > 0.01 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetZoomTo100}
+                  className="h-6 px-2 text-xs text-white hover:bg-white/10"
+                >
+                  <ZoomIn className="w-3 h-3 mr-1" />
+                  100%
+                </Button>
+              )}
+            </div>
             <Background color="#444" />
           </ReactFlow>
         </div>
