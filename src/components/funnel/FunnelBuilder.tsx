@@ -27,8 +27,9 @@ import { VideoFunnelPreview } from './VideoFunnelPreview';
 import CustomEdge from './CustomEdge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn } from 'lucide-react';
+import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FunnelExporter } from './FunnelExporter';
 import {
   placeNodeAvoidingOverlaps,
   resolveOverlaps,
@@ -67,6 +68,7 @@ function FunnelBuilderInner() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showExporter, setShowExporter] = useState(false);
   const [funnelName, setFunnelName] = useState('');
   const [currentFunnelId, setCurrentFunnelId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -521,6 +523,15 @@ function FunnelBuilderInner() {
               URL kopieren
             </Button>
             <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowExporter(true)}
+              className="text-white hover:bg-white/10 transition-all duration-300"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <Button 
               variant="default" 
               size="sm" 
               onClick={publishFunnel}
@@ -665,6 +676,15 @@ function FunnelBuilderInner() {
           onClose={() => setShowPreview(false)}
         />
       )}
+
+      {/* Export Modal */}
+      <FunnelExporter
+        isOpen={showExporter}
+        onClose={() => setShowExporter(false)}
+        nodes={nodes}
+        edges={edges}
+        funnelName={funnelName || currentFunnelId || ''}
+      />
     </div>
   );
 }
