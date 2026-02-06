@@ -285,35 +285,50 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
 
   // Handle START nodes in embed mode - show clickable start screen
   if (currentNode.type === 'start') {
-  const handleStartClick = () => {
+    // Find first video node to show its thumbnail as background
+    const edges = (window as any).funnelEdges || [];
+    const startEdge = edges.find((edge: any) => edge.source === currentNode.id);
+    const firstVideoNode = startEdge 
+      ? nodes.find(n => n.id === startEdge.target)
+      : nodes.find(n => n.type === 'video');
+    const videoUrl = firstVideoNode?.data?.videoUrl as string | undefined;
+
+    const handleStartClick = () => {
       // Event an Parent-Website senden für Zoom-Animation
       if (window.parent !== window) {
         window.parent.postMessage({ type: 'funnel_started' }, '*');
       }
       
-      const edges = (window as any).funnelEdges || [];
-      const startEdge = edges.find((edge: any) => edge.source === currentNode.id);
-      
       if (startEdge) {
         setCurrentNodeId(startEdge.target);
-      } else {
-        // Fallback: first video node
-        const videoNode = nodes.find(n => n.type === 'video');
-        if (videoNode) setCurrentNodeId(videoNode.id);
+      } else if (firstVideoNode) {
+        setCurrentNodeId(firstVideoNode.id);
       }
     };
 
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-900 z-50 flex items-center justify-center">
-        <div className="text-center p-8">
+      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+        {/* Video Preview Background */}
+        {videoUrl && (
+          <video
+            src={videoUrl}
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
+            muted
+            playsInline
+            preload="metadata"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
+        
+        <div className="relative z-10 text-center p-8">
           <button
             onClick={handleStartClick}
-            className="w-24 h-24 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-500/40 transition-all hover:scale-105 active:scale-95"
+            className="w-24 h-24 bg-yellow-500 hover:bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-yellow-500/40 transition-all hover:scale-105 active:scale-95"
           >
-            <Play className="w-12 h-12 text-white ml-1" fill="white" />
+            <Play className="w-12 h-12 text-black ml-1" fill="black" />
           </button>
           <h1 className="text-2xl font-bold text-white mb-2">
-            {(currentNode.data.label as string) || 'Bereit?'}
+            {(currentNode.data.label as string) || 'Start'}
           </h1>
           <p className="text-zinc-400 text-sm">
             Tippe um zu starten
