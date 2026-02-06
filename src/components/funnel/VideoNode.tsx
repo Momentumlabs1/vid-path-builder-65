@@ -190,87 +190,69 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
     const containerClasses = `absolute ${getPositionClasses(buttonPosition)} z-50 pointer-events-auto`;
 
-    // Shared dimension helpers (used across button types)
-    // IMPORTANT: In Builder the node container is ~240px wide. In Preview/Embed it's much larger.
-    // If we keep fixed px widths everywhere, buttons look "zu klein" in Preview/Live.
-    // Therefore we use viewport-relative widths ONLY in preview mode.
-    const getWidthClassesBuilder = (width: string) => {
+    // =============================================================================
+    // UNIFIED DIMENSION SYSTEM - Same pixel values in Builder, Preview, AND Embed
+    // These values MUST match the labels shown in NodePropertiesPanel.tsx
+    // =============================================================================
+    
+    // Width: Uses exact pixel values matching editor labels
+    // XS=80px, S=120px, M=160px, L=200px, XL=240px, 2XL=280px, full=100% (max 520px)
+    const getWidthClasses = (width: string) => {
       switch (width) {
         case 'xs':
-          return 'w-[60px]';
+          return 'w-[80px]';
         case 'small':
-          return 'w-[100px]';
+          return 'w-[120px]';
         case 'medium':
-          return 'w-[140px]';
+          return 'w-[160px]';
         case 'large':
-          return 'w-[180px]';
+          return 'w-[200px]';
         case 'xl':
-          return 'w-[220px]';
+          return 'w-[240px]';
         case '2xl':
-          return 'w-[260px]';
+          return 'w-[280px]';
         case 'full':
-          return 'w-full';
+          return 'w-full max-w-[520px]';
         default:
-          return 'w-auto';
+          return 'w-auto min-w-[80px]';
       }
     };
 
-    const getWidthClassesPreview = (width: string) => {
-      // Use min() so it stays within viewport on mobile but still grows on larger containers.
-      switch (width) {
-        case 'xs':
-          return 'w-[min(55vw,160px)]';
-        case 'small':
-          return 'w-[min(70vw,220px)]';
-        case 'medium':
-          return 'w-[min(78vw,280px)]';
-        case 'large':
-          return 'w-[min(84vw,320px)]';
-        case 'xl':
-          return 'w-[min(88vw,360px)]';
-        case '2xl':
-          return 'w-[min(92vw,400px)]';
-        case 'full':
-          return 'w-[min(92vw,520px)]';
-        default:
-          return 'w-auto';
-      }
-    };
-
-    const getWidthClasses = (width: string) =>
-      isPreview ? getWidthClassesPreview(width) : getWidthClassesBuilder(width);
-
+    // Height: Uses exact pixel values matching editor labels
+    // XS=24px, S=28px, M=36px, L=44px, XL=52px, 2XL=60px
+    // NOTE: No py-* padding mixed in - height is fixed, vertical centering via flex
     const getHeightClasses = (height: string) => {
       switch (height) {
         case 'xs':
-          return 'h-5 py-0.5';
+          return 'h-[24px]';
         case 'small':
-          return 'h-6 py-1';
+          return 'h-[28px]';
         case 'medium':
-          return 'h-8 py-1.5';
+          return 'h-[36px]';
         case 'large':
-          return 'h-10 py-2';
+          return 'h-[44px]';
         case 'xl':
-          return 'h-12 py-2.5';
+          return 'h-[52px]';
         case '2xl':
-          return 'h-14 py-3';
+          return 'h-[60px]';
         default:
-          return 'h-8 py-1.5';
+          return 'h-[36px]';
       }
     };
 
+    // Text size: XS=10px, S=12px, M=14px, L=16px
     const getTextSizeClasses = (size: string) => {
       switch (size) {
         case 'xs':
           return 'text-[10px]';
         case 'small':
-          return 'text-xs';
+          return 'text-[12px]';
         case 'medium':
-          return 'text-sm';
+          return 'text-[14px]';
         case 'large':
-          return 'text-base';
+          return 'text-[16px]';
         default:
-          return 'text-xs';
+          return 'text-[12px]';
       }
     };
 
@@ -371,7 +353,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const submitHeightClass = getHeightClasses(submitButtonHeight);
         const submitTextSizeClass = getTextSizeClasses(submitButtonTextSize);
 
-        const formWidthClass = isPreview ? 'max-w-[min(92vw,400px)]' : 'max-w-xs';
+        const formWidthClass = 'w-full max-w-[400px]';
 
         return (
           <div
