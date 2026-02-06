@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { X, ChevronLeft, Star, Users, Flag, Play } from 'lucide-react';
+import { X, ChevronLeft, Star, Users, Flag } from 'lucide-react';
 import { VideoNode } from './VideoNode';
 import { LeadCapture } from './LeadCapture';
 
@@ -26,62 +26,64 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Find the start node - in embed mode show it, otherwise skip to video
+  // Initial node selection: always skip the start node and jump to first connected/video node
   useEffect(() => {
     console.log('VideoFunnelPreview nodes:', nodes);
-    
+
     if (nodes.length === 0) return;
-    
+
     const edges = (window as any).funnelEdges || [];
     console.log('Available edges:', edges);
-    
-    // Find start node
-    const startNode = nodes.find(node => 
-      node.type === 'start' || 
-      node.id.toLowerCase().includes('start')
+
+    const startNode = nodes.find(
+      (node) => node.type === 'start' || node.id.toLowerCase().includes('start')
     );
-    
-    let initialNode = null;
-    
-    // In EMBED mode: Show start node so user clicks INSIDE iframe (iOS fix)
-    if (mode === 'embed' && startNode) {
-      initialNode = startNode;
-      console.log('Embed mode: showing start node for user gesture:', startNode);
-    } 
-    // In builder preview or no start node: skip to video
-    else if (startNode && edges.length > 0) {
+
+    let initialNode: Node | null = null;
+
+    if (startNode && edges.length > 0) {
       const startEdge = edges.find((edge: any) => edge.source === startNode.id);
       if (startEdge) {
-        const connectedNode = nodes.find(node => node.id === startEdge.target);
+        const connectedNode = nodes.find((node) => node.id === startEdge.target);
         if (connectedNode) {
           initialNode = connectedNode;
           console.log('Following edge to connected node:', connectedNode);
         }
       }
     }
-    
+
     // Fallbacks
-    if (!initialNode) {
-      initialNode = nodes.find(node => node.type === 'video');
-    }
-    if (!initialNode) {
-      initialNode = nodes.find(node => node.type !== 'start');
-    }
-    if (!initialNode && nodes.length > 0) {
-      initialNode = nodes[0];
-    }
-    
+    if (!initialNode) initialNode = nodes.find((node) => node.type === 'video') || null;
+    if (!initialNode) initialNode = nodes.find((node) => node.type !== 'start') || null;
+    if (!initialNode && nodes.length > 0) initialNode = nodes[0];
+
     if (initialNode) {
       setCurrentNodeId(initialNode.id);
     }
-  }, [nodes, mode]);
+  }, [nodes]);
 
   const currentNode = nodes.find(node => node.id === currentNodeId);
   const totalNodes = nodes.length;
   const currentStep = nodes.findIndex(node => node.id === currentNodeId) + 1;
   const progress = (currentStep / totalNodes) * 100;
 
-  // Save response to database
+  // If we ever land on a start node (e.g. back navigation), immediately skip it
+  useEffect(() => {
+    const node = nodes.find((n) => n.id === currentNodeId);
+    if (!node || node.type !== 'start') return;
+
+    const edges = (window as any).funnelEdges || [];
+    const startEdge = edges.find((edge: any) => edge.source === node.id);
+
+    const targetId =
+      startEdge?.target ||
+      nodes.find((n) => n.type === 'video')?.id ||
+      nodes.find((n) => n.type !== 'start')?.id;
+
+    if (targetId && targetId !== node.id) {
+      setCurrentNodeId(targetId);
+    }
+  }, [currentNodeId, nodes]);
   const saveResponse = async (question: string, answer: string, answerType: string, nodeId: string) => {
     try {
       const funnelName = window.location.pathname.includes('/funnel/') 
@@ -175,8 +177,13 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
 
   const goBack = () => {
     const currentIndex = nodes.findIndex(n => n.id === currentNodeId);
-    if (currentIndex > 0) {
-      setCurrentNodeId(nodes[currentIndex - 1].id);
+    if (currentIndex <= 0) return;
+
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (nodes[i]?.type !== 'start') {
+        setCurrentNodeId(nodes[i].id);
+        return;
+      }
     }
   };
 
@@ -283,60 +290,10 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   const isMobile = window.innerWidth < 768;
   const isEmbedMode = mode === 'embed';
 
-  // Handle START nodes in embed mode - show clickable start screen
+  // Start nodes should never be visible in the preview/embed player.
+  // If we land here briefly, show a neutral placeholder while the effect above skips ahead.
   if (currentNode.type === 'start') {
-    // Find first video node to show its thumbnail as background
-    const edges = (window as any).funnelEdges || [];
-    const startEdge = edges.find((edge: any) => edge.source === currentNode.id);
-    const firstVideoNode = startEdge 
-      ? nodes.find(n => n.id === startEdge.target)
-      : nodes.find(n => n.type === 'video');
-    const videoUrl = firstVideoNode?.data?.videoUrl as string | undefined;
-
-    const handleStartClick = () => {
-      // IMPORTANT: Do NOT notify parent for any zoom/scale behavior.
-      // The start tap should only advance the funnel inside the iframe.
-      const targetId =
-        startEdge?.target ||
-        firstVideoNode?.id ||
-        nodes.find((n) => n.type === 'video')?.id ||
-        nodes.find((n) => n.type !== 'start')?.id;
-
-      if (targetId) setCurrentNodeId(targetId);
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-        {/* Video Preview Background - higher visibility */}
-        {videoUrl && (
-          <video
-            src={videoUrl}
-            className="absolute inset-0 w-full h-full object-cover opacity-70"
-            muted
-            playsInline
-            preload="metadata"
-          />
-        )}
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
-        
-        {/* Centered content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center">
-          <button
-            onClick={handleStartClick}
-            className="w-16 h-16 bg-start hover:bg-start-hover rounded-full flex items-center justify-center shadow-xl shadow-start/30 transition-all duration-300 hover:scale-105 active:scale-95 mb-5"
-          >
-            <Play className="w-7 h-7 text-start-foreground fill-current ml-0.5" fill="currentColor" />
-          </button>
-          <h1 className="text-xl font-semibold text-white mb-1 tracking-wide">
-            {(currentNode.data.label as string) || 'Start'}
-          </h1>
-          <p className="text-white/60 text-xs">
-            Tippe um zu starten
-          </p>
-        </div>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-black z-50" />;
   }
 
   // Handle leadCapture nodes
