@@ -211,6 +211,10 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
           return 'w-[240px]';
         case '2xl':
           return 'w-[280px]';
+        case '3xl':
+          return 'w-[320px]';
+        case '4xl':
+          return 'w-[360px]';
         case 'full':
           return 'w-full max-w-[520px]';
         default:
@@ -235,12 +239,16 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
           return 'h-[52px]';
         case '2xl':
           return 'h-[60px]';
+        case '3xl':
+          return 'h-[72px]';
+        case '4xl':
+          return 'h-[84px]';
         default:
           return 'h-[36px]';
       }
     };
 
-    // Text size: XS=10px, S=12px, M=14px, L=16px
+    // Text size: XS=10px, S=12px, M=14px, L=16px, XL=18px, 2XL=20px
     const getTextSizeClasses = (size: string) => {
       switch (size) {
         case 'xs':
@@ -251,6 +259,10 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
           return 'text-[14px]';
         case 'large':
           return 'text-[16px]';
+        case 'xl':
+          return 'text-[18px]';
+        case '2xl':
+          return 'text-[20px]';
         default:
           return 'text-[12px]';
       }
@@ -349,11 +361,47 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         const submitButtonWidth = (data.submitButtonWidth as string) || 'full';
         const submitButtonTextSize = (data.submitButtonTextSize as string) || 'small';
 
+        // Input field sizing
+        const inputHeight = (data.inputHeight as string) || 'medium';
+        const inputWidth = (data.inputWidth as string) || 'full';
+        const inputTextSize = (data.inputTextSize as string) || 'small';
+
         const submitWidthClass = getWidthClasses(submitButtonWidth);
         const submitHeightClass = getHeightClasses(submitButtonHeight);
         const submitTextSizeClass = getTextSizeClasses(submitButtonTextSize);
 
-        const formWidthClass = 'w-full max-w-[400px]';
+        // Input size classes
+        const getInputHeightClass = (height: string) => {
+          switch (height) {
+            case 'xs': return 'h-[24px]';
+            case 'small': return 'h-[28px]';
+            case 'medium': return 'h-[36px]';
+            case 'large': return 'h-[44px]';
+            case 'xl': return 'h-[52px]';
+            case '2xl': return 'h-[60px]';
+            case '3xl': return 'h-[72px]';
+            case '4xl': return 'h-[84px]';
+            default: return 'h-[36px]';
+          }
+        };
+
+        const getInputWidthClass = (width: string) => {
+          switch (width) {
+            case 'small': return 'w-[200px]';
+            case 'medium': return 'w-[280px]';
+            case 'large': return 'w-[320px]';
+            case 'xl': return 'w-[400px]';
+            case 'full': return 'w-full max-w-[520px]';
+            default: return 'w-full max-w-[400px]';
+          }
+        };
+
+        const inputHeightClass = getInputHeightClass(inputHeight);
+        const inputWidthClass = getInputWidthClass(inputWidth);
+        const inputTextSizeClass = getTextSizeClasses(inputTextSize);
+
+        // Container width should match the larger of input or button
+        const formWidthClass = 'w-full max-w-[520px]';
 
         return (
           <div
@@ -361,13 +409,13 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            <div className={`space-y-2 w-full ${formWidthClass}`}> 
+            <div className={`space-y-2 ${formWidthClass}`}> 
               <input
                 type={data.answerType === 'email' ? 'email' : 'text'}
                 placeholder={(data.placeholder as string) || 'Hier eingeben...'}
                 value={textInput as string}
                 onChange={(e) => typeof setTextInput === 'function' && setTextInput(e.target.value)}
-                className="w-full px-3 py-2 glass-effect rounded-lg text-white font-figtree placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 text-sm smooth-transition"
+                className={`${inputWidthClass} ${inputHeightClass} ${inputTextSizeClass} px-3 glass-effect rounded-lg text-white font-figtree placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 smooth-transition`}
               />
               <UniversalButton
                 text={submitButtonText}
@@ -487,7 +535,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
             <video 
               ref={videoRef}
               src={data.videoUrl as string}
-              className={`w-full h-full object-cover pointer-events-none ${isPreview ? 'video-crossfade-enter' : ''}`}
+              className={`w-full h-full object-cover pointer-events-none ${isPreview ? 'opacity-100' : ''}`}
               style={{ 
                 touchAction: 'manipulation', 
                 willChange: 'transform, opacity',
@@ -555,14 +603,10 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                   });
                 }
               }}
-              onLoadStart={() => {
-                // Smoother loading transition
-                if (isPreview) {
-                  const video = document.querySelector('video');
-                  if (video) {
-                    video.style.opacity = '0';
-                  }
-                }
+              onError={(e) => {
+                // Bei Video-Fehler trotzdem sichtbar machen
+                e.currentTarget.style.opacity = '1';
+                console.error('Video load error:', e);
               }}
               onLoadedData={(e) => {
                 const video = e.currentTarget;
