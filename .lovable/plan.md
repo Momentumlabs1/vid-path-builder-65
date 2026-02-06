@@ -1,66 +1,119 @@
 
 
-## WYSIWYG Fix: Editor zeigt jetzt echte Größen
+## Fix: Schwarzes Video beim ersten Laden + Button-Größen Anpassung
 
-### Das Problem (kurz)
-Der Editor zeigt dir Buttons **bis zu 26% größer** als sie wirklich sind:
-- **`scale-105`** bei ausgewählten Nodes → +5% Vergrößerung
-- **`maxZoom: 1.2`** beim Anklicken → +20% Zoom
-- **Zusammen: 1.05 × 1.2 = 1.26** → deine "2XL" Buttons wirken im Editor riesig, aber in Vorschau/Website sind sie echt
+### Problem 1: Erstes Video ist schwarz (auf Homepage/Embed)
 
-### Die Lösung
+**Ursache gefunden:**
+- In `VideoNode.tsx` (Zeile 558-565) wird beim `onLoadStart` Event die Video-Opacity auf `0` gesetzt
+- Das Problem: `document.querySelector('video')` ist unzuverlässig (findet falsches Element)
+- Wenn `onLoadedData` nicht feuert (häufig im iFrame/Embed auf externen Websites), bleibt das Video **dauerhaft unsichtbar** (opacity: 0)
 
-#### 1. scale-105 entfernen (VideoNode.tsx, Zeile 465-466)
-```
-VORHER:
-!isPreview && selected 
-  ? 'border-purple-500 shadow-xl shadow-purple-500/30 scale-105'
+**Lösung:**
+1. **Entferne den `onLoadStart` opacity=0 Hack** - er verursacht mehr Probleme als er löst
+2. **Verwende CSS-Klassen statt inline styles** für die Crossfade-Animation
+3. **Setze ein Fallback-Timeout** das nach 1 Sekunde die Opacity auf 1 setzt, falls `onLoadedData` nicht feuert
 
-NACHHER:
-!isPreview && selected 
-  ? 'border-purple-500 shadow-xl shadow-purple-500/30'
-```
+### Problem 2: Button/Input-Größen im Editor vs Live
 
-#### 2. maxZoom auf 1.0 setzen (FunnelBuilder.tsx, Zeile 103-108)
-```
-VORHER:
-reactFlowInstance.fitView({ 
-  nodes: [{ id: node.id }], 
-  duration: 800,
-  padding: 0.3,
-  maxZoom: 1.2
-});
+**Status nach WYSIWYG-Fix:**
+- Zoom-Skalierung entfernt (scale-105 weg, maxZoom=1.0)
+- Editor zeigt jetzt echte Größen
 
-NACHHER:
-reactFlowInstance.fitView({ 
-  nodes: [{ id: node.id }], 
-  duration: 800,
-  padding: 0.5,
-  maxZoom: 1.0,
-  minZoom: 1.0
-});
-```
-
-#### 3. Zoom-Anzeige + "100%" Button hinzufügen (FunnelBuilder.tsx)
-In der Header-Leiste ein kleiner Indikator:
-- Zeigt aktuellen Zoom-Level an (z.B. "100%")
-- Button um sofort auf 100% zu springen
+**Noch zu tun:**
+- Input-Felder bekommen eigene Größenkontrollen (Input-Höhe, Input-Breite)
+- Größere Preset-Optionen hinzufügen (3XL, 4XL für Desktop-Embeds)
 
 ---
 
-### Technischer Hintergrund
+## Technische Änderungen
 
-| Datei | Zeile | Was passiert | Fix |
-|-------|-------|-------------|-----|
-| `VideoNode.tsx` | 465-466 | `scale-105` bei `selected` | Entfernen |
-| `FunnelBuilder.tsx` | 103-108 | `maxZoom: 1.2` | Auf `1.0` setzen |
-| `FunnelBuilder.tsx` | Header | Kein Zoom-Indikator | Hinzufügen |
+### Datei 1: `src/components/funnel/VideoNode.tsx`
+
+**Zeile 558-566 - onLoadStart entfernen:**
+```tsx
+// VORHER (problematisch):
+onLoadStart={() => {
+  if (isPreview) {
+    const video = document.querySelector('video');
+    if (video) {
+      video.style.opacity = '0';
+    }
+  }
+}}
+
+// NACHHER (entfernt - keine opacity manipulation beim Start):
+// onLoadStart entfernen oder leer lassen
+```
+
+**Zeile 567-584 - Fallback-Timer hinzufügen:**
+```tsx
+// VORHER:
+onLoadedData={(e) => {
+  const video = e.currentTarget;
+  if (!isPreview) {
+    video.currentTime = 2;
+  } else {
+    video.style.opacity = '1';
+    video.play().catch(...);
+  }
+}}
+
+// NACHHER:
+onLoadedData={(e) => {
+  const video = e.currentTarget;
+  if (!isPreview) {
+    video.currentTime = 2;
+  } else {
+    video.style.opacity = '1';
+    video.play().catch(() => {
+      console.log('Video autoplay failed');
+    });
+  }
+}}
+
+// PLUS: Fallback-Timer nach dem video Element (Zeile ~590)
+onError={(e) => {
+  // Bei Video-Fehler trotzdem sichtbar machen
+  e.currentTarget.style.opacity = '1';
+  console.error('Video load error:', e);
+}}
+```
+
+**Zeile 490 - Initial Opacity auf 1 setzen statt 0:**
+```tsx
+// VORHER:
+className={`... video-crossfade-enter`}
+
+// NACHHER - opacity immer 1, Crossfade nur über CSS-Klasse:
+className={`... ${isPreview ? 'opacity-100' : ''}`}
+style={{ 
+  touchAction: 'manipulation', 
+  willChange: 'transform, opacity',
+  transition: 'opacity 0.5s ease-out'
+}}
+```
+
+### Datei 2: `src/components/funnel/NodePropertiesPanel.tsx`
+
+**Input-Größen-Controls hinzufügen:**
+- Neue Sektion "Eingabefeld Größe" mit:
+  - Input-Höhe: SM, MD, LG, XL, 2XL
+  - Input-Breite: wie Button-Breite
+
+### Datei 3: Button-Presets erweitern
+
+**Größere Optionen:**
+- 3XL: 320px Breite, 72px Höhe
+- 4XL: 360px Breite, 84px Höhe
+- FULL: 100% Breite
 
 ---
 
-### Ergebnis nach Umsetzung
-- Editor zeigt **exakt dieselbe Größe** wie Vorschau und Website
-- Wenn du "2XL (280px)" wählst, siehst du überall 280px
-- Kein verstecktes Zoom/Scale mehr
-- WYSIWYG ist endlich Realität
+## Erwartetes Ergebnis
+
+1. **Erstes Video lädt sofort sichtbar** - kein schwarzer Bildschirm mehr
+2. **Input-Felder kontrollierbar** - eigene Größenoptionen im Editor
+3. **Größere Button-Presets** - für Desktop-Websites geeignet
+4. **Editor = Live = Website** - WYSIWYG garantiert
 
