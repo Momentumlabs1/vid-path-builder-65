@@ -505,6 +505,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectItem value="text" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Text Input</SelectItem>
                     <SelectItem value="email" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">E-Mail</SelectItem>
                     <SelectItem value="rating" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Rating</SelectItem>
+                    <SelectItem value="budgetSlider" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Budget-Slider</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1129,6 +1130,118 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           </Select>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Budget Slider Configuration */}
+              {localData.answerType === 'budgetSlider' && (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-white text-sm font-medium mb-2 block">Slider Einstellungen</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Min (€)</Label>
+                        <Input
+                          type="number"
+                          value={(localData.sliderMin as number) || 0}
+                          onChange={(e) => updateLocalData({ sliderMin: Number(e.target.value) })}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Max (€)</Label>
+                        <Input
+                          type="number"
+                          value={(localData.sliderMax as number) || 10000}
+                          onChange={(e) => updateLocalData({ sliderMax: Number(e.target.value) })}
+                          className="bg-zinc-800 border-zinc-700 text-white"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <Label className="text-white text-xs mb-2 block">Schrittweite (€)</Label>
+                      <Select
+                        value={String((localData.sliderStep as number) || 100)}
+                        onValueChange={(value) => updateLocalData({ sliderStep: Number(value) })}
+                      >
+                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectItem value="50">€50</SelectItem>
+                          <SelectItem value="100">€100</SelectItem>
+                          <SelectItem value="250">€250</SelectItem>
+                          <SelectItem value="500">€500</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-white text-sm font-medium mb-3 block">Submit Button</Label>
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-white text-xs mb-2 block">Button Text</Label>
+                        <Input
+                          value={(localData.sliderSubmitText as string) || 'Weiter'}
+                          onChange={(e) => updateLocalData({ sliderSubmitText: e.target.value })}
+                          className="bg-zinc-800 border-zinc-700 text-white text-sm"
+                          placeholder="Weiter"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-white text-xs mb-2 block">Farbe</Label>
+                          <Select
+                            value={(localData.sliderSubmitColor as string) || 'purple'}
+                            onValueChange={(value) => updateLocalData({ sliderSubmitColor: value })}
+                          >
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                              <SelectItem value="purple">Lila</SelectItem>
+                              <SelectItem value="blue">Blau</SelectItem>
+                              <SelectItem value="green">Grün</SelectItem>
+                              <SelectItem value="orange">Orange</SelectItem>
+                              <SelectItem value="red">Rot</SelectItem>
+                              <SelectItem value="white">Weiß</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-white text-xs mb-2 block">Style</Label>
+                          <Select
+                            value={(localData.sliderSubmitStyle as string) || 'glassmorphism'}
+                            onValueChange={(value) => updateLocalData({ sliderSubmitStyle: value })}
+                          >
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                              <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
+                              <SelectItem value="solid">Solid</SelectItem>
+                              <SelectItem value="outline">Outline</SelectItem>
+                              <SelectItem value="gradient">Gradient</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Budget Zone Preview */}
+                  <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-700/50">
+                    <Label className="text-white text-xs mb-2 block">Budget-Zonen Vorschau</Label>
+                    <div className="flex gap-1 text-[10px]">
+                      <div className="flex-1 bg-red-500/30 rounded p-1 text-center text-red-300">⚠️ Wenig<br/>€0-500</div>
+                      <div className="flex-1 bg-orange-500/30 rounded p-1 text-center text-orange-300">🌱 Starter<br/>€500-1.5k</div>
+                      <div className="flex-1 bg-green-500/30 rounded p-1 text-center text-green-300">✅ Solide<br/>€1.5k-4k</div>
+                      <div className="flex-1 bg-cyan-500/30 rounded p-1 text-center text-cyan-300">💎 Platin<br/>€4k-7k</div>
+                      <div className="flex-1 bg-yellow-500/30 rounded p-1 text-center text-yellow-300">👑 Gold<br/>€7k-10k</div>
                     </div>
                   </div>
                 </div>

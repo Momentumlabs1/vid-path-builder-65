@@ -474,6 +474,103 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         );
       }
 
+      case 'budgetSlider': {
+        const sliderMin = Number(data.sliderMin) || 0;
+        const sliderMax = Number(data.sliderMax) || 10000;
+        const sliderStep = Number(data.sliderStep) || 100;
+        const sliderSubmitText = (data.sliderSubmitText as string) || 'Weiter';
+        const sliderSubmitColor = (data.sliderSubmitColor as string) || 'purple';
+        const sliderSubmitStyle = (data.sliderSubmitStyle as string) || 'glassmorphism';
+        
+        // Use local state for slider value
+        const sliderValue = isPreview ? (data.sliderValue as number) ?? 2500 : 2500;
+        const setSliderValue = isPreview ? data.setSliderValue : () => {};
+
+        // Budget zone calculations
+        const getBudgetZone = (value: number) => {
+          if (value <= 500) return { label: 'Wenig', emoji: '⚠️', color: '#FF4444', bg: 'from-red-500/30 to-red-600/20' };
+          if (value <= 1500) return { label: 'Starter', emoji: '🌱', color: '#FFAA00', bg: 'from-orange-500/30 to-orange-600/20' };
+          if (value <= 4000) return { label: 'Solide', emoji: '✅', color: '#44DD44', bg: 'from-green-500/30 to-green-600/20' };
+          if (value <= 7000) return { label: 'Platin', emoji: '💎', color: '#00D4FF', bg: 'from-cyan-500/30 to-cyan-600/20' };
+          return { label: 'Gold', emoji: '👑', color: '#FFD700', bg: 'from-yellow-500/30 to-yellow-600/20' };
+        };
+
+        const zone = getBudgetZone(sliderValue);
+        const percentage = ((sliderValue - sliderMin) / (sliderMax - sliderMin)) * 100;
+
+        return (
+          <div
+            className={`${containerClasses} transition-all duration-500 ease-out ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            <div className={`w-full max-w-[320px] p-4 rounded-xl bg-gradient-to-br ${zone.bg} backdrop-blur-md border border-white/20`}>
+              <div className="text-center mb-4">
+                <p className="text-white/70 text-xs mb-1">Dein Budget für Trading</p>
+                <div className="text-3xl font-bold text-white" style={{ color: zone.color }}>
+                  €{sliderValue.toLocaleString('de-DE')}
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <span className="text-lg">{zone.emoji}</span>
+                  <span className="text-sm font-semibold" style={{ color: zone.color }}>{zone.label}</span>
+                </div>
+              </div>
+              
+              {/* Slider Track */}
+              <div className="relative mb-4">
+                <div className="h-3 rounded-full bg-gradient-to-r from-red-500 via-orange-500 via-green-500 via-cyan-500 to-yellow-500 opacity-40" />
+                <div 
+                  className="absolute top-0 h-3 rounded-full transition-all duration-200"
+                  style={{ 
+                    width: `${percentage}%`,
+                    background: `linear-gradient(90deg, #FF4444, #FFAA00, #44DD44, #00D4FF, #FFD700)`,
+                    backgroundSize: '500% 100%',
+                    backgroundPosition: '0% 0%'
+                  }}
+                />
+                <input
+                  type="range"
+                  min={sliderMin}
+                  max={sliderMax}
+                  step={sliderStep}
+                  value={sliderValue}
+                  onChange={(e) => typeof setSliderValue === 'function' && setSliderValue(Number(e.target.value))}
+                  className="absolute top-0 w-full h-3 opacity-0 cursor-pointer"
+                  style={{ touchAction: 'manipulation' }}
+                />
+                {/* Slider Thumb */}
+                <div 
+                  className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-lg transition-all duration-100 pointer-events-none"
+                  style={{ 
+                    left: `calc(${percentage}% - 12px)`,
+                    backgroundColor: zone.color,
+                    boxShadow: `0 0 12px ${zone.color}80`
+                  }}
+                />
+              </div>
+              
+              {/* Scale Labels */}
+              <div className="flex justify-between text-xs text-white/50 mb-4">
+                <span>€0</span>
+                <span>€2.5k</span>
+                <span>€5k</span>
+                <span>€7.5k</span>
+                <span>€10k</span>
+              </div>
+
+              <UniversalButton
+                text={sliderSubmitText}
+                color={sliderSubmitColor as any}
+                style={sliderSubmitStyle as any}
+                size="small"
+                onClick={() => handleAnswerClick(sliderValue, 'budgetSlider')}
+                className="w-full h-[44px] text-[14px]"
+              />
+            </div>
+          </div>
+        );
+      }
+
       default: {
         // Fallback zu button für alle anderen Fälle
         const fallbackColor = (data.buttonColor as string) || 'purple';
