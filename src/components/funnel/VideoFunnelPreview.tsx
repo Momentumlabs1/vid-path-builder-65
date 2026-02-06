@@ -285,7 +285,12 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
 
   // Handle START nodes in embed mode - show clickable start screen
   if (currentNode.type === 'start') {
-    const handleStartClick = () => {
+  const handleStartClick = () => {
+      // Event an Parent-Website senden für Zoom-Animation
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'funnel_started' }, '*');
+      }
+      
       const edges = (window as any).funnelEdges || [];
       const startEdge = edges.find((edge: any) => edge.source === currentNode.id);
       
