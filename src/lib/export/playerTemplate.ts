@@ -11,8 +11,19 @@ export interface FunnelNode {
     overlayText?: string;
     answerType?: string;
     answers?: string[];
+    buttonText?: string;
     buttonColor?: string;
+    yesText?: string;
+    noText?: string;
+    placeholder?: string;
+    delaySeconds?: number;
     delayBeforeButtons?: number;
+    timedVisibility?: boolean;
+    visibilityStartTime?: number;
+    visibilityDuration?: number;
+    buttonWidth?: string;
+    buttonHeight?: string;
+    buttonTextSize?: string;
     nextNodes?: Record<string, string>;
     title?: string;
     description?: string;
@@ -66,6 +77,7 @@ export function generatePlayerStyles(): string {
       overflow: hidden;
       position: relative;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.3s ease;
     }
     
     @media (max-width: 430px) {
@@ -127,11 +139,13 @@ export function generatePlayerStyles(): string {
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.5s ease;
+      pointer-events: none;
     }
     
     .buttons-container.visible {
       opacity: 1;
       transform: translateY(0);
+      pointer-events: auto;
     }
     
     .funnel-button {
@@ -146,6 +160,7 @@ export function generatePlayerStyles(): string {
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+      width: 100%;
     }
     
     .funnel-button:hover {
@@ -168,6 +183,25 @@ export function generatePlayerStyles(): string {
       backdrop-filter: blur(10px);
     }
     
+    .funnel-button.yes-btn {
+      background: #22c55e;
+      color: #fff;
+    }
+    
+    .funnel-button.no-btn {
+      background: #ef4444;
+      color: #fff;
+    }
+    
+    /* Button Sizes */
+    .funnel-button.size-sm { padding: 0.5rem 1rem; font-size: 0.875rem; min-height: 40px; }
+    .funnel-button.size-md { padding: 0.75rem 1.25rem; font-size: 1rem; min-height: 48px; }
+    .funnel-button.size-lg { padding: 1rem 1.5rem; font-size: 1.125rem; min-height: 56px; }
+    .funnel-button.size-xl { padding: 1.25rem 2rem; font-size: 1.25rem; min-height: 64px; }
+    .funnel-button.size-2xl { padding: 1.5rem 2.5rem; font-size: 1.375rem; min-height: 72px; }
+    .funnel-button.size-3xl { padding: 1.75rem 3rem; font-size: 1.5rem; min-height: 80px; }
+    .funnel-button.size-4xl { padding: 2rem 3.5rem; font-size: 1.625rem; min-height: 88px; }
+    
     .yes-no-container {
       display: flex;
       gap: 0.75rem;
@@ -177,6 +211,73 @@ export function generatePlayerStyles(): string {
       flex: 1;
     }
     
+    /* Text/Email Input */
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .funnel-input {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 1rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .funnel-input:focus {
+      outline: none;
+      border-color: var(--button-color, #facc15);
+    }
+    
+    .funnel-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Rating Stars */
+    .rating-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .stars-container {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .star-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: transform 0.2s ease;
+    }
+    
+    .star-button:hover {
+      transform: scale(1.2);
+    }
+    
+    .star-button svg {
+      width: 2rem;
+      height: 2rem;
+      fill: #4b5563;
+      stroke: #4b5563;
+      transition: all 0.2s ease;
+    }
+    
+    .star-button.active svg,
+    .star-button:hover svg {
+      fill: #facc15;
+      stroke: #facc15;
+    }
+
     /* Lead Capture Form */
     .lead-form {
       position: absolute;
@@ -375,12 +476,23 @@ export function generatePlayerStyles(): string {
 }
 
 export function generatePlayerScript(data: FunnelData, webhookUrl?: string): string {
+  // Sort nodes by position for sequential fallback
+  const sortedNodes = [...data.nodes]
+    .filter(n => n.type !== 'start')
+    .sort((a, b) => {
+      if (a.position.y !== b.position.y) return a.position.y - b.position.y;
+      return a.position.x - b.position.x;
+    });
+  
+  const nodeOrder = sortedNodes.map(n => n.id);
+  
   return `
 // Funnel Player - Generated Code
 // Funnel: ${data.name}
 // Generated: ${new Date().toISOString()}
 
 const FUNNEL_DATA = ${JSON.stringify(data, null, 2)};
+const NODE_ORDER = ${JSON.stringify(nodeOrder)};
 const WEBHOOK_URL = ${webhookUrl ? `'${webhookUrl}'` : 'null'};
 const SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
 
@@ -396,6 +508,9 @@ class FunnelPlayer {
     this.videoElement = null;
     this.progress = 0;
     this.buttonsVisible = false;
+    this.selectedRating = 0;
+    this.visibilityTimeout = null;
+    this.hideTimeout = null;
     
     this.init();
   }
@@ -419,12 +534,12 @@ class FunnelPlayer {
   
   showStartScreen(startNode) {
     // Find first video to show as background preview
-    const firstVideoNode = this.getNextNode(startNode.id);
+    const firstVideoNode = this.findNextNode(startNode.id);
     const previewUrl = firstVideoNode?.data?.videoUrl || '';
     
     this.playerEl.innerHTML = \`
       <div class="start-screen" onclick="window.funnelPlayer.startFunnel()">
-        \${previewUrl ? \`<video src="\${previewUrl}" muted loop autoplay style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3;"></video>\` : ''}
+        \${previewUrl ? \`<video src="\${previewUrl}" muted loop autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3;"></video>\` : ''}
         <button class="start-button">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
@@ -439,17 +554,43 @@ class FunnelPlayer {
   
   startFunnel() {
     const startNode = this.nodes.find(n => n.type === 'start');
-    const nextNode = this.getNextNode(startNode?.id);
+    const nextNode = this.findNextNode(startNode?.id);
     if (nextNode) {
       this.goToNode(nextNode.id);
     }
   }
   
-  getNextNode(nodeId) {
+  // Enhanced routing: nextNodes -> edges -> sequential fallback
+  findNextNode(nodeId, routingKey = 'default') {
+    const node = this.nodes.find(n => n.id === nodeId);
+    if (!node) return null;
+    
+    // 1. Try nextNodes with specific key
+    const nextNodes = node.data?.nextNodes;
+    if (nextNodes) {
+      // Try specific key first
+      if (nextNodes[routingKey]) {
+        return this.nodes.find(n => n.id === nextNodes[routingKey]);
+      }
+      // Try 'default' as fallback
+      if (routingKey !== 'default' && nextNodes['default']) {
+        return this.nodes.find(n => n.id === nextNodes['default']);
+      }
+    }
+    
+    // 2. Try edges
     const edge = this.edges.find(e => e.source === nodeId);
     if (edge) {
       return this.nodes.find(n => n.id === edge.target);
     }
+    
+    // 3. Sequential fallback based on position
+    const currentIndex = NODE_ORDER.indexOf(nodeId);
+    if (currentIndex >= 0 && currentIndex < NODE_ORDER.length - 1) {
+      const nextId = NODE_ORDER[currentIndex + 1];
+      return this.nodes.find(n => n.id === nextId);
+    }
+    
     return null;
   }
   
@@ -457,29 +598,52 @@ class FunnelPlayer {
     const node = this.nodes.find(n => n.id === nodeId);
     if (!node) return;
     
-    this.currentNodeId = nodeId;
-    this.buttonsVisible = false;
+    // Clear any pending visibility timeouts
+    if (this.visibilityTimeout) clearTimeout(this.visibilityTimeout);
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
     
-    switch (node.type) {
-      case 'video':
-        this.renderVideoNode(node);
-        break;
-      case 'leadCapture':
-        this.renderLeadCaptureNode(node);
-        break;
-      case 'end':
-        this.renderEndNode(node);
-        break;
-      default:
-        console.warn('Unknown node type:', node.type);
-    }
+    // Crossfade transition
+    this.playerEl.style.opacity = '0';
+    
+    setTimeout(() => {
+      this.currentNodeId = nodeId;
+      this.buttonsVisible = false;
+      this.selectedRating = 0;
+      
+      switch (node.type) {
+        case 'video':
+          this.renderVideoNode(node);
+          break;
+        case 'leadCapture':
+          this.renderLeadCaptureNode(node);
+          break;
+        case 'end':
+          this.renderEndNode(node);
+          break;
+        default:
+          console.warn('Unknown node type:', node.type);
+      }
+      
+      this.playerEl.style.opacity = '1';
+    }, 300);
   }
   
   renderVideoNode(node) {
-    const { videoUrl, overlayText, answerType, answers, buttonColor, delayBeforeButtons } = node.data;
-    const delay = delayBeforeButtons || 0;
-    const color = buttonColor || '#facc15';
+    const { 
+      videoUrl, 
+      overlayText, 
+      answerType, 
+      answers, 
+      buttonColor,
+      buttonText,
+      delaySeconds,
+      delayBeforeButtons,
+      timedVisibility,
+      visibilityStartTime,
+      visibilityDuration
+    } = node.data;
     
+    const color = this.getButtonColorHex(buttonColor);
     this.playerEl.style.setProperty('--button-color', color);
     
     this.playerEl.innerHTML = \`
@@ -489,14 +653,14 @@ class FunnelPlayer {
         </div>
         <video 
           id="funnel-video" 
-          src="\${videoUrl}" 
+          src="\${videoUrl || ''}" 
           playsinline 
           \${this.isMuted ? 'muted' : ''}
         ></video>
         <div class="overlay">
           \${overlayText ? \`<div class="overlay-text">\${overlayText}</div>\` : ''}
           <div class="buttons-container" id="buttons-container">
-            \${this.renderButtons(answerType, answers, color)}
+            \${this.renderInteraction(node)}
           </div>
         </div>
         <button class="unmute-button" id="unmute-btn">
@@ -511,38 +675,74 @@ class FunnelPlayer {
     const unmuteBtn = this.playerEl.querySelector('#unmute-btn');
     
     // Play video
-    this.videoElement.play().catch(e => console.log('Autoplay blocked:', e));
+    if (this.videoElement && videoUrl) {
+      this.videoElement.play().catch(e => console.log('Autoplay blocked:', e));
+    }
     
-    // Progress bar
-    this.videoElement.addEventListener('timeupdate', () => {
-      if (this.videoElement.duration) {
-        const progress = (this.videoElement.currentTime / this.videoElement.duration) * 100;
-        progressFill.style.width = progress + '%';
-        
-        // Show buttons after delay
-        const delayProgress = (delay / this.videoElement.duration) * 100;
-        if (progress >= delayProgress && !this.buttonsVisible) {
-          this.buttonsVisible = true;
-          buttonsContainer.classList.add('visible');
-        }
-      }
-    });
+    // Determine if this node needs user interaction
+    const needsInteraction = this.nodeNeedsInteraction(node);
     
-    // Video ended - auto-advance if no buttons
-    this.videoElement.addEventListener('ended', () => {
-      if (!answers || answers.length === 0) {
-        const nextNode = this.getNextNode(node.id);
-        if (nextNode) {
-          this.goToNode(nextNode.id);
+    // Calculate delay in seconds
+    const delay = delaySeconds ?? delayBeforeButtons ?? 0;
+    
+    // Progress bar and button visibility
+    if (this.videoElement) {
+      this.videoElement.addEventListener('timeupdate', () => {
+        if (this.videoElement.duration) {
+          const currentTime = this.videoElement.currentTime;
+          const duration = this.videoElement.duration;
+          const progress = (currentTime / duration) * 100;
+          progressFill.style.width = progress + '%';
+          
+          // Handle button visibility
+          if (!this.buttonsVisible && needsInteraction) {
+            if (timedVisibility && visibilityStartTime !== undefined) {
+              // Timed visibility: show at specific time
+              if (currentTime >= visibilityStartTime) {
+                this.buttonsVisible = true;
+                buttonsContainer.classList.add('visible');
+                
+                // Hide after duration if specified
+                if (visibilityDuration && visibilityDuration > 0) {
+                  const hideTime = visibilityStartTime + visibilityDuration;
+                  if (currentTime < hideTime) {
+                    this.hideTimeout = setTimeout(() => {
+                      buttonsContainer.classList.remove('visible');
+                    }, (hideTime - currentTime) * 1000);
+                  }
+                }
+              }
+            } else if (currentTime >= delay) {
+              // Standard delay
+              this.buttonsVisible = true;
+              buttonsContainer.classList.add('visible');
+            }
+          }
         }
-      }
-    });
+      });
+      
+      // Video ended
+      this.videoElement.addEventListener('ended', () => {
+        // Auto-advance only if answerType is 'none' or no interaction needed
+        if (!needsInteraction) {
+          const nextNode = this.findNextNode(node.id);
+          if (nextNode) {
+            this.goToNode(nextNode.id);
+          } else {
+            // Show completed
+            this.showCompleted();
+          }
+        }
+      });
+    }
     
     // Unmute button
     unmuteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this.isMuted = !this.isMuted;
-      this.videoElement.muted = this.isMuted;
+      if (this.videoElement) {
+        this.videoElement.muted = this.isMuted;
+      }
       unmuteBtn.innerHTML = this.isMuted ? this.getSpeakerOffIcon() : this.getSpeakerOnIcon();
     });
     
@@ -550,40 +750,172 @@ class FunnelPlayer {
     window.funnelPlayer = this;
   }
   
-  renderButtons(answerType, answers, color) {
-    if (!answers || answers.length === 0) return '';
+  nodeNeedsInteraction(node) {
+    const answerType = node.data?.answerType;
     
-    if (answerType === 'yesNo') {
+    // 'none' or undefined with no answers = no interaction needed
+    if (answerType === 'none') return false;
+    if (!answerType) return false;
+    
+    // These types always need interaction
+    if (['button', 'yesno', 'text', 'email', 'rating'].includes(answerType)) {
+      return true;
+    }
+    
+    // multipleChoice needs answers
+    if (answerType === 'multipleChoice') {
+      return Array.isArray(node.data?.answers) && node.data.answers.length > 0;
+    }
+    
+    return false;
+  }
+  
+  renderInteraction(node) {
+    const { answerType, answers, buttonText, buttonColor, yesText, noText, placeholder, buttonHeight } = node.data;
+    const sizeClass = this.getButtonSizeClass(buttonHeight);
+    
+    // answerType: button (CTA)
+    if (answerType === 'button') {
+      const text = buttonText || 'Weiter';
+      return \`
+        <button class="funnel-button primary \${sizeClass}" onclick="window.funnelPlayer.handleAnswer('continue', 'button')">
+          \${text} →
+        </button>
+      \`;
+    }
+    
+    // answerType: yesno
+    if (answerType === 'yesno') {
+      const yesLabel = yesText || 'Ja';
+      const noLabel = noText || 'Nein';
       return \`
         <div class="yes-no-container">
-          <button class="funnel-button primary" onclick="window.funnelPlayer.handleAnswer('Ja')">
-            ✓ Ja
+          <button class="funnel-button yes-btn \${sizeClass}" onclick="window.funnelPlayer.handleAnswer(true, 'yesno')">
+            ✓ \${yesLabel}
           </button>
-          <button class="funnel-button secondary" onclick="window.funnelPlayer.handleAnswer('Nein')">
-            ✗ Nein
+          <button class="funnel-button no-btn \${sizeClass}" onclick="window.funnelPlayer.handleAnswer(false, 'yesno')">
+            ✗ \${noLabel}
           </button>
         </div>
       \`;
     }
     
-    if (answerType === 'cta') {
-      const ctaText = answers[0] || 'Weiter';
-      return \`
-        <button class="funnel-button primary" onclick="window.funnelPlayer.handleAnswer('\${ctaText}')">
-          \${ctaText} →
+    // answerType: multipleChoice
+    if (answerType === 'multipleChoice' && Array.isArray(answers) && answers.length > 0) {
+      return answers.map((answer, index) => \`
+        <button class="funnel-button \${index === 0 ? 'primary' : 'secondary'} \${sizeClass}" 
+                onclick="window.funnelPlayer.handleAnswer(\${index}, 'multipleChoice')">
+          \${answer}
         </button>
+      \`).join('');
+    }
+    
+    // answerType: text or email
+    if (answerType === 'text' || answerType === 'email') {
+      const inputType = answerType === 'email' ? 'email' : 'text';
+      const placeholderText = placeholder || (answerType === 'email' ? 'E-Mail eingeben...' : 'Antwort eingeben...');
+      return \`
+        <div class="input-container">
+          <input type="\${inputType}" 
+                 id="text-input" 
+                 class="funnel-input" 
+                 placeholder="\${placeholderText}">
+          <button class="funnel-button primary \${sizeClass}" onclick="window.funnelPlayer.handleTextSubmit()">
+            Weiter →
+          </button>
+        </div>
       \`;
     }
     
-    // Multiple choice / button
-    return answers.map((answer, i) => \`
-      <button class="funnel-button \${i === 0 ? 'primary' : 'secondary'}" onclick="window.funnelPlayer.handleAnswer('\${answer}')">
-        \${answer}
-      </button>
-    \`).join('');
+    // answerType: rating
+    if (answerType === 'rating') {
+      return \`
+        <div class="rating-container">
+          <div class="stars-container" id="stars-container">
+            \${[1,2,3,4,5].map(i => \`
+              <button class="star-button" data-rating="\${i}" onclick="window.funnelPlayer.selectRating(\${i})">
+                <svg viewBox="0 0 24 24" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            \`).join('')}
+          </div>
+          <button class="funnel-button primary \${sizeClass}" id="rating-submit" onclick="window.funnelPlayer.handleRatingSubmit()" disabled>
+            Bewertung abgeben
+          </button>
+        </div>
+      \`;
+    }
+    
+    // answerType: none or default - no buttons
+    return '';
   }
   
-  handleAnswer(answer) {
+  getButtonSizeClass(height) {
+    const sizeMap = {
+      'sm': 'size-sm',
+      'md': 'size-md',
+      'lg': 'size-lg',
+      'xl': 'size-xl',
+      '2xl': 'size-2xl',
+      '3xl': 'size-3xl',
+      '4xl': 'size-4xl'
+    };
+    return sizeMap[height] || 'size-md';
+  }
+  
+  getButtonColorHex(colorName) {
+    const colorMap = {
+      'yellow': '#facc15',
+      'purple': '#a855f7',
+      'blue': '#3b82f6',
+      'green': '#22c55e',
+      'red': '#ef4444',
+      'orange': '#f97316',
+      'pink': '#ec4899',
+      'cyan': '#06b6d4',
+      'white': '#ffffff',
+      'gray': '#6b7280'
+    };
+    // If it's already a hex color, return as-is
+    if (colorName?.startsWith('#')) return colorName;
+    return colorMap[colorName] || colorMap['yellow'];
+  }
+  
+  selectRating(rating) {
+    this.selectedRating = rating;
+    const starsContainer = this.playerEl.querySelector('#stars-container');
+    const submitBtn = this.playerEl.querySelector('#rating-submit');
+    
+    if (starsContainer) {
+      starsContainer.querySelectorAll('.star-button').forEach((btn, index) => {
+        if (index < rating) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+    
+    if (submitBtn) {
+      submitBtn.disabled = false;
+    }
+  }
+  
+  handleTextSubmit() {
+    const input = this.playerEl.querySelector('#text-input');
+    if (input && input.value.trim()) {
+      this.handleAnswer(input.value.trim(), 'text');
+    }
+  }
+  
+  handleRatingSubmit() {
+    if (this.selectedRating > 0) {
+      this.handleAnswer(this.selectedRating, 'rating');
+    }
+  }
+  
+  handleAnswer(answer, answerType) {
     const node = this.nodes.find(n => n.id === this.currentNodeId);
     if (!node) return;
     
@@ -591,6 +923,7 @@ class FunnelPlayer {
     this.responses.push({
       nodeId: this.currentNodeId,
       answer: answer,
+      answerType: answerType,
       timestamp: new Date().toISOString()
     });
     
@@ -601,26 +934,66 @@ class FunnelPlayer {
         nodeId: this.currentNodeId,
         question: node.data.overlayText || node.data.label,
         answer: answer,
-        answerType: node.data.answerType
+        answerType: answerType
       }
     });
     
-    // Find next node
-    let nextNodeId = node.data.nextNodes?.[answer];
+    // Determine routing key based on answer type
+    let routingKey = 'default';
     
-    if (!nextNodeId) {
-      // Find from edges
-      const edge = this.edges.find(e => e.source === this.currentNodeId);
-      nextNodeId = edge?.target;
+    if (answerType === 'multipleChoice') {
+      // Use index as routing key
+      routingKey = String(answer);
+    } else if (answerType === 'yesno') {
+      // Use 'yes' or 'no' as routing key
+      routingKey = answer ? 'yes' : 'no';
+    } else if (answerType === 'rating') {
+      // Use rating level as routing key
+      const ratingNum = typeof answer === 'number' ? answer : parseInt(answer);
+      if (ratingNum <= 2) routingKey = 'low';
+      else if (ratingNum <= 4) routingKey = 'medium';
+      else routingKey = 'high';
     }
     
-    if (nextNodeId) {
-      this.goToNode(nextNodeId);
+    // Find next node with routing
+    const nextNode = this.findNextNode(this.currentNodeId, routingKey);
+    
+    if (nextNode) {
+      this.goToNode(nextNode.id);
+    } else {
+      // No next node found, show completed
+      this.showCompleted();
     }
   }
   
+  showCompleted() {
+    // Send completion webhook
+    this.sendToWebhook({
+      type: 'completed',
+      payload: {
+        responses: this.responses,
+        leadData: this.leadData
+      }
+    });
+    
+    this.playerEl.innerHTML = \`
+      <div class="end-screen fade-in">
+        <div class="checkmark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2>Vielen Dank!</h2>
+        <p>Sie haben den Funnel erfolgreich abgeschlossen.</p>
+      </div>
+    \`;
+  }
+  
   renderLeadCaptureNode(node) {
-    const { title, description, fields, optInText } = node.data;
+    const { title, description, fields, optInText, buttonColor } = node.data;
+    const color = this.getButtonColorHex(buttonColor);
+    this.playerEl.style.setProperty('--button-color', color);
+    
     const fieldLabels = {
       firstName: 'Vorname',
       lastName: 'Nachname',
@@ -669,15 +1042,19 @@ class FunnelPlayer {
       });
       
       // Go to next node
-      const nextNode = this.getNextNode(node.id);
+      const nextNode = this.findNextNode(node.id);
       if (nextNode) {
         this.goToNode(nextNode.id);
+      } else {
+        this.showCompleted();
       }
     });
   }
   
   renderEndNode(node) {
-    const { title, message, redirectUrl } = node.data;
+    const { title, message, redirectUrl, buttonColor } = node.data;
+    const color = this.getButtonColorHex(buttonColor);
+    this.playerEl.style.setProperty('--button-color', color);
     
     this.playerEl.innerHTML = \`
       <div class="end-screen fade-in">
