@@ -614,7 +614,7 @@ function FunnelBuilderInner() {
             }
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            fitView
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
             minZoom={0.05}
             maxZoom={4}
             className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
