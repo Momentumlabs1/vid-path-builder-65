@@ -379,7 +379,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectItem value="none">Ausgeblendet</SelectItem>
                       <SelectItem value="top-left">Oben Links</SelectItem>
                       <SelectItem value="top-center">Oben Mitte</SelectItem>
@@ -403,7 +403,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectItem value="small">Klein</SelectItem>
                       <SelectItem value="medium">Mittel</SelectItem>
                       <SelectItem value="large">Groß</SelectItem>
@@ -420,7 +420,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                       <SelectItem value="solid">Solid</SelectItem>
                       <SelectItem value="outline">Outline</SelectItem>
@@ -453,7 +453,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectItem value="none">Ausgeblendet</SelectItem>
                       <SelectItem value="top-left">Oben Links</SelectItem>
                       <SelectItem value="top-center">Oben Mitte</SelectItem>
@@ -477,7 +477,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectItem value="small">Klein</SelectItem>
                       <SelectItem value="medium">Mittel</SelectItem>
                       <SelectItem value="large">Groß</SelectItem>
@@ -498,14 +498,14 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                    <SelectItem value="button" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Single Button</SelectItem>
-                    <SelectItem value="multipleChoice" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Multiple Choice</SelectItem>
-                    <SelectItem value="yesno" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Yes/No</SelectItem>
-                    <SelectItem value="text" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Text Input</SelectItem>
-                    <SelectItem value="email" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">E-Mail</SelectItem>
-                    <SelectItem value="rating" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Rating</SelectItem>
-                    <SelectItem value="budgetSlider" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Budget-Slider</SelectItem>
+                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white z-50">
+                    <SelectItem value="button">Single Button</SelectItem>
+                    <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
+                    <SelectItem value="yesno">Yes/No</SelectItem>
+                    <SelectItem value="text">Text Input</SelectItem>
+                    <SelectItem value="email">E-Mail</SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                    <SelectItem value="budgetSlider">Budget-Slider</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -532,7 +532,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="purple">Lila</SelectItem>
                         <SelectItem value="blue">Blau</SelectItem>
                         <SelectItem value="green">Grün</SelectItem>
@@ -553,7 +553,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                         <SelectItem value="solid">Solid</SelectItem>
                         <SelectItem value="outline">Outline</SelectItem>
@@ -574,7 +574,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="xs">XS (24px)</SelectItem>
                             <SelectItem value="small">S (28px)</SelectItem>
                             <SelectItem value="medium">M (36px)</SelectItem>
@@ -595,7 +595,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="auto">Auto</SelectItem>
                             <SelectItem value="xs">XS (80px)</SelectItem>
                             <SelectItem value="small">S (120px)</SelectItem>
@@ -619,7 +619,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectItem value="xs">XS (10px)</SelectItem>
                           <SelectItem value="small">Klein (12px)</SelectItem>
                           <SelectItem value="medium">Mittel (14px)</SelectItem>
@@ -640,7 +640,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="top-left">Oben Links</SelectItem>
                         <SelectItem value="top-center">Oben Mitte</SelectItem>
                         <SelectItem value="top-right">Oben Rechts</SelectItem>
@@ -695,7 +695,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="purple">Lila</SelectItem>
                             <SelectItem value="blue">Blau</SelectItem>
                             <SelectItem value="green">Grün</SelectItem>
@@ -715,7 +715,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                             <SelectItem value="solid">Solid</SelectItem>
                             <SelectItem value="outline">Outline</SelectItem>
@@ -738,7 +738,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="purple">Lila</SelectItem>
                             <SelectItem value="blue">Blau</SelectItem>
                             <SelectItem value="green">Grün</SelectItem>
@@ -758,7 +758,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                             <SelectItem value="solid">Solid</SelectItem>
                             <SelectItem value="outline">Outline</SelectItem>
@@ -781,7 +781,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="horizontal">Horizontal</SelectItem>
                             <SelectItem value="vertical">Vertikal</SelectItem>
                           </SelectContent>
@@ -796,7 +796,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="auto">Auto</SelectItem>
                             <SelectItem value="xs">XS (80px)</SelectItem>
                             <SelectItem value="small">S (120px)</SelectItem>
@@ -820,7 +820,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="xs">XS (24px)</SelectItem>
                             <SelectItem value="small">S (28px)</SelectItem>
                             <SelectItem value="medium">M (36px)</SelectItem>
@@ -839,7 +839,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="xs">XS (10px)</SelectItem>
                             <SelectItem value="small">Klein (12px)</SelectItem>
                             <SelectItem value="medium">Mittel (14px)</SelectItem>
@@ -878,7 +878,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="xs">XS (24px)</SelectItem>
                             <SelectItem value="small">S (28px)</SelectItem>
                             <SelectItem value="medium">M (36px)</SelectItem>
@@ -899,7 +899,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="small">S (200px)</SelectItem>
                             <SelectItem value="medium">M (280px)</SelectItem>
                             <SelectItem value="large">L (320px)</SelectItem>
@@ -918,7 +918,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectItem value="xs">XS (10px)</SelectItem>
                           <SelectItem value="small">Klein (12px)</SelectItem>
                           <SelectItem value="medium">Mittel (14px)</SelectItem>
@@ -953,7 +953,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="purple">Lila</SelectItem>
                               <SelectItem value="blue">Blau</SelectItem>
                               <SelectItem value="green">Grün</SelectItem>
@@ -973,7 +973,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                               <SelectItem value="solid">Solid</SelectItem>
                               <SelectItem value="outline">Outline</SelectItem>
@@ -993,7 +993,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="xs">XS (24px)</SelectItem>
                               <SelectItem value="small">S (28px)</SelectItem>
                               <SelectItem value="medium">M (36px)</SelectItem>
@@ -1014,7 +1014,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="auto">Auto</SelectItem>
                               <SelectItem value="xs">XS (80px)</SelectItem>
                               <SelectItem value="small">S (120px)</SelectItem>
@@ -1039,7 +1039,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectItem value="xs">XS (10px)</SelectItem>
                           <SelectItem value="small">Klein (12px)</SelectItem>
                           <SelectItem value="medium">Mittel (14px)</SelectItem>
@@ -1069,7 +1069,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="3">3 Sterne</SelectItem>
                             <SelectItem value="5">5 Sterne</SelectItem>
                             <SelectItem value="10">10 Sterne</SelectItem>
@@ -1102,7 +1102,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="purple">Lila</SelectItem>
                               <SelectItem value="blue">Blau</SelectItem>
                               <SelectItem value="green">Grün</SelectItem>
@@ -1121,7 +1121,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                               <SelectItem value="solid">Solid</SelectItem>
                               <SelectItem value="outline">Outline</SelectItem>
@@ -1169,7 +1169,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectItem value="50">€50</SelectItem>
                           <SelectItem value="100">€100</SelectItem>
                           <SelectItem value="250">€250</SelectItem>
@@ -1202,7 +1202,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="purple">Lila</SelectItem>
                               <SelectItem value="blue">Blau</SelectItem>
                               <SelectItem value="green">Grün</SelectItem>
@@ -1221,7 +1221,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                               <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                               <SelectItem value="solid">Solid</SelectItem>
                               <SelectItem value="outline">Outline</SelectItem>
@@ -1308,7 +1308,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                                     <SelectItem value="purple">Lila</SelectItem>
                                     <SelectItem value="blue">Blau</SelectItem>
                                     <SelectItem value="green">Grün</SelectItem>
@@ -1330,7 +1330,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                                     <SelectItem value="glassmorphism">Glas</SelectItem>
                                     <SelectItem value="solid">Solide</SelectItem>
                                     <SelectItem value="gradient">Gradient</SelectItem>
@@ -1368,15 +1368,15 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                            <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (24px)</SelectItem>
-                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">S (28px)</SelectItem>
-                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">M (36px)</SelectItem>
-                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">L (44px)</SelectItem>
-                            <SelectItem value="xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XL (52px)</SelectItem>
-                            <SelectItem value="2xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">2XL (60px)</SelectItem>
-                            <SelectItem value="3xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">3XL (72px)</SelectItem>
-                            <SelectItem value="4xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">4XL (84px)</SelectItem>
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white z-50">
+                            <SelectItem value="xs">XS (24px)</SelectItem>
+                            <SelectItem value="small">S (28px)</SelectItem>
+                            <SelectItem value="medium">M (36px)</SelectItem>
+                            <SelectItem value="large">L (44px)</SelectItem>
+                            <SelectItem value="xl">XL (52px)</SelectItem>
+                            <SelectItem value="2xl">2XL (60px)</SelectItem>
+                            <SelectItem value="3xl">3XL (72px)</SelectItem>
+                            <SelectItem value="4xl">4XL (84px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1391,13 +1391,13 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                            <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (10px)</SelectItem>
-                            <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Klein (12px)</SelectItem>
-                            <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Mittel (14px)</SelectItem>
-                            <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Groß (16px)</SelectItem>
-                            <SelectItem value="xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XL (18px)</SelectItem>
-                            <SelectItem value="2xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">2XL (20px)</SelectItem>
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white z-50">
+                            <SelectItem value="xs">XS (10px)</SelectItem>
+                            <SelectItem value="small">Klein (12px)</SelectItem>
+                            <SelectItem value="medium">Mittel (14px)</SelectItem>
+                            <SelectItem value="large">Groß (16px)</SelectItem>
+                            <SelectItem value="xl">XL (18px)</SelectItem>
+                            <SelectItem value="2xl">2XL (20px)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1412,7 +1412,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectItem value="vertical">Vertikal</SelectItem>
                             <SelectItem value="horizontal">Horizontal</SelectItem>
                             <SelectItem value="grid">Grid 2x2</SelectItem>
@@ -1431,17 +1431,17 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
-                          <SelectItem value="auto" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Auto</SelectItem>
-                          <SelectItem value="xs" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XS (80px)</SelectItem>
-                          <SelectItem value="small" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">S (120px)</SelectItem>
-                          <SelectItem value="medium" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">M (160px)</SelectItem>
-                          <SelectItem value="large" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">L (200px)</SelectItem>
-                          <SelectItem value="xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">XL (240px)</SelectItem>
-                          <SelectItem value="2xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">2XL (280px)</SelectItem>
-                          <SelectItem value="3xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">3XL (320px)</SelectItem>
-                          <SelectItem value="4xl" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">4XL (360px)</SelectItem>
-                          <SelectItem value="full" className="text-white hover:bg-zinc-700 focus:bg-zinc-700 focus:text-white">Volle Breite</SelectItem>
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white z-50">
+                          <SelectItem value="auto">Auto</SelectItem>
+                          <SelectItem value="xs">XS (80px)</SelectItem>
+                          <SelectItem value="small">S (120px)</SelectItem>
+                          <SelectItem value="medium">M (160px)</SelectItem>
+                          <SelectItem value="large">L (200px)</SelectItem>
+                          <SelectItem value="xl">XL (240px)</SelectItem>
+                          <SelectItem value="2xl">2XL (280px)</SelectItem>
+                          <SelectItem value="3xl">3XL (320px)</SelectItem>
+                          <SelectItem value="4xl">4XL (360px)</SelectItem>
+                          <SelectItem value="full">Volle Breite</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1539,7 +1539,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="purple">Lila</SelectItem>
                         <SelectItem value="blue">Blau</SelectItem>
                         <SelectItem value="green">Grün</SelectItem>
@@ -1559,7 +1559,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
                         <SelectItem value="solid">Solid</SelectItem>
                         <SelectItem value="outline">Outline</SelectItem>
@@ -1577,7 +1577,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectItem value="top-left">Oben Links</SelectItem>
                         <SelectItem value="top-center">Oben Mitte</SelectItem>
                         <SelectItem value="top-right">Oben Rechts</SelectItem>
@@ -1737,14 +1737,14 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                 <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                                <SelectContent className="bg-zinc-800 border-zinc-700 text-white z-50">
                                   <SelectItem value="button">Single Button</SelectItem>
                                   <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
 
-                            {(localData.q2AnswerType as string || 'button') === 'button' && (
+                            {(localData.q2AnswerType as string) === 'button' && (
                               <div className="space-y-2">
                                 <div>
                                   <Label className="text-white text-xs mb-1 block">Button Text</Label>
@@ -1758,20 +1758,18 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                   <div>
                                     <Label className="text-white text-xs mb-1 block">Farbe</Label>
                                     <Select
-                                      value={(localData.q2ButtonColor as string) || 'purple'}
+                                      value={(localData.q2ButtonColor as string) || 'blue'}
                                       onValueChange={(value) => updateLocalData({ q2ButtonColor: value })}
                                     >
                                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
                                         <SelectValue />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectItem value="purple">Lila</SelectItem>
                                         <SelectItem value="blue">Blau</SelectItem>
                                         <SelectItem value="green">Grün</SelectItem>
                                         <SelectItem value="orange">Orange</SelectItem>
                                         <SelectItem value="red">Rot</SelectItem>
-                                        <SelectItem value="white">Weiß</SelectItem>
-                                        <SelectItem value="yellow">Gelb</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>
@@ -1784,11 +1782,11 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
                                         <SelectValue />
                                       </SelectTrigger>
-                                      <SelectContent className="bg-zinc-800 border-zinc-700">
-                                        <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
-                                        <SelectItem value="solid">Solid</SelectItem>
-                                        <SelectItem value="outline">Outline</SelectItem>
+                                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                                        <SelectItem value="glassmorphism">Glas</SelectItem>
+                                        <SelectItem value="solid">Solide</SelectItem>
                                         <SelectItem value="gradient">Gradient</SelectItem>
+                                        <SelectItem value="outline">Umriss</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </div>
@@ -1802,7 +1800,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
                                       <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                                       <SelectItem value="bottom-left">Unten Links</SelectItem>
                                       <SelectItem value="bottom-center">Unten Mitte</SelectItem>
                                       <SelectItem value="bottom-right">Unten Rechts</SelectItem>
@@ -1861,7 +1859,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
                                       <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                                       <SelectItem value="bottom-left">Unten Links</SelectItem>
                                       <SelectItem value="bottom-center">Unten Mitte</SelectItem>
                                       <SelectItem value="bottom-right">Unten Rechts</SelectItem>
@@ -1905,7 +1903,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                             <SelectValue placeholder="Node auswählen..." />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
+                          <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             {availableNodes.map((node) => (
                               <SelectItem key={node.id} value={node.id}>
                                 {node.data.label as string}
@@ -1929,7 +1927,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue placeholder="Node auswählen..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
                               {node.data.label as string}
@@ -1947,7 +1945,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue placeholder="Node auswählen..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
                               {node.data.label as string}
@@ -1969,7 +1967,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                         <SelectValue placeholder="Node auswählen..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         {availableNodes.map((node) => (
                           <SelectItem key={node.id} value={node.id}>
                             {node.data.label as string}
@@ -1997,7 +1995,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue placeholder="Node auswählen..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
                               {node.data.label as string}
@@ -2017,7 +2015,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue placeholder="Node auswählen..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
                               {node.data.label as string}
@@ -2037,7 +2035,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                           <SelectValue placeholder="Node auswählen..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
                               {node.data.label as string}
