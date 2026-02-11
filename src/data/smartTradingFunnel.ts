@@ -48,6 +48,7 @@ const introNodes: Node[] = [
     type: 'video',
     position: { x: CENTER_X, y: V1_Y },
     data: {
+      label: 'V1: Begrüßung',
       name: 'V1: Begrüßung',
       description: 'Hey ich bin Saif - Mehr wissen oder direkt los?',
       videoUrl: '',
@@ -71,6 +72,7 @@ const introNodes: Node[] = [
     type: 'video',
     position: { x: CENTER_X - 200, y: V2_Y },
     data: {
+      label: 'V2a: Story',
       name: 'V2a: Story',
       description: 'Meine Geschichte - Anfänger oder Fortgeschritten?',
       videoUrl: '',
@@ -94,6 +96,7 @@ const introNodes: Node[] = [
     type: 'video',
     position: { x: CENTER_X + 200, y: V2_Y },
     data: {
+      label: 'V2b: Direkt',
       name: 'V2b: Direkt',
       description: 'Okay - Anfänger oder Fortgeschritten?',
       videoUrl: '',
@@ -135,6 +138,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X, y: PFAD_START_Y },
     data: {
+      label: 'A1: Auslöser',
       name: 'A1: Auslöser',
       description: 'Du fängst gerade erst an – Was hat dich hierher gebracht?',
       videoUrl: '',
@@ -159,6 +163,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X - OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'A2a: Zeit',
       name: 'A2a: Zeit',
       description: 'Du hast endlich Zeit – Was willst du erreichen?',
       videoUrl: '',
@@ -183,6 +188,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'A2b: Unzufriedenheit',
       name: 'A2b: Unzufriedenheit',
       description: 'Du bist unzufrieden – Was willst du erreichen?',
       videoUrl: '',
@@ -207,6 +213,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X + OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'A2c: Inspiration',
       name: 'A2c: Inspiration',
       description: 'Du hast andere gesehen – Was willst du erreichen?',
       videoUrl: '',
@@ -231,6 +238,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X - OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT * 2 },
     data: {
+      label: 'A3a: Nebeneinkommen',
       name: 'A3a: Nebeneinkommen',
       description: 'Nebeneinkommen aufbauen – Was hält dich zurück?',
       videoUrl: '',
@@ -254,6 +262,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X, y: PFAD_START_Y + ROW_HEIGHT * 2 },
     data: {
+      label: 'A3b: Freiheit',
       name: 'A3b: Freiheit',
       description: 'Finanzielle Freiheit – Was hält dich zurück?',
       videoUrl: '',
@@ -277,6 +286,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X + OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT * 2 },
     data: {
+      label: 'A3c: Verstehen',
       name: 'A3c: Verstehen',
       description: 'Erstmal verstehen – Was hält dich zurück?',
       videoUrl: '',
@@ -300,6 +310,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X - OPTION_SPREAD / 2, y: PFAD_START_Y + ROW_HEIGHT * 3 },
     data: {
+      label: 'A4a: Angst',
       name: 'A4a: Angst',
       description: 'Angst vor Verlusten – Budget-Frage',
       videoUrl: '',
@@ -323,6 +334,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X + OPTION_SPREAD / 2, y: PFAD_START_Y + ROW_HEIGHT * 3 },
     data: {
+      label: 'A4b: Überforderung',
       name: 'A4b: Überforderung',
       description: 'Überforderung – Budget-Frage',
       videoUrl: '',
@@ -346,6 +358,7 @@ const anfaengerNodes: Node[] = [
     type: 'video',
     position: { x: ANFAENGER_X, y: PFAD_START_Y + ROW_HEIGHT * 4 },
     data: {
+      label: 'A5: Resümee',
       name: 'A5: Resümee',
       description: 'Zusammenfassung + Call buchen',
       videoUrl: '',
@@ -406,6 +419,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X, y: PFAD_START_Y },
     data: {
+      label: 'F1: Situation',
       name: 'F1: Situation',
       description: 'Du tradest schon – Wie siehts bei dir aus?',
       videoUrl: '',
@@ -430,6 +444,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X - OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'F2a: Verlust',
       name: 'F2a: Verlust',
       description: 'Du verlierst – Was ist das Problem?',
       videoUrl: '',
@@ -453,6 +468,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'F2b: Break-Even',
       name: 'F2b: Break-Even',
       description: 'Break-Even – Was ist das Problem?',
       videoUrl: '',
@@ -476,6 +492,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X + OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT },
     data: {
+      label: 'F2c: Random',
       name: 'F2c: Random',
       description: 'Komplett random – Was ist das Problem?',
       videoUrl: '',
@@ -499,6 +516,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X - OPTION_SPREAD / 2, y: PFAD_START_Y + ROW_HEIGHT * 2 },
     data: {
+      label: 'F3a: Strategie',
       name: 'F3a: Strategie',
       description: 'Keine Strategie – Was ist dein Ziel?',
       videoUrl: '',
@@ -523,6 +541,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X + OPTION_SPREAD / 2, y: PFAD_START_Y + ROW_HEIGHT * 2 },
     data: {
+      label: 'F3b: Emotionen',
       name: 'F3b: Emotionen',
       description: 'Emotionen – Was ist dein Ziel?',
       videoUrl: '',
@@ -547,6 +566,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X - OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT * 3 },
     data: {
+      label: 'F4a: Profitabel',
       name: 'F4a: Profitabel',
       description: 'Endlich profitabel – Budget-Frage',
       videoUrl: '',
@@ -570,6 +590,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X, y: PFAD_START_Y + ROW_HEIGHT * 3 },
     data: {
+      label: 'F4b: Prop-Firm',
       name: 'F4b: Prop-Firm',
       description: 'Prop-Firm Challenge – Budget-Frage',
       videoUrl: '',
@@ -593,6 +614,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X + OPTION_SPREAD, y: PFAD_START_Y + ROW_HEIGHT * 3 },
     data: {
+      label: 'F4c: Vollzeit',
       name: 'F4c: Vollzeit',
       description: 'Trading als Hauptjob – Budget-Frage',
       videoUrl: '',
@@ -616,6 +638,7 @@ const fortgeschrittenNodes: Node[] = [
     type: 'video',
     position: { x: FORTGESCHRITTEN_X, y: PFAD_START_Y + ROW_HEIGHT * 4 },
     data: {
+      label: 'F5: Resümee',
       name: 'F5: Resümee',
       description: 'Zusammenfassung + Call buchen',
       videoUrl: '',
@@ -674,6 +697,7 @@ const abschlussNodes: Node[] = [
     type: 'video',
     position: { x: CENTER_X, y: ABSCHLUSS_Y },
     data: {
+      label: 'V-END: Bestätigung',
       name: 'V-END: Bestätigung',
       description: 'Willkommen bei Smart Trading – Check deine Mails',
       videoUrl: '',
