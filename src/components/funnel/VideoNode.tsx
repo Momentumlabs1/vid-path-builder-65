@@ -107,6 +107,29 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     };
   }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer, data.videoUrl, question2Enabled, q2StartTime, q2EndTime]);
 
+  // Progress bar tracking - always active in preview mode, independent of timed visibility
+  useEffect(() => {
+    if (!isPreview || !data.videoUrl) return;
+    // Skip if timed visibility is on — that effect already handles progress
+    if (timedVisibility) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      const duration = video.duration || 0;
+      setVideoCurrentTime(currentTime);
+      setVideoDuration(duration);
+      if (duration > 0) {
+        setVideoProgress((currentTime / duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [isPreview, timedVisibility, data.videoUrl]);
+
   // Standard delay system for button visibility (when NOT using timed visibility)
   useEffect(() => {
     if (isPreview && !timedVisibility) {
