@@ -1,45 +1,56 @@
 
 
-# Dropdown-Text Fix: Die ECHTE Ursache
+# Dropdown-Text: Endgueltige Loesung mit Inline Styles
 
-## Problem
-In `SelectContent` (select.tsx, Zeile 76) steht die Basis-Klasse `text-popover-foreground`. Diese setzt die Textfarbe auf einen dunklen Wert aus dem hellen Theme (`hsl(222.2, 84%, 4.9%)` = fast schwarz).
+## Analyse des Screenshots
+Die letzten Aenderungen haben teilweise gegriffen: "Lead Capture" und "Ende" sind sichtbar. Aber das erste Item im Dropdown bleibt unsichtbar. Das bedeutet, dass CSS-Klassen allein nicht ausreichen -- Radix UI setzt intern Styles auf `SelectPrimitive.ItemText`, die Tailwind-Klassen ueberschreiben.
 
-Wenn per `className="... text-white"` die Farbe ueberschrieben werden soll, erkennt `tailwind-merge` (die `cn()`-Funktion) den Konflikt zwischen `text-popover-foreground` (Custom-Farbe) und `text-white` (Standard-Farbe) **nicht**. Beide Klassen bleiben im Output, und `text-popover-foreground` gewinnt wegen der CSS-Reihenfolge.
+## Loesung: Inline `style` statt CSS-Klassen
 
-Dasselbe gilt fuer `bg-popover` vs `bg-zinc-800`.
+### Datei: `src/components/ui/select.tsx`
 
-## Loesung
+**SelectItem (Zeile 116-131):**
+Auf dem `SelectPrimitive.Item` Element ein `style={{ color: 'white' }}` setzen. Zusaetzlich auf `SelectPrimitive.ItemText` ebenfalls `style={{ color: 'inherit' }}` setzen.
 
-### Datei: `src/components/ui/select.tsx` (SelectContent, Zeile 76)
+```tsx
+// Vorher (Zeile 116):
+<SelectPrimitive.Item
+  ref={ref}
+  className={cn(
+    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none text-inherit focus:bg-zinc-700 focus:text-white data-[highlighted]:bg-zinc-700 data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+    className
+  )}
+  {...props}
+>
 
-Aus der Basis-Klasse die Theme-abhaengigen Farben entfernen:
-
-**Vorher:**
+// Nachher:
+<SelectPrimitive.Item
+  ref={ref}
+  style={{ color: 'white' }}
+  className={cn(
+    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-zinc-700 data-[highlighted]:bg-zinc-700 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+    className
+  )}
+  {...props}
+>
 ```
-"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md ..."
+
+Und auf `SelectPrimitive.ItemText` (Zeile 130):
+```tsx
+// Vorher:
+<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+
+// Nachher:
+<SelectPrimitive.ItemText style={{ color: 'inherit' }}>{children}</SelectPrimitive.ItemText>
 ```
 
-**Nachher:**
-```
-"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md ..."
-```
+## Warum Inline Styles?
+- Inline `style` hat die hoechste CSS-Spezifitaet
+- Kein Tailwind-Merge-Konflikt moeglich
+- Kein Radix-internes Stylesheet kann es ueberschreiben
+- Es ist die einzige 100% zuverlaessige Methode
 
-Ohne `bg-popover` und `text-popover-foreground` in der Basis greifen die per `className` uebergebenen Werte (`bg-zinc-800`, `text-white`) direkt und ohne Konflikt.
-
-Als Fallback fuer den Fall, dass irgendwo kein explizites `className` gesetzt ist, werden stattdessen neutrale Defaults eingesetzt:
-
-```
-"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-zinc-900 text-white shadow-md ..."
-```
-
-### Warum das diesmal funktioniert
-- Kein Tailwind-Merge-Konflikt mehr: `bg-zinc-900` vs `bg-zinc-800` und `text-white` vs `text-white` werden korrekt dedupliziert
-- Die per `className` uebergebenen Werte gewinnen immer, weil `cn()` identische Utility-Typen korrekt merged
-- Alle bestehenden `SelectContent className="bg-zinc-800 border-zinc-700 text-white"` im NodePropertiesPanel funktionieren sofort
-
-### Kein weiterer Aenderungsbedarf
-- `SelectItem` hat bereits `text-inherit` + `focus:bg-zinc-700 focus:text-white` (korrekt)
-- `NodePropertiesPanel.tsx` hat bereits `text-white` auf allen SelectContent (korrekt)
-- `index.css` CSS-Overrides bleiben als zusaetzliche Sicherheit bestehen
-
+## Aenderungen zusammengefasst
+- **1 Datei**: `src/components/ui/select.tsx`
+- **2 Zeilen**: `style={{ color: 'white' }}` auf Item, `style={{ color: 'inherit' }}` auf ItemText
+- Keine weiteren Dateien betroffen
