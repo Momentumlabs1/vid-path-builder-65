@@ -1688,7 +1688,195 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       </div>
                       
                       <div className="text-xs text-orange-400 bg-orange-500/10 p-2 rounded">
-                        ⏱️ Sichtbar: Sek. {(localData.visibilityStartTime as number) || 0} - {((localData.visibilityStartTime as number) || 0) + ((localData.visibilityDuration as number) || 10)}
+                        ⏱️ Frage 1: Sek. {(localData.visibilityStartTime as number) || 0} - {((localData.visibilityStartTime as number) || 0) + ((localData.visibilityDuration as number) || 10)}
+                      </div>
+
+                      {/* Frage 2 Configuration */}
+                      <div className="border-t border-orange-500/30 pt-3 mt-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <Label className="text-white text-sm font-medium flex items-center gap-2">
+                            Frage 2
+                          </Label>
+                          <Switch
+                            checked={localData.question2Enabled as boolean}
+                            onCheckedChange={(checked) => updateLocalData({ question2Enabled: checked })}
+                          />
+                        </div>
+
+                        {localData.question2Enabled && (
+                          <div className="space-y-3 bg-zinc-900/50 rounded-lg p-3 border border-blue-500/30">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <Label className="text-white text-xs mb-1 block">Start bei (Sek.)</Label>
+                                <Input
+                                  type="number"
+                                  value={(localData.q2StartTime as number) || 0}
+                                  onChange={(e) => updateLocalData({ q2StartTime: parseInt(e.target.value) || 0 })}
+                                  className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm"
+                                  min={0}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-white text-xs mb-1 block">Sichtbar für (Sek.)</Label>
+                                <Input
+                                  type="number"
+                                  value={(localData.q2Duration as number) || 10}
+                                  onChange={(e) => updateLocalData({ q2Duration: parseInt(e.target.value) || 10 })}
+                                  className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm"
+                                  min={1}
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <Label className="text-white text-xs mb-1 block">Antwort-Typ</Label>
+                              <Select
+                                value={(localData.q2AnswerType as string) || 'button'}
+                                onValueChange={(value) => updateLocalData({ q2AnswerType: value })}
+                              >
+                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-800 border-zinc-700 z-50">
+                                  <SelectItem value="button">Single Button</SelectItem>
+                                  <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {(localData.q2AnswerType as string || 'button') === 'button' && (
+                              <div className="space-y-2">
+                                <div>
+                                  <Label className="text-white text-xs mb-1 block">Button Text</Label>
+                                  <Input
+                                    value={(localData.q2ButtonText as string) || 'Weiter'}
+                                    onChange={(e) => updateLocalData({ q2ButtonText: e.target.value })}
+                                    className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <Label className="text-white text-xs mb-1 block">Farbe</Label>
+                                    <Select
+                                      value={(localData.q2ButtonColor as string) || 'purple'}
+                                      onValueChange={(value) => updateLocalData({ q2ButtonColor: value })}
+                                    >
+                                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                                        <SelectItem value="purple">Lila</SelectItem>
+                                        <SelectItem value="blue">Blau</SelectItem>
+                                        <SelectItem value="green">Grün</SelectItem>
+                                        <SelectItem value="orange">Orange</SelectItem>
+                                        <SelectItem value="red">Rot</SelectItem>
+                                        <SelectItem value="white">Weiß</SelectItem>
+                                        <SelectItem value="yellow">Gelb</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <Label className="text-white text-xs mb-1 block">Style</Label>
+                                    <Select
+                                      value={(localData.q2ButtonStyle as string) || 'glassmorphism'}
+                                      onValueChange={(value) => updateLocalData({ q2ButtonStyle: value })}
+                                    >
+                                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                                        <SelectItem value="glassmorphism">Glassmorphism</SelectItem>
+                                        <SelectItem value="solid">Solid</SelectItem>
+                                        <SelectItem value="outline">Outline</SelectItem>
+                                        <SelectItem value="gradient">Gradient</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <div>
+                                  <Label className="text-white text-xs mb-1 block">Position</Label>
+                                  <Select
+                                    value={(localData.q2ButtonPosition as string) || 'bottom-center'}
+                                    onValueChange={(value) => updateLocalData({ q2ButtonPosition: value })}
+                                  >
+                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                                      <SelectItem value="bottom-left">Unten Links</SelectItem>
+                                      <SelectItem value="bottom-center">Unten Mitte</SelectItem>
+                                      <SelectItem value="bottom-right">Unten Rechts</SelectItem>
+                                      <SelectItem value="middle-center">Mitte Zentriert</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            )}
+
+                            {(localData.q2AnswerType as string) === 'multipleChoice' && (
+                              <div className="space-y-2">
+                                <Label className="text-white text-xs mb-1 block">Antwortmöglichkeiten</Label>
+                                {((localData.q2Answers as string[]) || ['Option A', 'Option B']).map((answer: string, index: number) => (
+                                  <div key={index} className="flex gap-2">
+                                    <Input
+                                      value={answer}
+                                      onChange={(e) => {
+                                        const currentAnswers = (localData.q2Answers as string[]) || ['Option A', 'Option B'];
+                                        const newAnswers = [...currentAnswers];
+                                        newAnswers[index] = e.target.value;
+                                        updateLocalData({ q2Answers: newAnswers });
+                                      }}
+                                      className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm flex-1"
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const currentAnswers = (localData.q2Answers as string[]) || ['Option A', 'Option B'];
+                                        updateLocalData({ q2Answers: currentAnswers.filter((_, i) => i !== index) });
+                                      }}
+                                      className="text-red-400 hover:text-red-300 h-8 px-2"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const currentAnswers = (localData.q2Answers as string[]) || ['Option A', 'Option B'];
+                                    updateLocalData({ q2Answers: [...currentAnswers, `Option ${String.fromCharCode(65 + currentAnswers.length)}`] });
+                                  }}
+                                  className="text-blue-400 hover:text-blue-300 h-8 text-xs"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" /> Option hinzufügen
+                                </Button>
+                                <div>
+                                  <Label className="text-white text-xs mb-1 block">Position</Label>
+                                  <Select
+                                    value={(localData.q2ButtonPosition as string) || 'bottom-center'}
+                                    onValueChange={(value) => updateLocalData({ q2ButtonPosition: value })}
+                                  >
+                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-8 text-sm">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                                      <SelectItem value="bottom-left">Unten Links</SelectItem>
+                                      <SelectItem value="bottom-center">Unten Mitte</SelectItem>
+                                      <SelectItem value="bottom-right">Unten Rechts</SelectItem>
+                                      <SelectItem value="middle-center">Mitte Zentriert</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="text-xs text-blue-400 bg-blue-500/10 p-2 rounded">
+                              ⏱️ Frage 2: Sek. {(localData.q2StartTime as number) || 0} - {((localData.q2StartTime as number) || 0) + ((localData.q2Duration as number) || 10)}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

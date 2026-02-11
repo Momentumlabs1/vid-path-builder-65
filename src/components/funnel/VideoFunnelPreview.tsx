@@ -167,17 +167,36 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
         setShowLeadCapture(true);
         setCurrentNodeId(nextNodeId);
       } else {
-        // Smooth transition with crossfade
-        setIsTransitioning(true);
-        setTimeout(() => {
-          setCurrentNodeId(nextNodeId);
-          setNodeKey(prev => prev + 1);
-          setTextInput('');
-          setSelectedRating(0);
+        // 3-second video continuation: let the video play for 3 more seconds before transitioning.
+        // If less than 3 seconds remain, transition when video ends or immediately.
+        const doTransition = () => {
+          setIsTransitioning(true);
           setTimeout(() => {
-            setIsTransitioning(false);
-          }, 100);
-        }, 200);
+            setCurrentNodeId(nextNodeId);
+            setNodeKey(prev => prev + 1);
+            setTextInput('');
+            setSelectedRating(0);
+            setTimeout(() => {
+              setIsTransitioning(false);
+            }, 100);
+          }, 200);
+        };
+
+        // Try to find the video element to check remaining time
+        const videoEl = document.querySelector('[data-player="true"] video') as HTMLVideoElement | null;
+        if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
+          const remaining = videoEl.duration - videoEl.currentTime;
+          if (remaining <= 3) {
+            // Less than 3s left → transition immediately
+            doTransition();
+          } else {
+            // Wait 3 seconds, then transition
+            setTimeout(doTransition, 3000);
+          }
+        } else {
+          // No video or unknown duration → transition after short delay
+          setTimeout(doTransition, 200);
+        }
       }
     } else {
       setIsCompleted(true);
