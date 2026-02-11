@@ -1,29 +1,45 @@
 
 
-# Dropdown-Text endgueltig sichtbar machen
+# Dropdown-Text Fix: Die ECHTE Ursache
 
-## Was bisher schief lief
-Die CSS-Overrides in `index.css` werden von Tailwind-Klassen in der `SelectItem`-Komponente ueberschrieben. Konkret: `focus:bg-accent focus:text-accent-foreground` und `data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground` setzen helle Theme-Farben, die hoehere Spezifitaet haben als die globalen CSS-Regeln.
+## Problem
+In `SelectContent` (select.tsx, Zeile 76) steht die Basis-Klasse `text-popover-foreground`. Diese setzt die Textfarbe auf einen dunklen Wert aus dem hellen Theme (`hsl(222.2, 84%, 4.9%)` = fast schwarz).
 
-## Was jetzt geaendert wird
+Wenn per `className="... text-white"` die Farbe ueberschrieben werden soll, erkennt `tailwind-merge` (die `cn()`-Funktion) den Konflikt zwischen `text-popover-foreground` (Custom-Farbe) und `text-white` (Standard-Farbe) **nicht**. Beide Klassen bleiben im Output, und `text-popover-foreground` gewinnt wegen der CSS-Reihenfolge.
 
-### 1. SelectItem in `src/components/ui/select.tsx` (Zeile 119)
-Die problematischen Tailwind-Klassen werden durch dunkle Farben ersetzt:
+Dasselbe gilt fuer `bg-popover` vs `bg-zinc-800`.
 
-Vorher:
+## Loesung
+
+### Datei: `src/components/ui/select.tsx` (SelectContent, Zeile 76)
+
+Aus der Basis-Klasse die Theme-abhaengigen Farben entfernen:
+
+**Vorher:**
 ```
-focus:bg-accent focus:text-accent-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground
+"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md ..."
 ```
 
-Nachher:
+**Nachher:**
 ```
-focus:bg-zinc-700 focus:text-white data-[highlighted]:bg-zinc-700 data-[highlighted]:text-white
+"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md ..."
 ```
 
-### 2. Alle SelectContent in `src/components/funnel/NodePropertiesPanel.tsx`
-Jede `SelectContent className="bg-zinc-800 border-zinc-700"` bekommt zusaetzlich `text-white`, damit die Textfarbe direkt vererbt wird -- als doppelte Absicherung.
+Ohne `bg-popover` und `text-popover-foreground` in der Basis greifen die per `className` uebergebenen Werte (`bg-zinc-800`, `text-white`) direkt und ohne Konflikt.
 
-## Ergebnis
-- Alle Dropdown-Eintraege zeigen weissen Text auf dunklem Hintergrund
-- Hover/Focus zeigt `zinc-700` mit weissem Text
-- Kein Ueberschreiben durch Theme-Farben mehr moeglich
+Als Fallback fuer den Fall, dass irgendwo kein explizites `className` gesetzt ist, werden stattdessen neutrale Defaults eingesetzt:
+
+```
+"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-zinc-900 text-white shadow-md ..."
+```
+
+### Warum das diesmal funktioniert
+- Kein Tailwind-Merge-Konflikt mehr: `bg-zinc-900` vs `bg-zinc-800` und `text-white` vs `text-white` werden korrekt dedupliziert
+- Die per `className` uebergebenen Werte gewinnen immer, weil `cn()` identische Utility-Typen korrekt merged
+- Alle bestehenden `SelectContent className="bg-zinc-800 border-zinc-700 text-white"` im NodePropertiesPanel funktionieren sofort
+
+### Kein weiterer Aenderungsbedarf
+- `SelectItem` hat bereits `text-inherit` + `focus:bg-zinc-700 focus:text-white` (korrekt)
+- `NodePropertiesPanel.tsx` hat bereits `text-white` auf allen SelectContent (korrekt)
+- `index.css` CSS-Overrides bleiben als zusaetzliche Sicherheit bestehen
+
