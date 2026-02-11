@@ -612,15 +612,10 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     }
   };
 
-  // Detect if we're in a desktop preview container
-  const isDesktopPreview = isPreview && window.innerWidth >= 768;
-  
   return (
     <div className={`${
       isPreview 
-        ? isDesktopPreview 
-          ? 'w-full h-full bg-black relative' 
-          : 'fixed inset-0 bg-black'
+        ? 'w-full h-full relative bg-black overflow-hidden'
         : 'group bg-zinc-900 border-2 rounded-xl overflow-hidden transition-all duration-300'
     } ${
       !isPreview && selected 
@@ -639,7 +634,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       )}
       
       {/* Video Preview */}
-      <div className={`relative w-full h-full bg-black ${isPreview && !isDesktopPreview ? 'aspect-video md:aspect-auto' : ''}`} style={{ touchAction: 'manipulation' }}>        
+      <div className="relative w-full h-full bg-black" style={{ touchAction: 'manipulation' }}>        
         {/* Progress Bar */}
         {renderProgressBar()}
         
@@ -654,9 +649,9 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 willChange: 'transform, opacity',
                 transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
               }}
-              muted={!isPreview}
+              muted
               loop
-              autoPlay={!isPreview}
+              autoPlay={!!isPreview}
               playsInline
               webkit-playsinline="true"
               disablePictureInPicture
@@ -665,35 +660,28 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               preload="auto"
               
               onLoadedMetadata={(e) => {
-                e.currentTarget.muted = !isPreview;
-                e.currentTarget.volume = isPreview ? 1 : 0;
+                e.currentTarget.muted = true;
+                e.currentTarget.volume = 0;
               }}
-               onCanPlay={(e) => {
-                 e.currentTarget.muted = !isPreview;
-                 e.currentTarget.volume = isPreview ? 1 : 0;
-                 if (isPreview) {
-                   e.currentTarget.style.opacity = '1';
-                   e.currentTarget.play().catch(() => {
-                     if (timedVisibility) setShowButtons(true);
-                   });
-                 }
-               }}
+              onCanPlay={(e) => {
+                if (isPreview) {
+                  e.currentTarget.play().catch(() => {
+                    setShowButtons(true);
+                  });
+                }
+              }}
               onError={(e) => {
-                // Bei Video-Fehler trotzdem sichtbar machen
                 e.currentTarget.style.opacity = '1';
+                setShowButtons(true);
                 console.error('Video load error:', e);
               }}
-               onLoadedData={(e) => {
-                 const video = e.currentTarget;
-                 if (!isPreview) {
-                   video.currentTime = 2;
-                 } else {
-                   video.style.opacity = '1';
-                   video.play().catch(() => {
-                     if (timedVisibility) setShowButtons(true);
-                   });
-                 }
-               }}
+              onLoadedData={(e) => {
+                const video = e.currentTarget;
+                if (!isPreview) {
+                  video.pause();
+                  video.currentTime = 2;
+                }
+              }}
             />
             
             {/* Play Button Overlay - only in builder mode */}

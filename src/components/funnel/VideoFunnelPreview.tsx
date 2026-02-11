@@ -215,7 +215,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
       : 'preview';
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] isolate pointer-events-auto">
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
           <div className="relative z-10 max-w-md mx-auto px-8">
@@ -247,7 +247,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   // Show completion screen if no current node or completed
   if (!currentNode || isCompleted) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] isolate pointer-events-auto">
         <div className="bg-zinc-900 p-6 rounded-lg text-center">
           <h2 className="text-xl text-white mb-2">Funnel beendet</h2>
           <p className="text-zinc-400 mb-4">Vielen Dank für Ihre Teilnahme!</p>
@@ -267,7 +267,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
     }
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] isolate pointer-events-auto">
         <div className="bg-zinc-900 p-8 rounded-lg text-center max-w-md">
           <h2 className="text-2xl text-white mb-4">{currentNode.data.title as string}</h2>
           <p className="text-zinc-400 mb-6">{currentNode.data.message as string}</p>
@@ -304,7 +304,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
       : 'preview';
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] isolate pointer-events-auto">
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
           <div className="relative z-10 max-w-md mx-auto px-8">
@@ -336,7 +336,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   // For video nodes, render in fullscreen with interactive elements
   if (currentNode.type === 'video') {
     return (
-      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black z-[9999] isolate pointer-events-auto flex items-center justify-center">
         {/* Mobile Header */}
         <div className="md:hidden bg-black/80 backdrop-blur-sm border-b border-white/10 p-4 flex items-center justify-between absolute top-0 left-0 right-0 z-10">
           <Button 
@@ -426,7 +426,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
 
   // Fallback for other node types (use original preview)
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-95 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-95 z-[9999] isolate pointer-events-auto">
       <div className="h-full flex flex-col md:flex-row">
         <div className="flex-1 relative bg-black flex items-center justify-center">
           <div className="w-full h-64 md:h-full bg-zinc-800 flex items-center justify-center">
