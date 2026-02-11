@@ -72,7 +72,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   // Standard delay system for button visibility (when NOT using timed visibility)
   useEffect(() => {
     if (isPreview && !timedVisibility) {
-      const delaySeconds = Number(data.delaySeconds) || 0;
+      // Only apply delay when a video is actually loaded
+      const delaySeconds = data.videoUrl ? (Number(data.delaySeconds) || 0) : 0;
       if (delaySeconds > 0) {
         setShowButtons(false);
         const timer = setTimeout(() => {
@@ -87,20 +88,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       // Always show in builder mode
       setShowButtons(true);
     }
-  }, [isPreview, data.delaySeconds, timedVisibility]);
-
-  // Reset button visibility when video changes (non-timed mode)
-  useEffect(() => {
-    if (isPreview && !timedVisibility) {
-      setShowButtons(false);
-      const delaySeconds = Number(data.delaySeconds) || 0;
-      const timer = setTimeout(() => {
-        setShowButtons(true);
-      }, delaySeconds * 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [data.videoUrl]);
+  }, [isPreview, data.delaySeconds, timedVisibility, data.videoUrl]);
 
   // 9-Positionen Grid System
   const getPositionClasses = (position: string) => {

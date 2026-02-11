@@ -122,34 +122,34 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
       currentNode.id
     );
 
-    // Priority 1: Check for direct edge connections (these override answer logic)
-    const edges = (window as any).funnelEdges || [];
-    const outgoingEdge = edges.find((edge: any) => edge.source === currentNode.id);
-    
-    let nextNodeId = null;
-    
-    if (outgoingEdge) {
-      // Direct edge connection takes priority
-      nextNodeId = outgoingEdge.target;
-      console.log('Using direct edge connection to:', nextNodeId);
-    } else {
-      // Fallback to answer-based logic only if no direct edge
-      const nextNodes = currentNode.data.nextNodes as Record<string, string>;
-      
+    // Priority 1: nextNodes mapping (respects user's answer choice)
+    const nextNodes = currentNode.data.nextNodes as Record<string, string> | undefined;
+    let nextNodeId: string | null = null;
+
+    if (nextNodes) {
       if (answerType === 'multipleChoice' && typeof answer === 'number') {
-        nextNodeId = nextNodes?.[answer];
+        nextNodeId = nextNodes[String(answer)] || null;
       } else if (answerType === 'yesno') {
-        nextNodeId = nextNodes?.[answer ? 'yes' : 'no'];
+        nextNodeId = nextNodes[answer ? 'yes' : 'no'] || null;
       } else {
-        nextNodeId = nextNodes?.default;
+        nextNodeId = nextNodes['default'] || null;
       }
-      
-      // Final fallback: find next node in sequence
-      if (!nextNodeId) {
-        const currentIndex = nodes.findIndex(n => n.id === currentNodeId);
-        if (currentIndex < nodes.length - 1) {
-          nextNodeId = nodes[currentIndex + 1].id;
-        }
+    }
+
+    // Priority 2: Edge fallback (only if nextNodes didn't resolve)
+    if (!nextNodeId) {
+      const edges = (window as any).funnelEdges || [];
+      const outgoingEdge = edges.find((edge: any) => edge.source === currentNode.id);
+      if (outgoingEdge) {
+        nextNodeId = outgoingEdge.target;
+      }
+    }
+
+    // Priority 3: Sequential fallback
+    if (!nextNodeId) {
+      const currentIndex = nodes.findIndex(n => n.id === currentNodeId);
+      if (currentIndex < nodes.length - 1) {
+        nextNodeId = nodes[currentIndex + 1].id;
       }
     }
 
