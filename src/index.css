@@ -151,16 +151,15 @@
   .progress-yellow { background-color: rgb(234, 179, 8); }
 
 
-  /* Dark select dropdown: any SelectContent with bg-zinc-800 gets white text */
-  .bg-zinc-800[role="listbox"] [role="option"],
-  .bg-zinc-800 [role="option"] {
+  /* Dark select dropdown: force white text & dark hover for any select with bg-zinc-800 */
+  [data-radix-popper-content-wrapper] .bg-zinc-800 {
     color: white !important;
   }
-  .bg-zinc-800[role="listbox"] [role="option"]:focus,
-  .bg-zinc-800[role="listbox"] [role="option"][data-highlighted],
-  .bg-zinc-800 [role="option"]:focus,
-  .bg-zinc-800 [role="option"][data-highlighted] {
-    background-color: rgb(63, 63, 70) !important; /* zinc-700 */
+  [data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"] {
+    color: white !important;
+  }
+  [data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"][data-highlighted] {
+    background-color: rgb(63, 63, 70) !important;
     color: white !important;
   }
 }
