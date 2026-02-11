@@ -334,8 +334,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`${containerClasses} transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`${containerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <UniversalButton
@@ -372,8 +372,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`absolute ${getPositionClasses(mcPosition)} z-50 pointer-events-auto transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`absolute ${getPositionClasses(mcPosition)} z-50 pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <div className={getLayoutClasses(mcLayout)}>
@@ -457,8 +457,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`${containerClasses} transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`${containerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <div className={`space-y-2 ${formWidthClass}`}> 
@@ -491,8 +491,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`${containerClasses} transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`${containerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <div className="space-y-4">
@@ -552,8 +552,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`${containerClasses} transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`${containerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <div className={`w-full max-w-[320px] p-4 rounded-xl bg-gradient-to-br ${zone.bg} backdrop-blur-md border border-white/20`}>
@@ -631,8 +631,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
         return (
           <div
-            className={`${containerClasses} transition-all duration-500 ease-out ${
-              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`${containerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
             <UniversalButton
@@ -774,7 +774,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
               if (q2AnswerType === 'button') {
                 return (
-                  <div className={`${q2ContainerClasses} transition-all duration-500 ease-out ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  <div className={`${q2ContainerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
                     <UniversalButton
                       text={(data.q2ButtonText as string) || 'Weiter'}
                       color={((data.q2ButtonColor as string) || 'purple') as any}
@@ -790,7 +790,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               if (q2AnswerType === 'multipleChoice') {
                 const q2Answers = (data.q2Answers as string[]) || ['Option A', 'Option B'];
                 return (
-                  <div className={`${q2ContainerClasses} transition-all duration-500 ease-out ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  <div className={`${q2ContainerClasses} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
                     <div className="space-y-2">
                       {q2Answers.map((answer: string, index: number) => (
                         <UniversalButton
