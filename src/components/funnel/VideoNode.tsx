@@ -644,11 +644,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               ref={videoRef}
               src={data.videoUrl as string}
               className={`w-full h-full object-cover pointer-events-none ${isPreview ? 'opacity-100' : ''}`}
-              style={{ 
-                touchAction: 'manipulation', 
-                willChange: 'transform, opacity',
-                transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
-              }}
+              style={{ touchAction: 'manipulation' }}
               muted
               loop
               autoPlay={!!isPreview}

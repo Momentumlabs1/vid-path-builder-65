@@ -78,6 +78,11 @@
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
     animation: text-pulse 2s ease-in-out infinite alternate;
   }
+
+  /* Disable continuous text-pulse animation inside player to prevent GPU repaints / vibration */
+  [data-player="true"] .text-shadow-glow {
+    animation: none;
+  }
   
   @keyframes text-pulse {
     0% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3); }

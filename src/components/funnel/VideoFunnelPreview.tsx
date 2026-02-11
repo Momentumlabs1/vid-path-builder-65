@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Node } from '@xyflow/react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,13 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [sliderValue, setSliderValue] = useState(2500);
+
+  // Body scroll lock while preview is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
 
   // Initial node selection: always skip the start node and jump to first connected/video node
   useEffect(() => {

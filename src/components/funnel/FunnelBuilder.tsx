@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ReactFlow,
   addEdge,
@@ -569,7 +570,7 @@ function FunnelBuilderInner() {
         )}
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className={`flex flex-1 overflow-hidden ${showPreview ? 'invisible pointer-events-none' : ''}`}>
         {/* Enhanced Toolbar */}
         <div className="bg-gradient-to-b from-zinc-900/90 to-zinc-800/90 backdrop-blur-xl border-r border-zinc-700/50 p-4 w-20 flex flex-col gap-3">
           <Button 
@@ -669,12 +670,15 @@ function FunnelBuilderInner() {
         )}
       </div>
 
-      {/* Preview Modal */}
-      {showPreview && (
-        <VideoFunnelPreview
-          nodes={nodes}
-          onClose={() => setShowPreview(false)}
-        />
+      {/* Preview Modal - rendered via Portal to escape all ReactFlow stacking contexts */}
+      {showPreview && createPortal(
+        <div data-player="true">
+          <VideoFunnelPreview
+            nodes={nodes}
+            onClose={() => setShowPreview(false)}
+          />
+        </div>,
+        document.body
       )}
 
       {/* Export Modal */}
