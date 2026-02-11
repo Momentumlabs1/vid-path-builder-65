@@ -12,6 +12,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [rating, setRating] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
+  const [showQuestion2, setShowQuestion2] = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [videoProgress, setVideoProgress] = useState(0);
@@ -25,12 +26,18 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   const selectedRating = isPreview ? data.selectedRating : rating;
   const setSelectedRating = isPreview ? data.setSelectedRating : setRating;
 
-  // Timed visibility settings
+  // Timed visibility settings (Question 1)
   const timedVisibility = data.timedVisibility as boolean;
   const visibilityStartTime = Number(data.visibilityStartTime) || 0;
   const visibilityDuration = Number(data.visibilityDuration) || 10;
-  const showCountdownTimer = data.showCountdownTimer !== false; // default true
+  const showCountdownTimer = data.showCountdownTimer !== false;
   const visibilityEndTime = visibilityStartTime + visibilityDuration;
+
+  // Question 2 settings
+  const question2Enabled = data.question2Enabled as boolean;
+  const q2StartTime = Number(data.q2StartTime) || 0;
+  const q2Duration = Number(data.q2Duration) || 10;
+  const q2EndTime = q2StartTime + q2Duration;
 
   // Video time tracking for timed visibility
   useEffect(() => {
@@ -65,9 +72,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
         setVideoProgress((currentTime / duration) * 100);
       }
 
-      // Timed window
+      // Timed window for Question 1
       const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
       setShowButtons(isInWindow);
+
+      // Timed window for Question 2
+      if (question2Enabled) {
+        const isInQ2Window = currentTime >= q2StartTime && currentTime < q2EndTime;
+        setShowQuestion2(isInQ2Window);
+      }
 
       // Update countdown
       if (isInWindow && showCountdownTimer) {
@@ -92,7 +105,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       window.clearTimeout(autoplayFallback);
     };
-  }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer, data.videoUrl]);
+  }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer, data.videoUrl, question2Enabled, q2StartTime, q2EndTime]);
 
   // Standard delay system for button visibility (when NOT using timed visibility)
   useEffect(() => {
@@ -727,8 +740,53 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
             {/* Countdown Timer for Timed Visibility */}
             {renderCountdownTimer()}
 
-            {/* Answer Buttons/Inputs Overlay */}
+            {/* Answer Buttons/Inputs Overlay (Question 1) */}
             {renderAnswerButtons()}
+
+            {/* Question 2 Overlay */}
+            {isPreview && question2Enabled && timedVisibility && showQuestion2 && (() => {
+              const q2AnswerType = (data.q2AnswerType as string) || 'button';
+              const q2Position = (data.q2ButtonPosition as string) || 'bottom-center';
+              const q2ContainerClasses = `absolute ${getPositionClasses(q2Position)} z-50 pointer-events-auto`;
+
+              if (q2AnswerType === 'button') {
+                return (
+                  <div className={`${q2ContainerClasses} transition-all duration-500 ease-out ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <UniversalButton
+                      text={(data.q2ButtonText as string) || 'Weiter'}
+                      color={((data.q2ButtonColor as string) || 'purple') as any}
+                      style={((data.q2ButtonStyle as string) || 'glassmorphism') as any}
+                      size="small"
+                      onClick={() => handleAnswerClick('q2_clicked', 'button')}
+                      className="w-[240px] h-[44px] text-[14px]"
+                    />
+                  </div>
+                );
+              }
+
+              if (q2AnswerType === 'multipleChoice') {
+                const q2Answers = (data.q2Answers as string[]) || ['Option A', 'Option B'];
+                return (
+                  <div className={`${q2ContainerClasses} transition-all duration-500 ease-out ${showQuestion2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <div className="space-y-2">
+                      {q2Answers.map((answer: string, index: number) => (
+                        <UniversalButton
+                          key={index}
+                          text={`${String.fromCharCode(65 + index)}. ${answer}`}
+                          color={((data.q2ButtonColor as string) || 'purple') as any}
+                          style={((data.q2ButtonStyle as string) || 'glassmorphism') as any}
+                          size="small"
+                          onClick={() => handleAnswerClick(index, 'multipleChoice')}
+                          className="w-[240px] h-[44px] text-[14px]"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            })()}
 
             {/* Timed Visibility Indicator im Builder */}
             {!isPreview && timedVisibility && (
