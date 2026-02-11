@@ -25,6 +25,7 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
   const [sessionId] = useState(() => crypto.randomUUID());
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [sliderValue, setSliderValue] = useState(2500);
 
   // Initial node selection: always skip the start node and jump to first connected/video node
   useEffect(() => {
@@ -403,7 +404,9 @@ export function VideoFunnelPreview({ nodes, onClose, mode = 'builderPreview' }: 
               textInput,
               setTextInput,
               selectedRating,
-              setSelectedRating
+              setSelectedRating,
+              sliderValue,
+              setSliderValue
             }}
             selected={false}
             type="video"

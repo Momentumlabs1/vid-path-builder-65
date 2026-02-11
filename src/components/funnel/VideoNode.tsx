@@ -89,7 +89,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
     }
   }, [isPreview, data.delaySeconds, timedVisibility]);
 
-  // Reset button visibility when node changes (non-timed mode)
+  // Reset button visibility when video changes (non-timed mode)
   useEffect(() => {
     if (isPreview && !timedVisibility) {
       setShowButtons(false);
@@ -100,7 +100,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       
       return () => clearTimeout(timer);
     }
-  }, [data.videoUrl, isPreview, timedVisibility]);
+  }, [data.videoUrl]);
 
   // 9-Positionen Grid System
   const getPositionClasses = (position: string) => {
@@ -649,55 +649,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
               preload="auto"
               
               onLoadedMetadata={(e) => {
-                // Audio logic based on preview mode
                 e.currentTarget.muted = !isPreview;
                 e.currentTarget.volume = isPreview ? 1 : 0;
-                try {
-                  const videoElement = e.currentTarget as any;
-                  if (videoElement.audioTracks) {
-                    for (let i = 0; i < videoElement.audioTracks.length; i++) {
-                      videoElement.audioTracks[i].enabled = isPreview;
-                    }
-                  }
-                } catch (error) {
-                  console.log('Audio tracks not supported');
-                }
-              }}
-              onPlay={(e) => {
-                // Audio logic based on preview mode
-                e.currentTarget.muted = !isPreview;
-                e.currentTarget.volume = isPreview ? 1 : 0;
-                try {
-                  const videoElement = e.currentTarget as any;
-                  if (videoElement.audioTracks) {
-                    for (let i = 0; i < videoElement.audioTracks.length; i++) {
-                      videoElement.audioTracks[i].enabled = isPreview;
-                    }
-                  }
-                } catch (error) {
-                  console.log('Audio tracks not supported');
-                }
               }}
               onCanPlay={(e) => {
-                // Audio logic based on preview mode
                 e.currentTarget.muted = !isPreview;
                 e.currentTarget.volume = isPreview ? 1 : 0;
-                try {
-                  const videoElement = e.currentTarget as any;
-                  if (videoElement.audioTracks) {
-                    for (let i = 0; i < videoElement.audioTracks.length; i++) {
-                      videoElement.audioTracks[i].enabled = isPreview;
-                    }
-                  }
-                } catch (error) {
-                  console.log('Audio tracks not supported');
-                }
                 if (isPreview) {
                   e.currentTarget.style.opacity = '1';
-                  // Try to play with audio in preview mode
-                  e.currentTarget.play().catch(() => {
-                    console.log('Video autoplay with audio failed - user interaction required');
-                  });
+                  e.currentTarget.play().catch(() => {});
                 }
               }}
               onError={(e) => {
@@ -710,17 +670,8 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 if (!isPreview) {
                   video.currentTime = 2;
                 } else {
-                  // Smooth fade-in when video is ready
                   video.style.opacity = '1';
-                  // Aggressive mobile autoplay fixes
-                  video.play().catch(() => {
-                    const playPromise = video.play();
-                    if (playPromise !== undefined) {
-                      playPromise.catch(() => {
-                        console.log('Video autoplay failed - user interaction required');
-                      });
-                    }
-                  });
+                  video.play().catch(() => {});
                 }
               }}
             />
