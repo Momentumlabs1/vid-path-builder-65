@@ -34,39 +34,64 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
 
   // Video time tracking for timed visibility
   useEffect(() => {
-    if (!isPreview) return;
-    
+    if (!isPreview || !timedVisibility) return;
+
+    // If there's no playable video (missing URL or element not mounted), don't block interactions.
+    if (!data.videoUrl) {
+      setShowButtons(true);
+      setTimedCountdown(null);
+      return;
+    }
+
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      setShowButtons(true);
+      setTimedCountdown(null);
+      return;
+    }
+
+    let didReceiveTimeUpdate = false;
 
     const handleTimeUpdate = () => {
+      didReceiveTimeUpdate = true;
+
       const currentTime = video.currentTime;
       const duration = video.duration || 0;
       setVideoCurrentTime(currentTime);
       setVideoDuration(duration);
-      
+
       // Update progress bar
       if (duration > 0) {
         setVideoProgress((currentTime / duration) * 100);
       }
-      
-      // Check if we're in the visibility window
-      if (timedVisibility) {
-        const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
-        setShowButtons(isInWindow);
-        
-        // Update countdown
-        if (isInWindow && showCountdownTimer) {
-          const remaining = Math.ceil(visibilityEndTime - currentTime);
-          setTimedCountdown(remaining);
-        } else {
-          setTimedCountdown(null);
-        }
+
+      // Timed window
+      const isInWindow = currentTime >= visibilityStartTime && currentTime < visibilityEndTime;
+      setShowButtons(isInWindow);
+
+      // Update countdown
+      if (isInWindow && showCountdownTimer) {
+        const remaining = Math.ceil(visibilityEndTime - currentTime);
+        setTimedCountdown(remaining);
+      } else {
+        setTimedCountdown(null);
       }
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+
+    // Fallback: if autoplay is blocked and timeupdate never fires, don't hide buttons forever.
+    const autoplayFallback = window.setTimeout(() => {
+      if (!didReceiveTimeUpdate) {
+        setShowButtons(true);
+        setTimedCountdown(null);
+      }
+    }, 1500);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      window.clearTimeout(autoplayFallback);
+    };
   }, [isPreview, timedVisibility, visibilityStartTime, visibilityEndTime, showCountdownTimer, data.videoUrl]);
 
   // Standard delay system for button visibility (when NOT using timed visibility)
@@ -155,12 +180,15 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
   // Render progress bar for preview mode
   const renderProgressBar = () => {
     if (!isPreview || videoDuration === 0) return null;
-    
+
+    // Avoid width-driven layout thrash + transition jitter by using transform-based rendering.
+    const progressScale = Math.max(0, Math.min(1, videoProgress / 100));
+
     return (
       <div className="absolute top-0 left-0 right-0 z-50 h-1 bg-black/30">
-        <div 
-          className={`h-full ${getProgressBarColor()} transition-all duration-300 ease-linear rounded-r-full`}
-          style={{ width: `${videoProgress}%` }}
+        <div
+          className={`h-full w-full ${getProgressBarColor()} rounded-r-full origin-left`}
+          style={{ transform: `scaleX(${progressScale})` }}
         />
       </div>
     );
@@ -640,28 +668,32 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
                 e.currentTarget.muted = !isPreview;
                 e.currentTarget.volume = isPreview ? 1 : 0;
               }}
-              onCanPlay={(e) => {
-                e.currentTarget.muted = !isPreview;
-                e.currentTarget.volume = isPreview ? 1 : 0;
-                if (isPreview) {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.play().catch(() => {});
-                }
-              }}
+               onCanPlay={(e) => {
+                 e.currentTarget.muted = !isPreview;
+                 e.currentTarget.volume = isPreview ? 1 : 0;
+                 if (isPreview) {
+                   e.currentTarget.style.opacity = '1';
+                   e.currentTarget.play().catch(() => {
+                     if (timedVisibility) setShowButtons(true);
+                   });
+                 }
+               }}
               onError={(e) => {
                 // Bei Video-Fehler trotzdem sichtbar machen
                 e.currentTarget.style.opacity = '1';
                 console.error('Video load error:', e);
               }}
-              onLoadedData={(e) => {
-                const video = e.currentTarget;
-                if (!isPreview) {
-                  video.currentTime = 2;
-                } else {
-                  video.style.opacity = '1';
-                  video.play().catch(() => {});
-                }
-              }}
+               onLoadedData={(e) => {
+                 const video = e.currentTarget;
+                 if (!isPreview) {
+                   video.currentTime = 2;
+                 } else {
+                   video.style.opacity = '1';
+                   video.play().catch(() => {
+                     if (timedVisibility) setShowButtons(true);
+                   });
+                 }
+               }}
             />
             
             {/* Play Button Overlay - only in builder mode */}
