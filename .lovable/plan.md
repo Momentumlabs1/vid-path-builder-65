@@ -1,103 +1,83 @@
 
+Ziel: Vorschau (Preview) soll stabil laufen (kein “Vibrieren”, kein “doppeltes Video”) und Interaktionen (Buttons/Inputs) zuverlässig sichtbar sein – ohne dass Editor/Preview/Live unterschiedliche Layout- oder Playback-Logik haben.
 
-# Smart Trading Video Funnel V11 - IMPLEMENTIERT ✅
+## Was ich im Code als Root-Causes sehe (konkret, reproduzierbar)
+### A) Preview-Layout verursacht “doppeltes Video”/Overlays (Mobile)
+In `src/components/funnel/VideoNode.tsx` wird bei `isPreview && window.innerWidth < 768` der äußere Wrapper auf **`fixed inset-0 bg-black`** gesetzt:
+- `VideoFunnelPreview` ist bereits ein Fullscreen-Overlay (`fixed inset-0 ... z-50`)
+- `VideoNode` erzeugt dann **nochmal** ein eigenes Fullscreen-Fixed-Layer (ohne eigenes z-index)
+⇒ Ergebnis: zwei übereinanderliegende Vollbild-Layer, die je nach Stacking Context flackern/“vibrieren” und wie “doppeltes Video” wirken können. Außerdem kann das die Button-Overlays “verschlucken”, weil die Ebenen gegeneinander arbeiten.
 
-## Zusammenfassung
+### B) Autoplay/Muted ist aktuell “umgedreht” und bricht Preview-Laufzeit + TimedVisibility
+In `VideoNode.tsx` beim `<video>`:
+- `muted={!isPreview}`  → im Preview **unmuted**
+- `autoPlay={!isPreview}` → im Preview **kein autoplay**
+Gleichzeitig wird im Preview zwar in `onCanPlay/onLoadedData` `play()` aufgerufen, aber unmuted Autoplay wird sehr häufig blockiert.
+⇒ Wenn Video nicht zuverlässig läuft, feuert `timeupdate` nicht sauber → TimedVisibility/Progress/“Buttons erscheinen zu Zeitpunkt X” wird unzuverlässig. Das führt für dich zu “ich sehe gar keine Buttons”.
 
-Komplett neue Funnel-Version mit 24 Videos, optimierter Struktur und einem neuen **Budget-Slider** Interaktionstyp. Die alte V6 (39 Videos) wurde ersetzt.
+### C) Background-Builder-Videos laufen weiter und können über dem Modal liegen
+Im Builder-Modus (`isPreview = false`) ist aktuell `autoPlay` aktiv (weil `autoPlay={!isPreview}`), d.h. **im Canvas laufen Videos** während das Preview-Modal offen ist.
+Zusammen mit einem relativ niedrigen Modal-z-index (`z-50`) kann das:
+- wie ein zweites Video “oben drüber” aussehen (ReactFlow kann hohe z-index Werte haben)
+- CPU/GPU Last erzeugen → “Vibrieren”, Jitter, Flackern
 
----
+## Geplante Änderungen (ohne Feature-Diskussion, reine Bugfixes)
+### 1) Preview-Layout: VideoNode darf niemals selbst “fixed fullscreen” sein
+**Datei:** `src/components/funnel/VideoNode.tsx`  
+**Änderung:** Wrapper-Klassen so umstellen, dass `isPreview` immer “container-driven” ist:
+- Entfernen von `fixed inset-0` für Preview komplett
+- Preview-Wrapper stattdessen immer: `w-full h-full relative bg-black overflow-hidden`
+- Desktop/Mobile-Unterscheidung im VideoNode nicht über `window.innerWidth` im Render steuern (wenn nötig, dann rein über Props/Container)
 
-## Status: FERTIG ✅
+**Erwarteter Effekt:** Kein doppeltes Vollbild-Layer mehr, Buttons liegen zuverlässig im selben Stacking-Kontext wie das Video.
 
-Alle Komponenten wurden implementiert:
+### 2) Playback-Policy: Preview/Embed muss autoplay + muted starten (Browser-Regeln)
+**Datei:** `src/components/funnel/VideoNode.tsx`  
+**Änderung am `<video>`:**
+- Preview: `autoPlay={true}` und `muted={true}` (initial), `playsInline`
+- Builder: `autoPlay={false}` (damit der Canvas im Hintergrund nicht “läuft”)
+- Zusätzlich: Play-Start in Preview zentralisieren (nicht doppelt in `onCanPlay` und `onLoadedData`), z.B. über einen einzigen, gut geclearten `useEffect`, der bei `data.videoUrl` + `isPreview` genau einmal `video.play()` versucht (muted), und bei Fail nicht in einen Loop gerät.
 
-1. ✅ **`src/data/smartTradingFunnel.ts`** - Komplett neu mit 24 Nodes
-2. ✅ **`src/components/funnel/VideoNode.tsx`** - Budget-Slider UI
-3. ✅ **`src/components/funnel/NodePropertiesPanel.tsx`** - Slider-Konfiguration
-4. ✅ **`src/lib/export/playerTemplate.ts`** - Slider im Standalone-Export
-5. ✅ **`src/components/funnel/SynchronizedPreview.tsx`** - Slider-Vorschau
+**Erwarteter Effekt:** Video läuft stabil in Preview, `timeupdate` feuert stabil, TimedVisibility kann funktionieren, UI flackert nicht.
 
----
+### 3) Buttons “nie sichtbar”: harte Sicherheits-Fallbacks für Preview
+**Datei:** `src/components/funnel/VideoNode.tsx`  
+**Änderung an der Button-Sichtbarkeitslogik:**
+- Wenn `isPreview` und das Video nach kurzer Zeit nicht “playing” ist bzw. `timeupdate` nicht kommt: Buttons nicht dauerhaft blockieren.
+- Für TimedVisibility: Wenn Autoplay/Playback scheitert, sollen Buttons **nicht** unsichtbar bleiben (du hattest das teilweise schon mit dem 1.5s Fallback, ich würde das robuster machen: statt nur `didReceiveTimeUpdate` zusätzlich `video.readyState`/`paused`/`currentTime` prüfen).
+- Für Delay: Delay nur anwenden, wenn Video wirklich läuft (nicht nur `videoUrl` gesetzt). Sonst sofort sichtbar.
 
-## Hauptänderungen
+**Erwarteter Effekt:** In Preview siehst du immer Buttons; TimedVisibility/Delay verhalten sich nur dann “streng”, wenn Playback tatsächlich läuft.
 
-| Aspekt | V6 (alt) | V11 (neu) |
-|--------|----------|-----------|
-| Videos gesamt | 39 | 24 |
-| Intro | 6 Videos | 3 Videos |
-| Anfänger | 16 Videos | 10 Videos |
-| Fortgeschritten | 16 Videos | 10 Videos |
-| Abschluss | 1 Video | 1 Video |
-| Budget-Frage | Keine | Slider (€0-€10.000) |
+### 4) Modal wirklich über alles legen (Z-Index / Stacking Context)
+**Datei:** `src/components/funnel/VideoFunnelPreview.tsx`  
+**Änderung:** Root-Wrapper von `z-50` auf sehr hoch (z.B. `z-[9999]`) + `isolation:isolate` (Tailwind: `isolate`) und explizit `pointer-events-auto`.
+Optional: Body-Scroll lock während Preview offen ist (verhindert “Layout shift”/Jitter durch Scrollbars).
 
----
+**Erwarteter Effekt:** ReactFlow-Canvas/Nodes können das Modal nicht mehr überdecken; “doppeltes Video” durch Überlagerung verschwindet.
 
-## Budget-Slider Feature
+### 5) Builder-Performance: Canvas-Videos nicht im Hintergrund abspielen
+**Datei:** `src/components/funnel/VideoNode.tsx`  
+**Änderung:** Im Builder-Modus kein Autoplay; optional nur ein Standbild oder Play-Overlay (wie ohnehin vorhanden).  
+**Erwarteter Effekt:** Kein Background-Rendering, weniger GPU-Last, “Vibrieren” reduziert.
 
-Neuer `answerType: 'budgetSlider'` mit:
-- Slider von €0 bis €10.000
-- 5 Farbbereiche mit Labels:
-  - €0-500: Wenig (rot) ⚠️
-  - €500-1.500: Starter (orange) 🌱
-  - €1.500-4.000: Solide (grün) ✅
-  - €4.000-7.000: Platin (cyan) 💎
-  - €7.000-10.000: Gold (gold) 👑
-- Dynamische Farbänderung beim Verschieben
-- "Weiter"-Button
+## Testplan (damit wir’s sicher abhaken können)
+1) Im Builder auf “Preview” klicken:
+   - Es darf nur **ein** Video sichtbar sein (kein zweites Canvas-Video drüber/drunter).
+   - Buttons müssen sichtbar sein (sofort, wenn Delay/TImedVisibility nicht sinnvoll greifen kann).
+2) Mobile Breite (Lovable Device Toggle) + Preview:
+   - Kein Flackern/Jitter, Buttons weiterhin sichtbar.
+3) Node mit TimedVisibility:
+   - Wenn Video spielt: Buttons erscheinen im Fenster.
+   - Wenn Video nicht spielt: Buttons werden nach kurzer Fallback-Zeit trotzdem sichtbar (keine “endlose Unsichtbarkeit”).
+4) Live/Embed Route (`/embed/...`):
+   - Autoplay startet (muted), UI stabil, keine doppelten Ebenen.
 
----
+## Dateien, die ich anfassen werde
+- `src/components/funnel/VideoNode.tsx` (Hauptfix: Layout + Autoplay/Muted + robuste Fallbacks)
+- `src/components/funnel/VideoFunnelPreview.tsx` (Modal z-index + optional scroll lock)
 
-## Daten die gesammelt werden
+## Risiko / Nebenwirkungen
+- Sound startet nicht automatisch (Browser-Policy). Korrekt ist: Start muted, optional späterer Unmute-Button (kann ich als Folge-Task ergänzen, sobald Preview wieder stabil ist).
+- TimedVisibility ist nur dann exakt simulierbar, wenn das Video wirklich läuft; sonst greifen Fallbacks (damit du nicht “blind” debuggen musst).
 
-**Anfänger:**
-- Auslöser (Zeit/Unzufriedenheit/Inspiration)
-- Ziel (Nebeneinkommen/Freiheit/Verstehen)
-- Blockade (Angst/Überforderung)
-- Budget (€0-€10.000)
-
-**Fortgeschritten:**
-- Situation (Verlust/Break-Even/Random)
-- Problem (Strategie/Emotionen)
-- Ziel (Profitabel/Prop-Firm/Vollzeit)
-- Budget (€0-€10.000)
-
----
-
-## Flow-Diagramm
-
-```text
-                    V1 (Begrüßung)
-                         │
-          ┌──────────────┴──────────────┐
-          ▼                             ▼
-    V2a (Story)                   V2b (Direkt)
-          │                             │
-          └──────────────┬──────────────┘
-                         │
-          ┌──────────────┴──────────────┐
-          ▼                             ▼
-   A1 (Anfänger)               F1 (Fortgeschr.)
-       │                             │
-   ┌───┼───┐                    ┌───┼───┐
-   ▼   ▼   ▼                    ▼   ▼   ▼
-  A2a A2b A2c                  F2a F2b F2c
-   └───┼───┘                    └───┼───┘
-       │                            │
-   ┌───┼───┐                    ┌───┴───┐
-   ▼   ▼   ▼                    ▼       ▼
-  A3a A3b A3c                  F3a     F3b
-   └───┼───┘                    └───┬───┘
-       │                            │
-   ┌───┴───┐                ┌───────┼───────┐
-   ▼       ▼                ▼       ▼       ▼
-  A4a     A4b              F4a     F4b     F4c
-   └───┬───┘                └───────┼───────┘
-       │                            │
-       ▼                            ▼
-  A5 (Resümee)              F5 (Resümee)
-       │                            │
-       └────────────┬───────────────┘
-                    ▼
-               V-END (Bestätigung)
-```
