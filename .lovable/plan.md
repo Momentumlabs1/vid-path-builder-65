@@ -1,83 +1,141 @@
 
-Ziel: Vorschau (Preview) soll stabil laufen (kein “Vibrieren”, kein “doppeltes Video”) und Interaktionen (Buttons/Inputs) zuverlässig sichtbar sein – ohne dass Editor/Preview/Live unterschiedliche Layout- oder Playback-Logik haben.
+Zielbild
+- Vorschau (Modal) ist absolut stabil: kein “Vibrieren”, kein Ghosting/Picture-in-picture, keine zweite Player-Instanz sichtbar.
+- Interaktionen (Buttons/Inputs) sind in Vorschau/Embed zuverlässig sichtbar (auch wenn Autoplay blockiert).
+- “Editor vs Vorschau” wird eindeutig und nachvollziehbar: Der Builder-Node ist eine Miniatur, aber es gibt eine echte 1:1 Preview im Editor (pixelgenau).
 
-## Was ich im Code als Root-Causes sehe (konkret, reproduzierbar)
-### A) Preview-Layout verursacht “doppeltes Video”/Overlays (Mobile)
-In `src/components/funnel/VideoNode.tsx` wird bei `isPreview && window.innerWidth < 768` der äußere Wrapper auf **`fixed inset-0 bg-black`** gesetzt:
-- `VideoFunnelPreview` ist bereits ein Fullscreen-Overlay (`fixed inset-0 ... z-50`)
-- `VideoNode` erzeugt dann **nochmal** ein eigenes Fullscreen-Fixed-Layer (ohne eigenes z-index)
-⇒ Ergebnis: zwei übereinanderliegende Vollbild-Layer, die je nach Stacking Context flackern/“vibrieren” und wie “doppeltes Video” wirken können. Außerdem kann das die Button-Overlays “verschlucken”, weil die Ebenen gegeneinander arbeiten.
+Was ich anhand des aktuellen Codes + Screenshot als Ursachen sehe
 
-### B) Autoplay/Muted ist aktuell “umgedreht” und bricht Preview-Laufzeit + TimedVisibility
-In `VideoNode.tsx` beim `<video>`:
-- `muted={!isPreview}`  → im Preview **unmuted**
-- `autoPlay={!isPreview}` → im Preview **kein autoplay**
-Gleichzeitig wird im Preview zwar in `onCanPlay/onLoadedData` `play()` aufgerufen, aber unmuted Autoplay wird sehr häufig blockiert.
-⇒ Wenn Video nicht zuverlässig läuft, feuert `timeupdate` nicht sauber → TimedVisibility/Progress/“Buttons erscheinen zu Zeitpunkt X” wird unzuverlässig. Das führt für dich zu “ich sehe gar keine Buttons”.
+1) “Doppeltes Video” / Ghosting im Preview
+- Dein Screenshot (großes Video + kleiner Player unten links) sieht nach zwei gleichzeitig sichtbaren Player-Instanzen aus:
+  - Instanz A: Preview-Modal (VideoFunnelPreview → VideoNode isPreview=true).
+  - Instanz B: Builder-Canvas (ReactFlow NodeCards), der weiterhin im DOM ist (und ggf. weiterhin sichtbar/komposited), obwohl das Modal darüber liegt.
+- Auch wenn das Modal z-[9999] hat, können GPU-Compositing/Stacking-Kontexte + Video-Layer (Hardware Acceleration) dazu führen, dass ein Video-Layer “durchblutet” bzw. als “Ghost” sichtbar bleibt (besonders wenn am <video> `willChange`/`transition` gesetzt ist).
 
-### C) Background-Builder-Videos laufen weiter und können über dem Modal liegen
-Im Builder-Modus (`isPreview = false`) ist aktuell `autoPlay` aktiv (weil `autoPlay={!isPreview}`), d.h. **im Canvas laufen Videos** während das Preview-Modal offen ist.
-Zusammen mit einem relativ niedrigen Modal-z-index (`z-50`) kann das:
-- wie ein zweites Video “oben drüber” aussehen (ReactFlow kann hohe z-index Werte haben)
-- CPU/GPU Last erzeugen → “Vibrieren”, Jitter, Flackern
+2) “Vibrieren” des gesamten Videos
+Das ist sehr häufig eine Kombination aus:
+- Zu viele Repaints auf einer Video-Layer-Komposition (z.B. durch animierte Schatten/Filter/Backdrops über dem Video).
+- Dauer-Updates aus `timeupdate` (setState) + zusätzliche CSS-Animationen auf Overlay-Text.
+- In deinem globalen CSS animiert `.text-shadow-glow` permanent (`animation: text-pulse ... infinite`). Diese Animation liegt bei Overlay-Text über dem Video und zwingt häufige Repaints. Das kann sich so anfühlen, als “zittert” das ganze Video.
 
-## Geplante Änderungen (ohne Feature-Diskussion, reine Bugfixes)
-### 1) Preview-Layout: VideoNode darf niemals selbst “fixed fullscreen” sein
-**Datei:** `src/components/funnel/VideoNode.tsx`  
-**Änderung:** Wrapper-Klassen so umstellen, dass `isPreview` immer “container-driven” ist:
-- Entfernen von `fixed inset-0` für Preview komplett
-- Preview-Wrapper stattdessen immer: `w-full h-full relative bg-black overflow-hidden`
-- Desktop/Mobile-Unterscheidung im VideoNode nicht über `window.innerWidth` im Render steuern (wenn nötig, dann rein über Props/Container)
+3) “Buttons im Editor anders als in Vorschau”
+- Im Builder-Canvas wird der VideoNode bewusst als Mini-Karte gerendert: `style={{ width: '240px', height: '426px' }}`.
+- In der Vorschau ist die “Phone Simulation” deutlich größer (`400x711`), bzw. auf Mobile sogar full-screen.
+- Bei festen Pixel-Buttons (z.B. XL = 240px) ist die absolute Größe zwar gleich, aber:
+  - Bei “full width” (w-full) ist es zwangsläufig anders, weil “full” die Containerbreite nutzt (240 vs 400).
+  - Selbst bei festen Größen wirkt es visuell anders, weil die Videofläche/Framing anders ist.
+=> Wenn du wirklich “Editor = Preview”, brauchst du im Editor eine echte 1:1 Preview-Ansicht (nicht nur die Node-Karte im Flow).
 
-**Erwarteter Effekt:** Kein doppeltes Vollbild-Layer mehr, Buttons liegen zuverlässig im selben Stacking-Kontext wie das Video.
+Konkreter Umsetzungsplan
 
-### 2) Playback-Policy: Preview/Embed muss autoplay + muted starten (Browser-Regeln)
-**Datei:** `src/components/funnel/VideoNode.tsx`  
-**Änderung am `<video>`:**
-- Preview: `autoPlay={true}` und `muted={true}` (initial), `playsInline`
-- Builder: `autoPlay={false}` (damit der Canvas im Hintergrund nicht “läuft”)
-- Zusätzlich: Play-Start in Preview zentralisieren (nicht doppelt in `onCanPlay` und `onLoadedData`), z.B. über einen einzigen, gut geclearten `useEffect`, der bei `data.videoUrl` + `isPreview` genau einmal `video.play()` versucht (muted), und bei Fail nicht in einen Loop gerät.
+A) Preview technisch vollständig vom Builder isolieren (beseitigt doppeltes Video zuverlässig)
+Dateien: 
+- src/components/funnel/FunnelBuilder.tsx
+- src/components/funnel/VideoFunnelPreview.tsx
 
-**Erwarteter Effekt:** Video läuft stabil in Preview, `timeupdate` feuert stabil, TimedVisibility kann funktionieren, UI flackert nicht.
+Schritte:
+1) Preview-Modal per React Portal in `document.body` rendern
+   - Statt das Modal als normales JSX unter dem Builder zu rendern, in ein Portal auslagern.
+   - Effekt: Das Modal ist garantiert außerhalb aller ReactFlow/Canvas/Transform/Stacking-Kontexte.
+   - Damit verschwindet in der Praxis das “kleiner Player auf dem großen Video”-Artefakt.
 
-### 3) Buttons “nie sichtbar”: harte Sicherheits-Fallbacks für Preview
-**Datei:** `src/components/funnel/VideoNode.tsx`  
-**Änderung an der Button-Sichtbarkeitslogik:**
-- Wenn `isPreview` und das Video nach kurzer Zeit nicht “playing” ist bzw. `timeupdate` nicht kommt: Buttons nicht dauerhaft blockieren.
-- Für TimedVisibility: Wenn Autoplay/Playback scheitert, sollen Buttons **nicht** unsichtbar bleiben (du hattest das teilweise schon mit dem 1.5s Fallback, ich würde das robuster machen: statt nur `didReceiveTimeUpdate` zusätzlich `video.readyState`/`paused`/`currentTime` prüfen).
-- Für Delay: Delay nur anwenden, wenn Video wirklich läuft (nicht nur `videoUrl` gesetzt). Sonst sofort sichtbar.
+2) Builder während Preview “inert” setzen
+   - Wenn `showPreview` true:
+     - ReactFlow-Container: `aria-hidden="true"` + `pointer-events-none` + optional `opacity-0` oder `visibility-hidden`
+   - Effekt: Kein Klick/Focus/Scroll im Builder, keine Überlagerung, weniger Repaints.
 
-**Erwarteter Effekt:** In Preview siehst du immer Buttons; TimedVisibility/Delay verhalten sich nur dann “streng”, wenn Playback tatsächlich läuft.
+3) Body Scroll Lock + stabile Viewport-Basis
+   - Während Preview offen ist: `document.body.style.overflow = 'hidden'`
+   - Beim Close: sauber zurücksetzen.
+   - Effekt: keine Scrollbar-Layout-Shifts (die oft als “Jitter” wahrgenommen werden).
 
-### 4) Modal wirklich über alles legen (Z-Index / Stacking Context)
-**Datei:** `src/components/funnel/VideoFunnelPreview.tsx`  
-**Änderung:** Root-Wrapper von `z-50` auf sehr hoch (z.B. `z-[9999]`) + `isolation:isolate` (Tailwind: `isolate`) und explizit `pointer-events-auto`.
-Optional: Body-Scroll lock während Preview offen ist (verhindert “Layout shift”/Jitter durch Scrollbars).
+B) Background-Videos im Builder hart pausieren (Performance + verhindert Ghost-Layer)
+Datei:
+- src/components/funnel/VideoNode.tsx
 
-**Erwarteter Effekt:** ReactFlow-Canvas/Nodes können das Modal nicht mehr überdecken; “doppeltes Video” durch Überlagerung verschwindet.
+Schritte:
+1) In Builder-Mode (isPreview false) sicherstellen, dass Video nie spielt:
+   - Bereits vorhanden: `autoPlay={!!isPreview}` und `onLoadedData` pausiert.
+   - Ergänzen: ein `useEffect`, der bei `!isPreview` immer `videoRef.current?.pause()` ausführt (auch wenn das Video schon geladen ist).
+   - Zusätzlich `videoRef.current.currentTime = 0` oder ein stabiler Frame (z.B. 0 oder 2s) nur einmal setzen.
 
-### 5) Builder-Performance: Canvas-Videos nicht im Hintergrund abspielen
-**Datei:** `src/components/funnel/VideoNode.tsx`  
-**Änderung:** Im Builder-Modus kein Autoplay; optional nur ein Standbild oder Play-Overlay (wie ohnehin vorhanden).  
-**Erwarteter Effekt:** Kein Background-Rendering, weniger GPU-Last, “Vibrieren” reduziert.
+2) Video CSS entschärfen (verhindert GPU-Compositing Artefakte)
+   - Aktuell hat das <video> inline:
+     - `willChange: 'transform, opacity'`
+     - `transition: 'opacity 0.5s ... transform 0.5s ...'`
+   - Entfernen bzw. auf “minimal” reduzieren (keine transform-transition am Video).
+   - Effekt: deutlich weniger “Ghosting” / doppelte Frames bei Hardwarebeschleunigung.
 
-## Testplan (damit wir’s sicher abhaken können)
-1) Im Builder auf “Preview” klicken:
-   - Es darf nur **ein** Video sichtbar sein (kein zweites Canvas-Video drüber/drunter).
-   - Buttons müssen sichtbar sein (sofort, wenn Delay/TImedVisibility nicht sinnvoll greifen kann).
-2) Mobile Breite (Lovable Device Toggle) + Preview:
-   - Kein Flackern/Jitter, Buttons weiterhin sichtbar.
-3) Node mit TimedVisibility:
-   - Wenn Video spielt: Buttons erscheinen im Fenster.
-   - Wenn Video nicht spielt: Buttons werden nach kurzer Fallback-Zeit trotzdem sichtbar (keine “endlose Unsichtbarkeit”).
-4) Live/Embed Route (`/embed/...`):
-   - Autoplay startet (muted), UI stabil, keine doppelten Ebenen.
+C) “Vibrieren” abstellen, indem permanente Animationen im Preview deaktiviert werden
+Dateien:
+- src/index.css
+- src/components/funnel/VideoNode.tsx (optional)
+- src/components/funnel/SynchronizedPreview.tsx (optional)
 
-## Dateien, die ich anfassen werde
-- `src/components/funnel/VideoNode.tsx` (Hauptfix: Layout + Autoplay/Muted + robuste Fallbacks)
-- `src/components/funnel/VideoFunnelPreview.tsx` (Modal z-index + optional scroll lock)
+Schritte:
+1) `.text-shadow-glow` Animation im Player-Kontext abschalten
+   Optionen (eine wählen):
+   - (Empfohlen) Player-spezifische Klasse: z.B. am Preview-Root `data-player="true"` setzen und CSS:
+     - `[data-player="true"] .text-shadow-glow { animation: none; }`
+   - oder in den Komponenten im Preview-Modus den ClassName `text-shadow-glow` weglassen/ersetzen.
+   Effekt: Keine kontinuierlichen Text-Shadow-Repaints über dem Video.
 
-## Risiko / Nebenwirkungen
-- Sound startet nicht automatisch (Browser-Policy). Korrekt ist: Start muted, optional späterer Unmute-Button (kann ich als Folge-Task ergänzen, sobald Preview wieder stabil ist).
-- TimedVisibility ist nur dann exakt simulierbar, wenn das Video wirklich läuft; sonst greifen Fallbacks (damit du nicht “blind” debuggen musst).
+2) Optional: `prefers-reduced-motion` respektieren
+   - Unter `@media (prefers-reduced-motion: reduce)` alle nicht notwendigen Animationen deaktivieren.
+   - Das ist ein Bonus, hilft aber auch bei schwächeren Geräten.
 
+D) Editor vs Vorschau: echte 1:1 Preview im Editor anbieten (statt Flow-Node als Referenz)
+Dateien:
+- src/components/funnel/NodePropertiesPanel.tsx
+- (optional) src/components/funnel/SynchronizedPreview.tsx
+
+Schritte:
+1) In NodePropertiesPanel eine “Pixelgenaue Vorschau” hinzufügen
+   - Statt SynchronizedPreview (vereinfachte Vorschau) eine echte VideoNode-Instanz im isPreview-Modus rendern, eingebettet in einen festen Container:
+     - Desktop: 400x711
+     - Mobile Toggle: w-full h-full oder 400x711 weiterhin (je nach Ziel)
+   - Diese Preview nutzt exakt dieselben Dimension-Funktionen und Overlays wie der echte Player.
+
+2) Klarer Hinweis im UI:
+   - “Flow-Karte ist eine Miniatur; für 1:1 Größen bitte die Pixel-Preview nutzen.”
+   - Damit ist die Erwartung sauber: du vergleichst nicht mehr “Mini-Karte” vs “Phone Player”.
+
+E) Button-Größen-Diskrepanz bei “full width” erklären/absichern
+Dateien:
+- src/components/funnel/VideoNode.tsx
+- src/components/funnel/NodePropertiesPanel.tsx
+
+Schritte:
+1) Wenn buttonWidth === 'full':
+   - Optional: Anzeige im Editor “full = Containerbreite; im Flow-Node kleiner” (Info-Label).
+2) Optional: In Pixel-Preview zusätzlich die effektive Renderbreite anzeigen (z.B. “Button: 400px in Preview”).
+
+Test-Checkliste (End-to-End)
+1) /builder?funnel=smart-trading-v6 → “Vorschau”
+   - Es darf nur ein Player sichtbar sein (kein kleiner Overlay-Player).
+   - Video wirkt stabil (kein Zittern).
+2) Während Preview offen ist:
+   - Builder ist nicht klickbar/scrollbar-shifted.
+3) Buttons:
+   - Im Preview erscheinen Buttons zuverlässig (bei timedVisibility im Window, sonst via Fallback).
+4) Editor-Vergleich:
+   - Pixel-Preview im Properties Panel vs Preview-Modal: Buttons sind identisch (selbe Breite/Höhe/Textgröße).
+5) Mobile Viewport:
+   - Keine GPU-Artefakte, kein Ghosting.
+
+Risiko / Nebenwirkungen
+- Portal + inert/pointer-events kann erfordern, dass Close/ESC sauber gehandhabt wird (Focus Management).
+- Deaktivieren von Text-Glow-Animation reduziert “Glow-Effekt”, erhöht aber massiv Stabilität.
+- Pixel-Preview in Properties Panel kann Performance kosten; daher nur rendern, wenn ein Node selektiert ist (und optional nur, wenn “Preview anzeigen” Toggle aktiv ist).
+
+Umfang (welche Dateien ich anfassen werde)
+- src/components/funnel/FunnelBuilder.tsx (Builder während Preview inert + optional Portal-Wrapper Trigger)
+- src/components/funnel/VideoFunnelPreview.tsx (Portal-Rendering, data-player Flag, Scroll-Lock)
+- src/components/funnel/VideoNode.tsx (Builder-Pause-Hardening, Video inline-style entschärfen, optional Preview-spezifische Klassen)
+- src/components/funnel/NodePropertiesPanel.tsx (Pixelgenaue Preview mit echter VideoNode)
+- src/index.css (Player-spezifisches Disable für text-shadow Animation)
+
+Ergebnis
+- Kein “Doppel-Video” mehr (Portal + Inert + Pause).
+- Kein “Vibrieren” mehr (Animations-Disable + weniger GPU/Video-Transitions).
+- Kein endloses “Editor vs Vorschau” Missverständnis mehr (pixelgenaue Preview direkt im Editor).
