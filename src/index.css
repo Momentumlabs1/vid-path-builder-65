@@ -151,17 +151,27 @@
   .progress-yellow { background-color: rgb(234, 179, 8); }
 
 
-  /* Dark select dropdown: force white text & dark hover for any select with bg-zinc-800 */
-  [data-radix-popper-content-wrapper] .bg-zinc-800 {
-    color: white !important;
-  }
-  [data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"] {
-    color: white !important;
-  }
-  [data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"][data-highlighted] {
-    background-color: rgb(63, 63, 70) !important;
-    color: white !important;
-  }
+}
+
+/* Dark select dropdown: force white text on ALL dark-bg selects (OUTSIDE @layer for higher specificity) */
+.bg-zinc-800[role="listbox"],
+.bg-zinc-800 [role="listbox"],
+[data-radix-popper-content-wrapper] .bg-zinc-800,
+.bg-zinc-800[data-radix-select-viewport] {
+  color: white !important;
+}
+.bg-zinc-800 [role="option"],
+[data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"] {
+  color: white !important;
+}
+.bg-zinc-800 [role="option"][data-highlighted],
+.bg-zinc-800 [role="option"]:focus,
+[data-radix-popper-content-wrapper] .bg-zinc-800 [role="option"][data-highlighted] {
+  background-color: rgb(63, 63, 70) !important;
+  color: white !important;
+}
+.bg-zinc-800 [role="option"] svg {
+  color: white !important;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
