@@ -570,7 +570,7 @@ function FunnelBuilderInner() {
         )}
       </div>
 
-      <div className={`flex flex-1 overflow-hidden ${showPreview ? 'invisible pointer-events-none' : ''}`}>
+      <div className="flex flex-1 overflow-hidden" style={showPreview ? { display: 'none' } : undefined}>
         {/* Enhanced Toolbar */}
         <div className="bg-gradient-to-b from-zinc-900/90 to-zinc-800/90 backdrop-blur-xl border-r border-zinc-700/50 p-4 w-20 flex flex-col gap-3">
           <Button 
