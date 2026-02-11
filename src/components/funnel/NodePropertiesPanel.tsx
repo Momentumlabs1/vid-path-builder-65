@@ -1625,7 +1625,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                   <Slider
                     value={[parseInt((localData.delaySeconds as string) || '0')]}
                     onValueChange={(value) => updateLocalData({ delaySeconds: value[0] })}
-                    max={30}
+                    max={120}
                     min={0}
                     step={1}
                     className="w-full"
