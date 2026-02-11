@@ -621,7 +621,7 @@ export const VideoNode = memo(({ data, selected }: NodeProps) => {
       !isPreview && selected 
         ? 'border-purple-500 shadow-xl shadow-purple-500/30' 
         : !isPreview ? 'border-zinc-700 hover:border-zinc-600 hover:shadow-lg' : ''
-    }`} style={!isPreview ? { width: '240px', height: '426px' } : undefined}>
+    }`} style={!isPreview ? { width: '400px', height: '711px' } : undefined}>
       {/* Handles - only show in builder mode */}
       {!isPreview && (
         <>
