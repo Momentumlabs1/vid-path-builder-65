@@ -1906,7 +1906,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                           <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                             {availableNodes.map((node) => (
                               <SelectItem key={node.id} value={node.id}>
-                                {node.data.label as string}
+                                {(node.data.label as string) || (node.data.name as string) || node.id}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -1930,7 +1930,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
-                              {node.data.label as string}
+                              {(node.data.label as string) || (node.data.name as string) || node.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1948,7 +1948,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
-                              {node.data.label as string}
+                              {(node.data.label as string) || (node.data.name as string) || node.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1970,7 +1970,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                       <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                         {availableNodes.map((node) => (
                           <SelectItem key={node.id} value={node.id}>
-                            {node.data.label as string}
+                          {(node.data.label as string) || (node.data.name as string) || node.id}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1998,7 +1998,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
-                              {node.data.label as string}
+                              {(node.data.label as string) || (node.data.name as string) || node.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -2018,7 +2018,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
-                              {node.data.label as string}
+                              {(node.data.label as string) || (node.data.name as string) || node.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -2038,7 +2038,7 @@ export function NodePropertiesPanel({ node, nodes, onUpdateNode, onClose }: Node
                         <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
                           {availableNodes.map((node) => (
                             <SelectItem key={node.id} value={node.id}>
-                              {node.data.label as string}
+                              {(node.data.label as string) || (node.data.name as string) || node.id}
                             </SelectItem>
                           ))}
                         </SelectContent>
