@@ -276,3 +276,14 @@ All colors MUST be HSL.
     @apply bg-background text-foreground font-figtree;
   }
 }
+
+/* Force white text in ALL Radix Select dropdowns */
+[data-radix-select-viewport] [role="option"],
+[data-radix-select-viewport] [role="option"] span,
+[data-radix-select-viewport] [role="option"] * {
+  color: white !important;
+}
+
+[data-radix-select-viewport] {
+  color: white !important;
+}
