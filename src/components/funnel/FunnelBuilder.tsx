@@ -28,7 +28,7 @@ import { VideoFunnelPreview } from './VideoFunnelPreview';
 import CustomEdge from './CustomEdge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download } from 'lucide-react';
+import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FunnelExporter } from './FunnelExporter';
 import {
