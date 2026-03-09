@@ -1,47 +1,56 @@
 
 
-# Plan: KI-Assistent im Funnel Builder
+# Dropdown-Text: Endgueltige Loesung mit Inline Styles
 
-## Was wird gebaut
+## Analyse des Screenshots
+Die letzten Aenderungen haben teilweise gegriffen: "Lead Capture" und "Ende" sind sichtbar. Aber das erste Item im Dropdown bleibt unsichtbar. Das bedeutet, dass CSS-Klassen allein nicht ausreichen -- Radix UI setzt intern Styles auf `SelectPrimitive.ItemText`, die Tailwind-Klassen ueberschreiben.
 
-Ein **AI Chat Panel** im Funnel Builder, über das Nutzer beschreiben können, welchen Funnel sie brauchen. Die KI generiert daraus automatisch die komplette Funnel-Struktur (Nodes + Edges) und lädt sie in den Editor.
+## Loesung: Inline `style` statt CSS-Klassen
 
-## Komponenten
+### Datei: `src/components/ui/select.tsx`
 
-### 1. Backend: Edge Function `funnel-ai`
-- Nimmt eine Nutzerbeschreibung entgegen (z.B. "Ich will einen Immobilien-Funnel mit 3 Videos")
-- Nutzt Lovable AI Gateway (`google/gemini-3-flash-preview`) mit Tool-Calling
-- Gibt strukturierte Nodes + Edges zurück (Start → Video → LeadCapture → End etc.)
-- System-Prompt kennt alle Node-Typen (video, start, end, leadCapture, api) und deren `data`-Felder
-- Braucht: `LOVABLE_API_KEY` (muss erst aktiviert werden)
+**SelectItem (Zeile 116-131):**
+Auf dem `SelectPrimitive.Item` Element ein `style={{ color: 'white' }}` setzen. Zusaetzlich auf `SelectPrimitive.ItemText` ebenfalls `style={{ color: 'inherit' }}` setzen.
 
-### 2. Frontend: `FunnelAIChat` Komponente
-- Slide-in Panel (rechte Seite) oder Sheet, toggle per Button in der Toolbar
-- Chat-Interface: Nutzer tippt Beschreibung, KI antwortet mit Vorschlag
-- "Funnel generieren" Button lädt die KI-generierten Nodes/Edges in den ReactFlow-Canvas
-- Streaming-Antwort für UX
+```tsx
+// Vorher (Zeile 116):
+<SelectPrimitive.Item
+  ref={ref}
+  className={cn(
+    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none text-inherit focus:bg-zinc-700 focus:text-white data-[highlighted]:bg-zinc-700 data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+    className
+  )}
+  {...props}
+>
 
-### 3. Integration in FunnelBuilder
-- Neuer "KI" Button in der Toolbar (Sparkles Icon)
-- `setNodes` / `setEdges` werden mit KI-Output befüllt
-- Bestehende Nodes können optional beibehalten oder ersetzt werden
-
-## Technischer Ablauf
-
-```text
-User beschreibt Funnel → Edge Function → Lovable AI (tool calling)
-                                              ↓
-                                     Strukturiertes JSON:
-                                     { nodes: [...], edges: [...] }
-                                              ↓
-                              Frontend lädt in ReactFlow Canvas
+// Nachher:
+<SelectPrimitive.Item
+  ref={ref}
+  style={{ color: 'white' }}
+  className={cn(
+    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-zinc-700 data-[highlighted]:bg-zinc-700 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+    className
+  )}
+  {...props}
+>
 ```
 
-## Schritte
+Und auf `SelectPrimitive.ItemText` (Zeile 130):
+```tsx
+// Vorher:
+<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
 
-1. **LOVABLE_API_KEY aktivieren** via `ai_gateway--enable`
-2. **Edge Function `funnel-ai`** erstellen — System-Prompt mit Node-Schema, Tool-Calling für strukturierte Ausgabe
-3. **`FunnelAIChat` Komponente** — Chat UI mit Streaming, "Anwenden" Button
-4. **FunnelBuilder Integration** — KI-Button in Toolbar, Panel-Toggle, Nodes/Edges laden
-5. **Vorschläge-Feature** — Beim Öffnen zeigt die KI 3-4 Funnel-Ideen als Quick-Actions (z.B. "Immobilien-Funnel", "Coaching-Funnel", "E-Commerce-Funnel")
+// Nachher:
+<SelectPrimitive.ItemText style={{ color: 'inherit' }}>{children}</SelectPrimitive.ItemText>
+```
 
+## Warum Inline Styles?
+- Inline `style` hat die hoechste CSS-Spezifitaet
+- Kein Tailwind-Merge-Konflikt moeglich
+- Kein Radix-internes Stylesheet kann es ueberschreiben
+- Es ist die einzige 100% zuverlaessige Methode
+
+## Aenderungen zusammengefasst
+- **1 Datei**: `src/components/ui/select.tsx`
+- **2 Zeilen**: `style={{ color: 'white' }}` auf Item, `style={{ color: 'inherit' }}` auf ItemText
+- Keine weiteren Dateien betroffen

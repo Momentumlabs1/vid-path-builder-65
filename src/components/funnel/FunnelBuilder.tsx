@@ -28,9 +28,10 @@ import { VideoFunnelPreview } from './VideoFunnelPreview';
 import CustomEdge from './CustomEdge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download } from 'lucide-react';
+import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FunnelExporter } from './FunnelExporter';
+import { FunnelAIChat } from './FunnelAIChat';
 import {
   placeNodeAvoidingOverlaps,
   resolveOverlaps,
@@ -70,6 +71,7 @@ function FunnelBuilderInner() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showExporter, setShowExporter] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
   const [funnelName, setFunnelName] = useState('');
   const [currentFunnelId, setCurrentFunnelId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -609,6 +611,16 @@ function FunnelBuilderInner() {
             <div className="w-6 h-4 bg-gradient-to-br from-red-500 to-orange-500 rounded group-hover:shadow-lg group-hover:shadow-red-500/30"></div>
             <span className="text-xs">Ende</span>
           </Button>
+          <div className="border-t border-zinc-700/50 my-2"></div>
+          <Button 
+            onClick={() => setShowAIChat(!showAIChat)}
+            variant="ghost" 
+            size="sm" 
+            className={`w-12 h-12 p-0 text-white hover:bg-purple-600/20 hover:scale-105 transition-all duration-300 flex flex-col gap-1 group ${showAIChat ? 'bg-purple-600/20' : ''}`}
+          >
+            <Sparkles className={`w-4 h-4 ${showAIChat ? 'text-purple-400' : 'text-white'} group-hover:text-purple-300`} />
+            <span className="text-xs">KI</span>
+          </Button>
         </div>
 
         {/* Main Canvas with Smart Layout */}
@@ -667,6 +679,18 @@ function FunnelBuilderInner() {
               onClose={() => setSelectedNode(null)}
             />
           </div>
+        )}
+
+        {/* AI Chat Panel */}
+        {showAIChat && !selectedNode && (
+          <FunnelAIChat
+            onApplyFunnel={(newNodes, newEdges) => {
+              setNodes(resolveOverlaps(newNodes));
+              setEdges(newEdges);
+              setShowAIChat(false);
+            }}
+            onClose={() => setShowAIChat(false)}
+          />
         )}
       </div>
 
