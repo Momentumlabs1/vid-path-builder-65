@@ -680,6 +680,18 @@ function FunnelBuilderInner() {
             />
           </div>
         )}
+
+        {/* AI Chat Panel */}
+        {showAIChat && !selectedNode && (
+          <FunnelAIChat
+            onApplyFunnel={(newNodes, newEdges) => {
+              setNodes(resolveOverlaps(newNodes));
+              setEdges(newEdges);
+              setShowAIChat(false);
+            }}
+            onClose={() => setShowAIChat(false)}
+          />
+        )}
       </div>
 
       {/* Preview Modal - rendered via Portal to escape all ReactFlow stacking contexts */}
