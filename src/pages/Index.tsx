@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Play, ArrowRight, CheckCircle2, Sparkles, GitBranch, Globe, Code2,
-  Video, Rocket, Star, Brain, TrendingDown, Clock, Eye, Target,
+  Video, Star, Brain, TrendingDown, Clock, Eye, Target,
   Heart, MousePointerClick, Users, BarChart3, Zap, Shield, ArrowDown
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
@@ -88,13 +88,11 @@ export default function Index() {
           SECTION 1: HERO
       ═══════════════════════════════════════════ */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col">
-        {/* Background image with parallax zoom */}
         <motion.div style={{ scale: heroScale }} className="absolute inset-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
         </motion.div>
 
-        {/* Nav overlay */}
         <nav className="relative z-20 px-4 sm:px-8 py-5">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2.5">
@@ -116,10 +114,8 @@ export default function Index() {
           </div>
         </nav>
 
-        {/* Hero content */}
         <motion.div style={{ opacity: heroOpacity }} className="relative z-10 flex-1 flex items-center px-4">
           <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text */}
             <div>
               <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
                 className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 text-sm px-4 py-1.5 rounded-full mb-6 border border-white/10">
@@ -151,7 +147,6 @@ export default function Index() {
                 </a>
               </motion.div>
             </div>
-            {/* Right: Device mockup */}
             <motion.div initial={{ opacity: 0, y: 40, rotate: 3 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="hidden lg:flex justify-center">
@@ -163,7 +158,6 @@ export default function Index() {
           </div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
           className="relative z-10 pb-8 flex justify-center">
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}
@@ -179,7 +173,7 @@ export default function Index() {
       <section id="problem" className="py-32 px-4 bg-background">
         <div className="max-w-5xl mx-auto">
           <FadeUp className="text-center mb-20">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-destructive mb-4 block">Das Problem</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Das Problem</span>
             <h2 className="text-4xl sm:text-6xl font-bold leading-tight mb-8">
               Niemand schaut<br />dein Video zu Ende.
             </h2>
@@ -189,17 +183,19 @@ export default function Index() {
             </p>
           </FadeUp>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-20">
+          {/* Stats — clean card style, no colored backgrounds */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
             {[
               { num: 95, suffix: "%", label: "brechen nach 10 Sek. ab", icon: Eye },
               { num: 70, suffix: "%", label: "Bounce Rate auf Landing Pages", icon: TrendingDown },
               { num: 8, suffix: "s", label: "Aufmerksamkeitsspanne", icon: Clock },
             ].map((stat, i) => (
               <FadeUp key={stat.label} delay={i * 0.15}>
-                <div className="text-center p-6 sm:p-8 rounded-2xl bg-destructive/5 border border-destructive/10">
-                  <stat.icon className="h-6 w-6 text-destructive mx-auto mb-3" />
-                  <div className="text-3xl sm:text-5xl font-bold text-destructive mb-2">
+                <div className="text-center p-8 rounded-2xl bg-card border border-border shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mx-auto mb-4">
+                    <stat.icon className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="text-4xl sm:text-5xl font-bold text-foreground mb-2 tracking-tight">
                     <AnimatedNumber target={stat.num} suffix={stat.suffix} />
                   </div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -210,12 +206,12 @@ export default function Index() {
 
           {/* Comparison visual */}
           <ScaleReveal>
-            <div className="rounded-2xl overflow-hidden border border-border/30 shadow-xl">
+            <div className="rounded-2xl overflow-hidden border border-border shadow-lg">
               <img src={comparisonVisual} alt="Vergleich: Langweiliges lineares Video vs. interaktiver VidPath Funnel" className="w-full h-auto" loading="lazy" />
             </div>
             <div className="grid grid-cols-2 mt-4 text-center text-sm">
               <span className="text-muted-foreground">❌ Klassisches Video — passiv, langweilig</span>
-              <span className="text-primary font-medium">✅ VidPath — interaktiv, fesselnd</span>
+              <span className="text-foreground font-medium">✅ VidPath — interaktiv, fesselnd</span>
             </div>
           </ScaleReveal>
         </div>
@@ -254,7 +250,7 @@ export default function Index() {
       <section id="solution" className="py-32 px-4 bg-background">
         <div className="max-w-6xl mx-auto">
           <FadeUp className="text-center mb-20">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Die Lösung</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Die Lösung</span>
             <h2 className="text-3xl sm:text-5xl font-bold mb-6">
               Ein Verkaufsgespräch,<br />das sich anfühlt wie Netflix.
             </h2>
@@ -334,7 +330,6 @@ export default function Index() {
             </SlideIn>
             <SlideIn from="right" delay={0.15} className="order-1 lg:order-2">
               <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-cyan-950 to-black border border-cyan-500/20 p-8">
-                {/* Mock builder canvas */}
                 <div className="space-y-4">
                   {[
                     { label: "▶️ Start", color: "bg-emerald-500/20 border-emerald-500/30" },
@@ -382,10 +377,10 @@ export default function Index() {
 
           {/* Feature 3: Lead Qualification */}
           <FadeUp>
-            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary/5 via-purple-500/5 to-cyan-500/5 border border-primary/10 p-8 sm:p-12">
+            <div className="relative rounded-3xl overflow-hidden bg-muted/30 border border-border p-8 sm:p-12">
               <div className="grid lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                  <div className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-4">
+                  <div className="inline-flex items-center gap-2 text-muted-foreground text-sm font-medium mb-4">
                     <Brain className="h-4 w-4" /> Automatische Lead-Qualifizierung
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-bold mb-4">
@@ -401,7 +396,7 @@ export default function Index() {
                       { label: "Lead Scoring", desc: "Automatische Qualifizierung" },
                       { label: "CRM-Export", desc: "Via API oder Webhook" },
                     ].map((f) => (
-                      <div key={f.label} className="p-4 rounded-xl bg-background/50 border border-border/30">
+                      <div key={f.label} className="p-4 rounded-xl bg-background border border-border">
                         <div className="font-semibold text-sm mb-1">{f.label}</div>
                         <div className="text-xs text-muted-foreground">{f.desc}</div>
                       </div>
@@ -411,12 +406,12 @@ export default function Index() {
                 <div className="hidden lg:flex items-center justify-center">
                   <div className="relative w-48 h-48">
                     <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 rounded-full border-2 border-dashed border-primary/20" />
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-border" />
                     <motion.div animate={{ rotate: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-4 rounded-full border-2 border-dashed border-purple-500/20" />
+                      className="absolute inset-4 rounded-full border-2 border-dashed border-muted-foreground/20" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                        <Target className="h-8 w-8 text-primary" />
+                      <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center">
+                        <Target className="h-8 w-8 text-foreground" />
                       </div>
                     </div>
                   </div>
@@ -428,12 +423,12 @@ export default function Index() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SECTION 5: VIDEO DEMO PLACEHOLDER
+          SECTION 5: VIDEO DEMO
       ═══════════════════════════════════════════ */}
       <section id="demo" className="py-32 px-4 bg-muted/20">
         <div className="max-w-4xl mx-auto">
           <FadeUp className="text-center mb-12">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Sieh selbst</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Sieh selbst</span>
             <h2 className="text-3xl sm:text-5xl font-bold mb-4">Erlebe einen Video-Funnel live</h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               Klicke Play und erlebe, wie sich ein interaktiver Video-Funnel anfühlt — aus Zuschauer-Perspektive.
@@ -441,14 +436,14 @@ export default function Index() {
           </FadeUp>
 
           <ScaleReveal>
-            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video border border-border/30 shadow-2xl shadow-black/20 group cursor-pointer">
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video border border-border shadow-2xl group cursor-pointer">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-950/80 via-black to-cyan-950/80" />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
                   className="h-20 w-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-colors">
                   <Play className="h-8 w-8 text-white fill-white ml-1" />
                 </motion.div>
-                <span className="text-white/50 text-sm">Demo-Video kommt bald — hier wird dein Funnel eingebettet</span>
+                <span className="text-white/50 text-sm">Demo-Video kommt bald</span>
               </div>
               <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
                 <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
@@ -463,7 +458,7 @@ export default function Index() {
           <FadeUp delay={0.3} className="mt-6 flex justify-center gap-3">
             {["💰 Geld sparen", "📈 Schneller wachsen", "🚀 Alles zeigen"].map((btn) => (
               <motion.div key={btn} whileHover={{ y: -2 }}
-                className="px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-sm font-medium cursor-default">
+                className="px-5 py-2.5 rounded-xl bg-muted border border-border text-sm font-medium cursor-default">
                 {btn}
               </motion.div>
             ))}
@@ -480,22 +475,22 @@ export default function Index() {
       <section className="py-32 px-4 bg-background">
         <div className="max-w-3xl mx-auto">
           <FadeUp className="text-center mb-20">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">So einfach geht's</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">So einfach geht's</span>
             <h2 className="text-3xl sm:text-5xl font-bold">In 4 Schritten live</h2>
           </FadeUp>
 
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-purple-500/50 to-cyan-500/50" />
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-border via-muted-foreground/30 to-border" />
 
             {[
-              { step: "01", title: "Beschreibe deinen Funnel", desc: "Sag der KI in einem Satz, was du brauchst. Oder wähle eine fertige Vorlage.", icon: Sparkles, color: "text-primary" },
-              { step: "02", title: "Videos & Antworten hinzufügen", desc: "Lade Videos hoch, definiere Buttons, Multiple Choice oder Slider. Drag & Drop.", icon: Video, color: "text-purple-400" },
-              { step: "03", title: "Pfade & Logik verbinden", desc: "Verbinde Entscheidungen mit Nodes. Die KI hilft dir bei der optimalen Struktur.", icon: GitBranch, color: "text-pink-400" },
-              { step: "04", title: "Embed & Go Live", desc: "Ein Klick — dein Funnel ist live. Ein Script-Tag — er läuft auf deiner Website.", icon: Globe, color: "text-cyan-400" },
+              { step: "01", title: "Beschreibe deinen Funnel", desc: "Sag der KI in einem Satz, was du brauchst. Oder wähle eine fertige Vorlage.", icon: Sparkles },
+              { step: "02", title: "Videos & Antworten hinzufügen", desc: "Lade Videos hoch, definiere Buttons, Multiple Choice oder Slider. Drag & Drop.", icon: Video },
+              { step: "03", title: "Pfade & Logik verbinden", desc: "Verbinde Entscheidungen mit Nodes. Die KI hilft dir bei der optimalen Struktur.", icon: GitBranch },
+              { step: "04", title: "Embed & Go Live", desc: "Ein Klick — dein Funnel ist live. Ein Script-Tag — er läuft auf deiner Website.", icon: Globe },
             ].map((s, i) => (
               <FadeUp key={s.step} delay={i * 0.1} className="relative pl-20 pb-16 last:pb-0">
-                <div className="absolute left-4 top-1 h-9 w-9 rounded-full bg-background border-2 border-primary/30 flex items-center justify-center">
-                  <s.icon className={`h-4 w-4 ${s.color}`} />
+                <div className="absolute left-4 top-1 h-9 w-9 rounded-full bg-background border-2 border-border flex items-center justify-center">
+                  <s.icon className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="text-xs font-mono text-muted-foreground mb-2">{s.step}</div>
                 <h3 className="text-xl font-bold mb-2">{s.title}</h3>
@@ -512,24 +507,26 @@ export default function Index() {
       <section className="py-32 px-4 bg-muted/20">
         <div className="max-w-6xl mx-auto">
           <FadeUp className="text-center mb-16">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Features</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Features</span>
             <h2 className="text-3xl sm:text-5xl font-bold">Alles in einem Tool</h2>
           </FadeUp>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: Sparkles, title: "KI-Assistent", desc: "Funnel per Prompt generieren", span: "col-span-2", bg: "bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20" },
-              { icon: MousePointerClick, title: "Drag & Drop", desc: "Visueller Node-Editor", span: "", bg: "bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20" },
-              { icon: GitBranch, title: "Verzweigungen", desc: "Buttons, MC, Slider", span: "", bg: "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20" },
-              { icon: Users, title: "Lead Capture", desc: "Formulare direkt im Funnel", span: "", bg: "bg-gradient-to-br from-orange-500/10 to-amber-500/10 border-orange-500/20" },
-              { icon: BarChart3, title: "Analytics", desc: "Echtzeit-Tracking aller Pfade", span: "", bg: "bg-gradient-to-br from-pink-500/10 to-rose-500/10 border-pink-500/20" },
-              { icon: Code2, title: "Embed", desc: "1 Zeile Code, jede Website", span: "col-span-2", bg: "bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20" },
-              { icon: Shield, title: "DSGVO", desc: "EU-Server, Opt-in eingebaut", span: "", bg: "bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20" },
-              { icon: Zap, title: "API & Webhooks", desc: "CRM, E-Mail, alles verbinden", span: "", bg: "bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20" },
+              { icon: Sparkles, title: "KI-Assistent", desc: "Funnel per Prompt generieren", span: "col-span-2" },
+              { icon: MousePointerClick, title: "Drag & Drop", desc: "Visueller Node-Editor", span: "" },
+              { icon: GitBranch, title: "Verzweigungen", desc: "Buttons, MC, Slider", span: "" },
+              { icon: Users, title: "Lead Capture", desc: "Formulare direkt im Funnel", span: "" },
+              { icon: BarChart3, title: "Analytics", desc: "Echtzeit-Tracking aller Pfade", span: "" },
+              { icon: Code2, title: "Embed", desc: "1 Zeile Code, jede Website", span: "col-span-2" },
+              { icon: Shield, title: "DSGVO", desc: "EU-Server, Opt-in eingebaut", span: "" },
+              { icon: Zap, title: "API & Webhooks", desc: "CRM, E-Mail, alles verbinden", span: "" },
             ].map((f, i) => (
               <FadeUp key={f.title} delay={i * 0.05} className={f.span}>
-                <motion.div whileHover={{ y: -3 }} className={`p-6 rounded-2xl border h-full ${f.bg} transition-all`}>
-                  <f.icon className="h-6 w-6 text-foreground mb-3" />
+                <motion.div whileHover={{ y: -3 }} className="p-6 rounded-2xl border border-border bg-card h-full transition-all hover:shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4">
+                    <f.icon className="h-5 w-5 text-foreground" />
+                  </div>
                   <h3 className="font-bold mb-1">{f.title}</h3>
                   <p className="text-sm text-muted-foreground">{f.desc}</p>
                 </motion.div>
@@ -545,6 +542,7 @@ export default function Index() {
       <section className="py-32 px-4 bg-background">
         <div className="max-w-5xl mx-auto">
           <FadeUp className="text-center mb-16">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Erfahrungen</span>
             <h2 className="text-3xl sm:text-4xl font-bold">Erfolgsgeschichten</h2>
           </FadeUp>
 
@@ -555,7 +553,7 @@ export default function Index() {
               { quote: "Einen Code kopiert, auf meine Seite gesetzt — und die Conversion hat sich verdreifacht. So einfach.", name: "Lisa W.", role: "E-Commerce Inhaberin", metric: "2 Min. Setup" },
             ].map((t, i) => (
               <FadeUp key={i} delay={i * 0.1}>
-                <div className="p-6 rounded-2xl border border-border/50 bg-card/50 h-full flex flex-col">
+                <div className="p-6 rounded-2xl border border-border bg-card h-full flex flex-col">
                   <div className="flex gap-0.5 mb-4">
                     {Array.from({ length: 5 }).map((_, j) => (
                       <Star key={j} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -567,7 +565,7 @@ export default function Index() {
                       <div className="font-semibold text-sm">{t.name}</div>
                       <div className="text-xs text-muted-foreground">{t.role}</div>
                     </div>
-                    <div className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                    <div className="text-xs font-medium text-foreground bg-muted px-2.5 py-1 rounded-full">
                       {t.metric}
                     </div>
                   </div>
@@ -584,7 +582,7 @@ export default function Index() {
       <section id="pricing" className="py-32 px-4 bg-muted/20">
         <div className="max-w-5xl mx-auto">
           <FadeUp className="text-center mb-16">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Preise</span>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Preise</span>
             <h2 className="text-3xl sm:text-5xl font-bold mb-4">Starte kostenlos. Wachse unbegrenzt.</h2>
           </FadeUp>
 
@@ -592,7 +590,7 @@ export default function Index() {
             {plans.map((plan, i) => (
               <FadeUp key={plan.name} delay={i * 0.1}>
                 <motion.div whileHover={{ y: -4 }}>
-                  <Card className={`relative h-full ${plan.highlighted ? "border-primary shadow-xl shadow-primary/10" : "border-border/50"}`}>
+                  <Card className={`relative h-full ${plan.highlighted ? "border-primary shadow-lg" : "border-border"}`}>
                     {plan.highlighted && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full">
                         Beliebt
@@ -650,7 +648,7 @@ export default function Index() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-border/40 py-16 px-4">
+      <footer className="border-t border-border py-16 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -685,7 +683,7 @@ export default function Index() {
             </ul>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto border-t border-border/40 mt-12 pt-8 text-center text-sm text-muted-foreground">
+        <div className="max-w-6xl mx-auto border-t border-border mt-12 pt-8 text-center text-sm text-muted-foreground">
           © 2026 VidPath. Alle Rechte vorbehalten.
         </div>
       </footer>
