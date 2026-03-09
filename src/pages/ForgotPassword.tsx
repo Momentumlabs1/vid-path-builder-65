@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail, Play, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -30,47 +30,62 @@ export default function ForgotPassword() {
     setLoading(false);
   };
 
-  if (sent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <Mail className="h-12 w-12 mx-auto text-primary mb-2" />
-            <CardTitle>E-Mail gesendet</CardTitle>
-            <CardDescription>Überprüfe dein Postfach für den Reset-Link.</CardDescription>
-          </CardHeader>
-          <CardFooter className="justify-center">
-            <Link to="/login" className="text-primary hover:underline text-sm">Zurück zum Login</Link>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Passwort zurücksetzen</CardTitle>
-          <CardDescription>Gib deine E-Mail ein, um einen Reset-Link zu erhalten.</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleReset}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">E-Mail</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@beispiel.de" required />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Link to="/" className="flex items-center gap-2.5 mb-10">
+          <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Play className="h-4 w-4 text-primary fill-primary" />
+          </div>
+          <span className="text-xl font-bold text-foreground tracking-tight">VidPath</span>
+        </Link>
+
+        {sent ? (
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Mail className="h-8 w-8 text-primary" />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Wird gesendet..." : "Reset-Link senden"}
-            </Button>
-            <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-              <ArrowLeft className="h-3 w-3" /> Zurück zum Login
+            <h1 className="text-2xl font-bold text-foreground mb-3">E-Mail gesendet</h1>
+            <p className="text-muted-foreground mb-6">
+              Überprüfe dein Postfach (<span className="text-foreground font-medium">{email}</span>) für den Reset-Link.
+            </p>
+            <Link to="/login">
+              <Button variant="outline" className="gap-2">
+                Zum Login <ArrowRight className="h-4 w-4" />
+              </Button>
             </Link>
-          </CardFooter>
-        </form>
-      </Card>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-foreground mb-2">Passwort zurücksetzen</h1>
+              <p className="text-muted-foreground">Gib deine E-Mail ein und wir senden dir einen Reset-Link.</p>
+            </div>
+
+            <form onSubmit={handleReset} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-Mail</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@beispiel.de" required className="h-11" />
+              </div>
+
+              <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+                {loading ? "Wird gesendet..." : "Reset-Link senden"}
+              </Button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+                <ArrowLeft className="h-3 w-3" /> Zurück zum Login
+              </Link>
+            </div>
+          </>
+        )}
+      </motion.div>
     </div>
   );
 }
