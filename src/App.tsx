@@ -38,11 +38,11 @@ const App = () => (
             <Route path="/funnel/:funnelId" element={<FunnelViewer />} />
             <Route path="/embed/:funnelId" element={<EmbedViewer />} />
 
-            {/* Protected routes */}
-            <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
-            <Route path="/builder" element={<AuthGuard><FunnelBuilderPage /></AuthGuard>} />
-            <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
-            <Route path="/client/:funnelName" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+            {/* App routes (auth temporarily disabled for preview) */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/builder" element={<FunnelBuilderPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/client/:funnelName" element={<ClientDashboard />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
