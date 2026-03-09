@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Play, Settings, Share2, Save, FolderOpen, Copy, Home, Users, Globe, ZoomIn, Download, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FunnelExporter } from './FunnelExporter';
+import { FunnelAIChat } from './FunnelAIChat';
 import {
   placeNodeAvoidingOverlaps,
   resolveOverlaps,
