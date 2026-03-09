@@ -2,104 +2,71 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Play, Zap, BarChart3, Users, ArrowRight, CheckCircle2,
-  Sparkles, MousePointerClick, GitBranch, Globe, Code2,
-  Video, Shield, Rocket, Star, ChevronRight, Brain,
-  TrendingDown, Clock, Eye, Target, Heart
+  Play, ArrowRight, CheckCircle2, Sparkles, GitBranch, Globe, Code2,
+  Video, Rocket, Star, Brain, TrendingDown, Clock, Eye, Target,
+  Heart, MousePointerClick, Users, BarChart3, Zap, Shield, ArrowDown
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 
-import heroImage from "@/assets/hero-funnel-dark.png";
+import heroBg from "@/assets/hero-bg-abstract.jpg";
+import phoneMockup from "@/assets/phone-funnel-mockup.png";
+import comparisonVisual from "@/assets/comparison-visual.png";
 import funnelPathsImage from "@/assets/funnel-paths-glow.png";
-import interactiveVideoImage from "@/assets/interactive-video-3d.png";
 import leadQualifyImage from "@/assets/lead-qualify-visual.png";
 
-/* ── Animation Helpers ── */
-function FadeIn({ children, className = "", delay = 0, direction = "up" }: {
-  children: React.ReactNode; className?: string; delay?: number; direction?: "up" | "down" | "left" | "right";
-}) {
+/* ── Reusable Animation Wrappers ── */
+function FadeUp({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const dirs = { up: [40, 0], down: [-40, 0], left: [0, 40], right: [0, -40] };
-  const [y, x] = direction === "left" || direction === "right" ? [0, dirs[direction][1]] : [dirs[direction][0], 0];
-
+  const inView = useInView(ref, { once: true, margin: "-80px" });
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y, x }}
-      animate={isInView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={className}
-    >
+    <motion.div ref={ref} initial={{ opacity: 0, y: 40 }} animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
       {children}
     </motion.div>
   );
 }
 
-function ScaleIn({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function SlideIn({ children, className = "", delay = 0, from = "left" }: { children: React.ReactNode; className?: string; delay?: number; from?: "left" | "right" }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={className}
-    >
+    <motion.div ref={ref} initial={{ opacity: 0, x: from === "left" ? -60 : 60 }} animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
       {children}
     </motion.div>
   );
 }
 
-/* ── Funnel Examples ── */
-const funnelExamples = [
-  {
-    title: "Immobilien-Funnel",
-    description: "Qualifiziere Käufer automatisch mit Video-Fragen zu Budget, Lage und Objekttyp.",
-    nodes: ["Intro-Video", "Kauf oder Miete?", "Budget", "Lage", "Lead Capture", "Danke"],
-    color: "from-emerald-500/20 to-teal-500/20",
-    border: "border-emerald-500/30",
-    icon: "🏠",
-  },
-  {
-    title: "Coaching-Funnel",
-    description: "Führe potenzielle Klienten durch ein Assessment und sammle qualifizierte Leads.",
-    nodes: ["Willkommen", "Dein Ziel?", "Erfahrung", "Plan", "Lead Capture", "Buchung"],
-    color: "from-purple-500/20 to-pink-500/20",
-    border: "border-purple-500/30",
-    icon: "💪",
-  },
-  {
-    title: "E-Commerce-Funnel",
-    description: "Zeige Produkte interaktiv und leite Kunden zum passenden Angebot.",
-    nodes: ["Produktvideo", "Interesse?", "Variante", "Upsell", "Lead Capture", "Shop"],
-    color: "from-orange-500/20 to-amber-500/20",
-    border: "border-orange-500/30",
-    icon: "🛒",
-  },
-];
+function ScaleReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, scale: 0.85 }} animate={inView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
-/* ── How it works ── */
-const steps = [
-  { step: "01", title: "Beschreibe deinen Funnel", description: "Sag der KI was du brauchst — oder wähle eine Vorlage. Die KI baut die Grundstruktur in Sekunden.", icon: Sparkles },
-  { step: "02", title: "Videos hinzufügen", description: "Lade deine Videos hoch oder verlinke sie. Lege Antwort-Buttons, Multiple Choice oder Slider fest.", icon: Video },
-  { step: "03", title: "Pfade verbinden", description: "Verbinde Nodes per Drag & Drop. Erstelle Verzweigungen basierend auf Nutzer-Antworten.", icon: GitBranch },
-  { step: "04", title: "Veröffentlichen", description: "Ein Klick — dein Funnel ist live. Bette ihn per Embed-Code auf jeder Website ein.", icon: Globe },
-];
-
-/* ── Features ── */
-const features = [
-  { icon: Sparkles, title: "KI Funnel-Assistent", description: "Beschreibe deinen Funnel in Worten — die KI baut die komplette Struktur automatisch." },
-  { icon: MousePointerClick, title: "Drag & Drop Builder", description: "Visueller Editor mit Echtzeit-Vorschau. Nodes verbinden, Videos einbetten, Logik definieren." },
-  { icon: GitBranch, title: "Entscheidungspfade", description: "Button, Multiple Choice, Slider — leite Zuschauer zum passenden Inhalt." },
-  { icon: Users, title: "Lead Capture", description: "Integrierte Formulare. Leads landen direkt in deinem Dashboard." },
-  { icon: BarChart3, title: "Analytics", description: "Verfolge jede Antwort, jeden Pfad und jede Conversion in Echtzeit." },
-  { icon: Code2, title: "Embed überall", description: "Ein Script-Tag — fertig. Dein Funnel läuft auf jeder Website." },
-  { icon: Shield, title: "DSGVO-konform", description: "Europäische Server. Opt-in-Management und Datenschutz eingebaut." },
-  { icon: Zap, title: "API-Integration", description: "Verbinde Funnels mit CRMs, E-Mail-Tools und Webhooks." },
-];
+/* ── Animated Number ── */
+function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+  useEffect(() => {
+    if (!inView) return;
+    let current = 0;
+    const inc = target / 60;
+    const timer = setInterval(() => {
+      current += inc;
+      if (current >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(current));
+    }, 33);
+    return () => clearInterval(timer);
+  }, [target, inView]);
+  return <span ref={ref}>{count.toLocaleString('de-DE')}{suffix}</span>;
+}
 
 /* ── Pricing ── */
 const plans = [
@@ -108,515 +75,543 @@ const plans = [
   { name: "Business", price: "79€", period: "/Monat", features: ["Alles aus Pro", "Team (5 Seats)", "API-Zugriff", "Whitelabel", "Dedicated Support", "Custom Domain"], cta: "Business wählen", highlighted: false },
 ];
 
-/* ── Animated counter ── */
-function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  useEffect(() => {
-    if (!isInView) return;
-    const dur = 2000;
-    const numSteps = 60;
-    const inc = target / numSteps;
-    let current = 0;
-    const timer = setInterval(() => {
-      current += inc;
-      if (current >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(current));
-    }, dur / numSteps);
-    return () => clearInterval(timer);
-  }, [target, isInView]);
-  return <span ref={ref}>{count.toLocaleString('de-DE')}{suffix}</span>;
-}
-
-/* ── Mini Flow Viz ── */
-function FunnelFlowViz({ nodes, color }: { nodes: string[]; color: string }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5 mt-4">
-      {nodes.map((node, i) => (
-        <div key={i} className="flex items-center gap-1.5">
-          <div className={`px-2.5 py-1 rounded-md bg-gradient-to-r ${color} text-xs font-medium text-foreground border border-border/30`}>
-            {node}
-          </div>
-          {i < nodes.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground" />}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function Index() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* ── Nav ── */}
-      <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="border-b border-border/40 backdrop-blur-xl sticky top-0 z-50 bg-background/80"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Play className="h-4 w-4 text-primary-foreground fill-current" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-primary">Vid</span>Path
-            </span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#problem" className="hover:text-foreground transition-colors">Das Problem</a>
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">So funktioniert's</a>
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">Preise</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/login"><Button variant="ghost" size="sm">Anmelden</Button></Link>
-            <Link to="/signup"><Button size="sm">Kostenlos starten</Button></Link>
-          </div>
-        </div>
-      </motion.nav>
 
-      {/* ── Hero ── */}
-      <section ref={heroRef} className="relative py-20 sm:py-28 px-4 overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.05, 0.08, 0.05] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[700px] bg-primary/10 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.03, 0.06, 0.03] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl"
-          />
-        </div>
-
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-5xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-8"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Das Verkaufsgespräch der Zukunft — als Video-Erlebnis
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
-          >
-            Dein Verkaufsgespräch.{" "}
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Interaktiv. Personalisiert. 24/7.
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35 }}
-            className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed"
-          >
-            Verwandle dein bestes Verkaufsgespräch in ein interaktives Video-Erlebnis.
-            Jeder Zuschauer wählt seinen eigenen Weg — und bekommt genau die Antworten,
-            die ihn zum Abschluss führen.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-          >
-            <Link to="/signup">
-              <Button size="lg" className="text-base px-8 h-12 shadow-lg shadow-primary/20">
-                Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <a href="#problem">
-              <Button variant="outline" size="lg" className="text-base px-8 h-12">
-                <Play className="mr-2 h-4 w-4" /> Warum das funktioniert
-              </Button>
-            </a>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
-          >
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={8} /></div>
-              <div className="text-sm text-muted-foreground mt-1">Sek. Aufmerksamkeit</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={3} suffix="x" /></div>
-              <div className="text-sm text-muted-foreground mt-1">höhere Conversion</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={100} suffix="%" /></div>
-              <div className="text-sm text-muted-foreground mt-1">personalisiert</div>
-            </div>
-          </motion.div>
+      {/* ═══════════════════════════════════════════
+          SECTION 1: IMMERSIVE HERO — Dark, cinematic
+      ═══════════════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex flex-col">
+        {/* Background image with parallax zoom */}
+        <motion.div style={{ scale: heroScale }} className="absolute inset-0">
+          <img src={heroBg} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
         </motion.div>
 
-        {/* Hero Visual */}
-        <ScaleIn className="max-w-5xl mx-auto mt-16 relative" delay={0.4}>
-          <div className="rounded-2xl overflow-hidden border border-border/30 shadow-2xl shadow-primary/10">
-            <img
-              src={heroImage}
-              alt="VidPath Funnel Builder — interaktive Video-Funnels mit Verzweigungspfaden"
-              className="w-full h-auto"
-              loading="eager"
-            />
-            {/* Gradient overlay for seamless blend */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-40 pointer-events-none" />
-          </div>
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.5, delay: 1.0 }}
-            className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/30 flex items-center gap-2"
-          >
-            <Sparkles className="h-4 w-4" /> Jeder Zuschauer erlebt seinen eigenen Pfad
-          </motion.div>
-        </ScaleIn>
-      </section>
-
-      {/* ── THE PROBLEM ── */}
-      <section id="problem" className="py-24 px-4 relative overflow-hidden">
-        {/* Background visual */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.07]">
-          <img src={leadQualifyImage} alt="" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/80 via-muted/90 to-muted/80 pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          <FadeIn className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-destructive/10 text-destructive text-sm font-medium px-4 py-1.5 rounded-full mb-4">
-              <TrendingDown className="h-3.5 w-3.5" /> Das Problem
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
-              Die Aufmerksamkeit deiner Zielgruppe ist{" "}
-              <span className="text-destructive">tot</span>.
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
-              8 Sekunden. So lange hast du, bevor dein Zuschauer weiterscrollt.
-              Klassische Videos, Landing Pages und PDFs haben keine Chance mehr.
-              <strong className="text-foreground"> Menschen wollen eine Storyline. Sie wollen entertainet werden.</strong>
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-20">
-            {[
-              { icon: Clock, title: "8 Sekunden", desc: "Die Aufmerksamkeitsspanne ist kürzer als die eines Goldfischs. Passive Inhalte verlieren sofort.", delay: 0 },
-              { icon: Eye, title: "95% scrollen weiter", desc: "Klassische Videos werden nach 10 Sek. abgebrochen. Landing Pages haben 70%+ Bounce Rate.", delay: 0.1 },
-              { icon: Target, title: "Einheitsbrei konvertiert nicht", desc: "Jeder Kunde hat andere Fragen. Ein Video für alle = für niemanden relevant.", delay: 0.2 },
-            ].map((item) => (
-              <FadeIn key={item.title} delay={item.delay}>
-                <Card className="border-destructive/20 bg-destructive/5 h-full">
-                  <CardContent className="pt-6">
-                    <item.icon className="h-8 w-8 text-destructive mb-4" />
-                    <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                  </CardContent>
-                </Card>
-              </FadeIn>
-            ))}
-          </div>
-
-          {/* Divider */}
-          <FadeIn className="relative mb-20">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/50" /></div>
-            <div className="relative flex justify-center">
-              <motion.span
-                whileInView={{ scale: [0.8, 1.05, 1] }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-background px-6 py-2 rounded-full text-sm font-semibold text-primary border border-primary/20"
-              >
-                ↓ Die Lösung ↓
-              </motion.span>
-            </div>
-          </FadeIn>
-
-          {/* Solution cards with visual */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              {[
-                { icon: Heart, title: "Entertainment statt Langeweile", desc: "Menschen wollen eine Storyline. Sie wollen entertainet werden, mitentscheiden, Teil der Geschichte sein. VidPath macht genau das.", delay: 0 },
-                { icon: GitBranch, title: "Jeder bekommt seinen Weg", desc: "Durch interaktive Verzweigungen erlebt jeder Zuschauer ein maßgeschneidertes Erlebnis — wie ein persönliches Verkaufsgespräch, aber skalierbar.", delay: 0.1 },
-                { icon: Brain, title: "Qualifizierung auf Autopilot", desc: "Jede Antwort verrät dir mehr über deinen Lead. Am Ende weißt du genau, was er will und ob er qualifiziert ist — bevor du einen Finger rührst.", delay: 0.2 },
-              ].map((item) => (
-                <FadeIn key={item.title} delay={item.delay} direction="left">
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                          <item.icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </FadeIn>
-              ))}
-            </div>
-            <ScaleIn delay={0.2}>
-              <div className="relative rounded-2xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/10">
-                <img
-                  src={interactiveVideoImage}
-                  alt="Interaktiver Video-Player mit Antwort-Buttons"
-                  className="w-full h-auto"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none" />
+        {/* Nav overlay */}
+        <nav className="relative z-20 px-4 sm:px-8 py-5">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <Play className="h-4 w-4 text-white fill-white" />
               </div>
-            </ScaleIn>
+              <span className="text-xl font-bold text-white tracking-tight">VidPath</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
+              <a href="#problem" className="hover:text-white transition-colors">Problem</a>
+              <a href="#solution" className="hover:text-white transition-colors">Lösung</a>
+              <a href="#demo" className="hover:text-white transition-colors">Demo</a>
+              <a href="#pricing" className="hover:text-white transition-colors">Preise</a>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link to="/login"><Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">Anmelden</Button></Link>
+              <Link to="/signup"><Button size="sm" className="bg-white text-black hover:bg-white/90">Starten</Button></Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </nav>
 
-      {/* ── Comparison ── */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Vom passiven Zuschauer zum <span className="text-primary">aktiven Teilnehmer</span>
-            </h2>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <FadeIn delay={0} direction="left">
-              <Card className="border-destructive/20 h-full">
-                <CardContent className="pt-6">
-                  <div className="text-sm font-semibold text-destructive uppercase tracking-wider mb-4">❌ Klassisch</div>
-                  <ul className="space-y-4">
-                    {["Lineares Video — für alle gleich", "Zuschauer ist passiv, scrollt weiter", "Keine Daten über Interessen", "Lead-Formular am Ende — 90% sind weg", "Jeder bekommt die gleiche Botschaft"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                        <TrendingDown className="h-4 w-4 text-destructive mt-0.5 shrink-0" />{item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </FadeIn>
-            <FadeIn delay={0.15} direction="right">
-              <Card className="border-primary/30 shadow-lg shadow-primary/5 h-full">
-                <CardContent className="pt-6">
-                  <div className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">✅ Mit VidPath</div>
-                  <ul className="space-y-4">
-                    {["Interaktive Pfade — jeder erlebt seinen Weg", "Zuschauer entscheidet aktiv mit", "Jede Antwort = Datenpunkt über den Lead", "Lead Capture fühlt sich natürlich an", "Personalisierte Storyline, die fesselt"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />{item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </FadeIn>
+        {/* Hero content */}
+        <motion.div style={{ opacity: heroOpacity }} className="relative z-10 flex-1 flex items-center px-4">
+          <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text */}
+            <div>
+              <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 text-sm px-4 py-1.5 rounded-full mb-6 border border-white/10">
+                <Sparkles className="h-3.5 w-3.5" /> Interaktive Video-Funnels mit KI
+              </motion.div>
+              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6 tracking-tight">
+                Dein bestes Verkaufs&shy;gespräch.<br />
+                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                  Als interaktives Video.
+                </span>
+              </motion.h1>
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5 }}
+                className="text-lg text-white/60 max-w-lg mb-8 leading-relaxed">
+                Jeder Zuschauer wählt seinen eigenen Weg. Jede Antwort qualifiziert deinen Lead.
+                Dein Verkaufsgespräch läuft 24/7 — personalisiert und skalierbar.
+              </motion.p>
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.65 }}
+                className="flex flex-col sm:flex-row gap-4">
+                <Link to="/signup">
+                  <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base px-8 h-13 shadow-2xl shadow-white/10">
+                    Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <a href="#demo">
+                  <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 text-base px-8 h-13">
+                    <Play className="mr-2 h-4 w-4" /> Demo ansehen
+                  </Button>
+                </a>
+              </motion.div>
+            </div>
+            {/* Right: Phone mockup */}
+            <motion.div initial={{ opacity: 0, y: 40, rotate: 5 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="hidden lg:flex justify-center">
+              <div className="relative">
+                <img src={phoneMockup} alt="VidPath auf dem Smartphone — interaktiver Video-Funnel" className="w-80 h-auto drop-shadow-2xl" />
+                <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-4 -right-8 bg-purple-500/20 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full border border-purple-400/30">
+                  ✨ KI-generiert
+                </motion.div>
+                <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute bottom-20 -left-12 bg-cyan-500/20 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full border border-cyan-400/30">
+                  📊 Lead qualifiziert
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Fullwidth Visual Break: Funnel Paths ── */}
-      <section className="relative py-32 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 1.2 }}
-          viewport={{ once: true }}
-          className="absolute inset-0"
-        >
-          <img
-            src={funnelPathsImage}
-            alt="Verzweigungspfade Visualisierung"
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/40 to-background" />
         </motion.div>
-        <div className="relative z-10 max-w-3xl mx-auto text-center px-4">
-          <FadeIn>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
-              Ein Einstieg.<br />
-              <span className="text-primary">Unendliche Wege.</span>
+
+        {/* Scroll indicator */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}
+          className="relative z-10 pb-8 flex justify-center">
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}
+            className="text-white/30">
+            <ArrowDown className="h-6 w-6" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 2: THE PROBLEM — Bold statement, stark contrast
+      ═══════════════════════════════════════════ */}
+      <section id="problem" className="py-32 px-4 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <FadeUp className="text-center mb-20">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-destructive mb-4 block">Das Problem</span>
+            <h2 className="text-4xl sm:text-6xl font-bold leading-tight mb-8">
+              Niemand schaut<br />dein Video zu Ende.
             </h2>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Jeder Zuschauer navigiert sich durch seinen individuellen Pfad.
-              Du sammelst Daten bei jedem Schritt — und weißt am Ende genau, wer dein Traumkunde ist.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Die Aufmerksamkeitsspanne deiner Zielgruppe ist bei <strong className="text-foreground">8 Sekunden</strong>.
+              Kürzer als die eines Goldfischs. Und du versuchst sie mit einem linearen 3-Minuten-Video zu überzeugen?
             </p>
-          </FadeIn>
-        </div>
-      </section>
+          </FadeUp>
 
-      {/* ── How it works ── */}
-      <section id="how-it-works" className="py-24 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-4">
-              <Rocket className="h-3.5 w-3.5" /> In 4 Schritten zum Funnel
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">So baust du deinen Video-Funnel</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Vom ersten Prompt bis zum eingebetteten Funnel — in wenigen Minuten.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((s, i) => (
-              <FadeIn key={s.step} delay={i * 0.1}>
-                <div className="relative group">
-                  <div className="text-6xl font-bold text-primary/10 mb-4">{s.step}</div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4"
-                  >
-                    <s.icon className="h-6 w-6 text-primary" />
-                  </motion.div>
-                  <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Features ── */}
-      <section id="features" className="py-24 px-4">
-        <div className="max-w-6xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Alles was du brauchst</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Ein Tool für den gesamten Funnel-Lifecycle — von der KI-Erstellung bis zur Analyse.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((f, i) => (
-              <FadeIn key={f.title} delay={i * 0.05}>
-                <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-                  <Card className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full">
-                    <CardContent className="pt-6">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                        <f.icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-semibold mb-2">{f.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Funnel Examples ── */}
-      <section id="examples" className="py-24 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-4">
-              <GitBranch className="h-3.5 w-3.5" /> Fertige Vorlagen
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Funnel-Beispiele</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Starte mit einer Vorlage oder lass die KI deinen individuellen Funnel bauen.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {funnelExamples.map((ex, i) => (
-              <FadeIn key={ex.title} delay={i * 0.1}>
-                <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25 }}>
-                  <Card className={`${ex.border} bg-card/50 hover:shadow-xl transition-all duration-300 h-full`}>
-                    <CardContent className="pt-6">
-                      <div className="text-4xl mb-4">{ex.icon}</div>
-                      <h3 className="text-lg font-semibold mb-2">{ex.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{ex.description}</p>
-                      <FunnelFlowViz nodes={ex.nodes} color={ex.color} />
-                      <Link to="/signup" className="block mt-6">
-                        <Button variant="outline" size="sm" className="w-full">
-                          Diese Vorlage nutzen <ArrowRight className="ml-2 h-3 w-3" />
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Social Proof ── */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <FadeIn><h2 className="text-3xl sm:text-4xl font-bold mb-16">Was Nutzer sagen</h2></FadeIn>
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* Dramatic stats */}
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-20">
             {[
-              { quote: "Mein Verkaufsgespräch läuft jetzt 24/7 — als interaktives Video. Die Leads sind deutlich besser qualifiziert.", name: "Sarah M.", role: "Immobilienmaklerin" },
-              { quote: "Die Leute lieben es, selbst zu entscheiden. Die Verweildauer ist 4x höher als bei normalen Videos.", name: "Thomas K.", role: "Online-Coach" },
-              { quote: "Embed-Code kopiert, auf meine Seite gesetzt — fertig. Die Conversion hat sich verdreifacht.", name: "Lisa W.", role: "E-Commerce" },
-            ].map((t, i) => (
-              <FadeIn key={i} delay={i * 0.1}>
-                <Card className="border-border/50 bg-card/50 text-left h-full">
-                  <CardContent className="pt-6">
-                    <div className="flex gap-0.5 mb-3">
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <Star key={j} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              { num: 95, suffix: "%", label: "brechen nach 10 Sek. ab", icon: Eye },
+              { num: 70, suffix: "%", label: "Bounce Rate auf Landing Pages", icon: TrendingDown },
+              { num: 8, suffix: "s", label: "Aufmerksamkeitsspanne", icon: Clock },
+            ].map((stat, i) => (
+              <FadeUp key={stat.label} delay={i * 0.15}>
+                <div className="text-center p-6 sm:p-8 rounded-2xl bg-destructive/5 border border-destructive/10">
+                  <stat.icon className="h-6 w-6 text-destructive mx-auto mb-3" />
+                  <div className="text-3xl sm:text-5xl font-bold text-destructive mb-2">
+                    <AnimatedNumber target={stat.num} suffix={stat.suffix} />
+                  </div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+
+          {/* Comparison visual — full width */}
+          <ScaleReveal>
+            <div className="rounded-2xl overflow-hidden border border-border/30 shadow-xl">
+              <img src={comparisonVisual} alt="Vergleich: Langweiliges lineares Video vs. interaktiver VidPath Funnel" className="w-full h-auto" loading="lazy" />
+            </div>
+            <div className="grid grid-cols-2 mt-4 text-center text-sm">
+              <span className="text-muted-foreground">❌ Klassisches Video — passiv, langweilig</span>
+              <span className="text-primary font-medium">✅ VidPath — interaktiv, fesselnd</span>
+            </div>
+          </ScaleReveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 3: THE SHIFT — Horizontal scroll-feel, immersive statement
+      ═══════════════════════════════════════════ */}
+      <section className="relative py-40 overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 1.5 }}
+          viewport={{ once: true }} className="absolute inset-0">
+          <img src={funnelPathsImage} alt="" className="w-full h-full object-cover" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-black/60 to-background" />
+        </motion.div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
+          <FadeUp>
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-purple-400 mb-6 block">Der Wandel</span>
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-8">
+              Menschen wollen keine<br />Videos schauen.<br />
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                Sie wollen Geschichten erleben.
+              </span>
+            </h2>
+            <p className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto">
+              Sie wollen entertainet werden. Mitentscheiden. Teil der Story sein.
+              VidPath macht dein Verkaufsgespräch genau dazu — ein interaktives Erlebnis,
+              das fesselt, qualifiziert und konvertiert.
+            </p>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 4: THE SOLUTION — Asymmetric layout, image + text
+      ═══════════════════════════════════════════ */}
+      <section id="solution" className="py-32 px-4 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <FadeUp className="text-center mb-20">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Die Lösung</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+              Ein Verkaufsgespräch,<br />das sich anfühlt wie Netflix.
+            </h2>
+          </FadeUp>
+
+          {/* Feature 1: Storyline */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-32">
+            <SlideIn from="left">
+              <div className="relative rounded-2xl overflow-hidden aspect-square bg-gradient-to-br from-purple-950 to-black border border-purple-500/20">
+                <img src={leadQualifyImage} alt="Verzweigungspfade — jeder Lead bekommt seinen eigenen Weg" className="w-full h-full object-cover opacity-80" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                      <span className="text-white/80 text-sm font-medium">Live Funnel — 3 aktive Pfade</span>
+                    </div>
+                    <div className="flex gap-2">
+                      {["Anfänger", "Fortgeschritten", "Profi"].map((p) => (
+                        <div key={p} className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs border border-purple-500/30">{p}</div>
                       ))}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">"{t.quote}"</p>
+                  </div>
+                </div>
+              </div>
+            </SlideIn>
+            <SlideIn from="right" delay={0.15}>
+              <div>
+                <div className="inline-flex items-center gap-2 text-purple-400 text-sm font-medium mb-4">
+                  <Heart className="h-4 w-4" /> Storyline statt Monolog
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold mb-4">Jeder Zuschauer wird zum Hauptdarsteller</h3>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                  Dein Zuschauer klickt, wählt, entscheidet — und bekommt im nächsten Video genau die Antwort,
+                  die auf <em>seine</em> Situation passt. Das fühlt sich nicht wie Marketing an.
+                  Das fühlt sich wie ein echtes Gespräch an.
+                </p>
+                <ul className="space-y-3">
+                  {["Personalisierte Pfade statt Einheitsbrei", "Jede Antwort = qualifizierter Datenpunkt", "Bis zu 3x höhere Watch-Time"].map((t) => (
+                    <li key={t} className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />{t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </SlideIn>
+          </div>
+
+          {/* Feature 2: KI Builder — reversed layout */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-32">
+            <SlideIn from="left" className="order-2 lg:order-1">
+              <div>
+                <div className="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium mb-4">
+                  <Sparkles className="h-4 w-4" /> KI-gestützt
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold mb-4">Sag der KI, was du brauchst</h3>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                  "Ich brauche einen Coaching-Funnel mit 5 Videos und Lead-Capture."
+                  — Die KI baut dir die komplette Struktur in unter 10 Sekunden.
+                  Du fügst nur noch deine Videos hinzu.
+                </p>
+                <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Sparkles className="h-3 w-3 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">KI Funnel-Assistent</span>
+                  </div>
+                  <div className="bg-background rounded-lg p-3 text-sm text-muted-foreground italic border border-border/30">
+                    "Erstelle einen Immobilien-Funnel: Intro → Kauf oder Miete → Budget → Lage → Lead Capture → Danke"
+                  </div>
+                  <div className="mt-3 flex items-center gap-2 text-xs text-primary">
+                    <CheckCircle2 className="h-3 w-3" /> 6 Nodes generiert · 5 Verbindungen erstellt
+                  </div>
+                </div>
+              </div>
+            </SlideIn>
+            <SlideIn from="right" delay={0.15} className="order-1 lg:order-2">
+              <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-cyan-950 to-black border border-cyan-500/20 p-8">
+                {/* Mock builder canvas */}
+                <div className="space-y-4">
+                  {[
+                    { label: "▶️ Start", color: "bg-emerald-500/20 border-emerald-500/30" },
+                    { label: "🎬 Intro-Video", color: "bg-primary/10 border-primary/20" },
+                    { label: "❓ Kauf oder Miete?", color: "bg-purple-500/10 border-purple-500/30" },
+                  ].map((node, i) => (
+                    <motion.div key={node.label}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + i * 0.15 }}
+                      viewport={{ once: true }}
+                      className="flex items-center gap-3">
+                      <div className="w-px h-6 bg-cyan-500/30 ml-6" style={{ display: i === 0 ? 'none' : 'block' }} />
+                      <div className={`px-4 py-2.5 rounded-lg border text-sm font-medium ${node.color} text-foreground`}>
+                        {node.label}
+                      </div>
+                    </motion.div>
+                  ))}
+                  {/* Branch */}
+                  <div className="pl-6 flex gap-4 mt-2">
+                    {["💰 Budget", "🏠 Lage"].map((b, i) => (
+                      <motion.div key={b}
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 + i * 0.1 }}
+                        viewport={{ once: true }}
+                        className="px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/30 text-xs font-medium">
+                        {b}
+                      </motion.div>
+                    ))}
+                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
+                    viewport={{ once: true }}
+                    className="pl-6 flex items-center gap-3 mt-2">
+                    <div className="px-4 py-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-sm font-medium">
+                      📋 Lead Capture
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </SlideIn>
+          </div>
+
+          {/* Feature 3: Lead Qualification — full width card */}
+          <FadeUp>
+            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary/5 via-purple-500/5 to-cyan-500/5 border border-primary/10 p-8 sm:p-12">
+              <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                  <div className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-4">
+                    <Brain className="h-4 w-4" /> Automatische Lead-Qualifizierung
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-bold mb-4">
+                    Wisse alles über deinen Lead — bevor du ihn anrufst
+                  </h3>
+                  <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+                    Jede Entscheidung im Funnel ist ein Datenpunkt. Budget? Erfahrung? Ziel?
+                    Dein CRM bekommt einen fertig qualifizierten Lead — nicht nur Name und E-Mail.
+                  </p>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    {[
+                      { label: "Antwort-Tracking", desc: "Jede Entscheidung wird gespeichert" },
+                      { label: "Lead Scoring", desc: "Automatische Qualifizierung" },
+                      { label: "CRM-Export", desc: "Via API oder Webhook" },
+                    ].map((f) => (
+                      <div key={f.label} className="p-4 rounded-xl bg-background/50 border border-border/30">
+                        <div className="font-semibold text-sm mb-1">{f.label}</div>
+                        <div className="text-xs text-muted-foreground">{f.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="hidden lg:flex items-center justify-center">
+                  <div className="relative w-48 h-48">
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-primary/20" />
+                    <motion.div animate={{ rotate: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-4 rounded-full border-2 border-dashed border-purple-500/20" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <Target className="h-8 w-8 text-primary" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 5: VIDEO DEMO PLACEHOLDER
+      ═══════════════════════════════════════════ */}
+      <section id="demo" className="py-32 px-4 bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <FadeUp className="text-center mb-12">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Sieh selbst</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-4">Erlebe einen Video-Funnel live</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Klicke Play und erlebe, wie sich ein interaktiver Video-Funnel anfühlt — aus Zuschauer-Perspektive.
+            </p>
+          </FadeUp>
+
+          <ScaleReveal>
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video border border-border/30 shadow-2xl shadow-black/20 group cursor-pointer">
+              {/* Video placeholder */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-950/80 via-black to-cyan-950/80" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
+                  className="h-20 w-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                  <Play className="h-8 w-8 text-white fill-white ml-1" />
+                </motion.div>
+                <span className="text-white/50 text-sm">Demo-Video kommt bald — hier wird dein Funnel eingebettet</span>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+                <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div animate={{ width: ["0%", "35%"] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full" />
+                </div>
+                <span className="text-white/30 text-xs font-mono">1:24 / 3:45</span>
+              </div>
+            </div>
+          </ScaleReveal>
+
+          {/* Interactive buttons mock below video */}
+          <FadeUp delay={0.3} className="mt-6 flex justify-center gap-3">
+            {["💰 Geld sparen", "📈 Schneller wachsen", "🚀 Alles zeigen"].map((btn, i) => (
+              <motion.div key={btn} whileHover={{ y: -2 }}
+                className="px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-sm font-medium cursor-default">
+                {btn}
+              </motion.div>
+            ))}
+          </FadeUp>
+          <p className="text-center text-xs text-muted-foreground mt-3">
+            ↑ So sehen die interaktiven Buttons unter deinem Video aus
+          </p>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 6: HOW IT WORKS — Timeline style, vertical
+      ═══════════════════════════════════════════ */}
+      <section className="py-32 px-4 bg-background">
+        <div className="max-w-3xl mx-auto">
+          <FadeUp className="text-center mb-20">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">So einfach geht's</span>
+            <h2 className="text-3xl sm:text-5xl font-bold">In 4 Schritten live</h2>
+          </FadeUp>
+
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-purple-500/50 to-cyan-500/50" />
+
+            {[
+              { step: "01", title: "Beschreibe deinen Funnel", desc: "Sag der KI in einem Satz, was du brauchst. Oder wähle eine fertige Vorlage.", icon: Sparkles, color: "text-primary" },
+              { step: "02", title: "Videos & Antworten hinzufügen", desc: "Lade Videos hoch, definiere Buttons, Multiple Choice oder Slider. Drag & Drop.", icon: Video, color: "text-purple-400" },
+              { step: "03", title: "Pfade & Logik verbinden", desc: "Verbinde Entscheidungen mit Nodes. Die KI hilft dir bei der optimalen Struktur.", icon: GitBranch, color: "text-pink-400" },
+              { step: "04", title: "Embed & Go Live", desc: "Ein Klick — dein Funnel ist live. Ein Script-Tag — er läuft auf deiner Website.", icon: Globe, color: "text-cyan-400" },
+            ].map((s, i) => (
+              <FadeUp key={s.step} delay={i * 0.1} className="relative pl-20 pb-16 last:pb-0">
+                {/* Circle on timeline */}
+                <div className="absolute left-4 top-1 h-9 w-9 rounded-full bg-background border-2 border-primary/30 flex items-center justify-center">
+                  <s.icon className={`h-4 w-4 ${s.color}`} />
+                </div>
+                <div className="text-xs font-mono text-muted-foreground mb-2">{s.step}</div>
+                <h3 className="text-xl font-bold mb-2">{s.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 7: FEATURES — Bento grid
+      ═══════════════════════════════════════════ */}
+      <section className="py-32 px-4 bg-muted/20">
+        <div className="max-w-6xl mx-auto">
+          <FadeUp className="text-center mb-16">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Features</span>
+            <h2 className="text-3xl sm:text-5xl font-bold">Alles in einem Tool</h2>
+          </FadeUp>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: Sparkles, title: "KI-Assistent", desc: "Funnel per Prompt generieren", span: "col-span-2", bg: "bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20" },
+              { icon: MousePointerClick, title: "Drag & Drop", desc: "Visueller Node-Editor", span: "", bg: "bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20" },
+              { icon: GitBranch, title: "Verzweigungen", desc: "Buttons, MC, Slider", span: "", bg: "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20" },
+              { icon: Users, title: "Lead Capture", desc: "Formulare direkt im Funnel", span: "", bg: "bg-gradient-to-br from-orange-500/10 to-amber-500/10 border-orange-500/20" },
+              { icon: BarChart3, title: "Analytics", desc: "Echtzeit-Tracking aller Pfade", span: "", bg: "bg-gradient-to-br from-pink-500/10 to-rose-500/10 border-pink-500/20" },
+              { icon: Code2, title: "Embed", desc: "1 Zeile Code, jede Website", span: "col-span-2", bg: "bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20" },
+              { icon: Shield, title: "DSGVO", desc: "EU-Server, Opt-in eingebaut", span: "", bg: "bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20" },
+              { icon: Zap, title: "API & Webhooks", desc: "CRM, E-Mail, alles verbinden", span: "", bg: "bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20" },
+            ].map((f, i) => (
+              <FadeUp key={f.title} delay={i * 0.05} className={f.span}>
+                <motion.div whileHover={{ y: -3 }} className={`p-6 rounded-2xl border h-full ${f.bg} transition-all`}>
+                  <f.icon className="h-6 w-6 text-foreground mb-3" />
+                  <h3 className="font-bold mb-1">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground">{f.desc}</p>
+                </motion.div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 8: SOCIAL PROOF — Minimal, elegant
+      ═══════════════════════════════════════════ */}
+      <section className="py-32 px-4 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <FadeUp className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold">Erfolgsgeschichten</h2>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { quote: "Mein Verkaufsgespräch läuft jetzt 24/7. Die Leads sind 3x besser qualifiziert als vorher.", name: "Sarah M.", role: "Immobilienmaklerin", metric: "+312% Conversion" },
+              { quote: "Die Verweildauer ist 4x höher als bei normalen Videos. Die Leute LIEBEN es, selbst zu entscheiden.", name: "Thomas K.", role: "Online-Coach", metric: "4x Watch-Time" },
+              { quote: "Einen Code kopiert, auf meine Seite gesetzt — und die Conversion hat sich verdreifacht. So einfach.", name: "Lisa W.", role: "E-Commerce Inhaberin", metric: "2 Min. Setup" },
+            ].map((t, i) => (
+              <FadeUp key={i} delay={i * 0.1}>
+                <div className="p-6 rounded-2xl border border-border/50 bg-card/50 h-full flex flex-col">
+                  <div className="flex gap-0.5 mb-4">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Star key={j} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-6">"{t.quote}"</p>
+                  <div className="flex items-end justify-between">
                     <div>
                       <div className="font-semibold text-sm">{t.name}</div>
                       <div className="text-xs text-muted-foreground">{t.role}</div>
                     </div>
-                  </CardContent>
-                </Card>
-              </FadeIn>
+                    <div className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                      {t.metric}
+                    </div>
+                  </div>
+                </div>
+              </FadeUp>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Pricing ── */}
-      <section id="pricing" className="py-24 px-4 bg-muted/30">
+      {/* ═══════════════════════════════════════════
+          SECTION 9: PRICING — Clean, clear
+      ═══════════════════════════════════════════ */}
+      <section id="pricing" className="py-32 px-4 bg-muted/20">
         <div className="max-w-5xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Einfache, transparente Preise</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Starte kostenlos. Upgrade wenn dein Business wächst.</p>
-          </FadeIn>
+          <FadeUp className="text-center mb-16">
+            <span className="text-sm font-mono uppercase tracking-[0.3em] text-primary mb-4 block">Preise</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-4">Starte kostenlos. Wachse unbegrenzt.</h2>
+          </FadeUp>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
-              <FadeIn key={plan.name} delay={i * 0.1}>
-                <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-                  <Card className={`relative flex flex-col h-full ${
-                    plan.highlighted ? "border-primary shadow-xl shadow-primary/10 scale-[1.02]" : "border-border/50 hover:border-primary/30"
-                  }`}>
+              <FadeUp key={plan.name} delay={i * 0.1}>
+                <motion.div whileHover={{ y: -4 }}>
+                  <Card className={`relative h-full ${plan.highlighted ? "border-primary shadow-xl shadow-primary/10" : "border-border/50"}`}>
                     {plan.highlighted && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full">
-                        Am beliebtesten
+                        Beliebt
                       </div>
                     )}
-                    <CardContent className="pt-8 flex flex-col flex-1">
+                    <CardContent className="pt-8 flex flex-col h-full">
                       <h3 className="text-lg font-semibold mb-1">{plan.name}</h3>
                       <div className="mb-6">
                         <span className="text-4xl font-bold">{plan.price}</span>
@@ -635,78 +630,76 @@ export default function Index() {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </FadeIn>
+              </FadeUp>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
-      <section className="py-24 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.06]">
-          <img src={leadQualifyImage} alt="" className="w-full h-full object-cover" loading="lazy" />
+      {/* ═══════════════════════════════════════════
+          SECTION 10: FINAL CTA — Dark, immersive
+      ═══════════════════════════════════════════ */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={heroBg} alt="" className="w-full h-full object-cover opacity-30" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-black/90 to-background" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background pointer-events-none" />
-        <FadeIn className="max-w-3xl mx-auto text-center relative z-10">
-          <Sparkles className="h-10 w-10 text-primary mx-auto mb-6" />
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Dein bestes Verkaufsgespräch — als interaktives Video. Für immer.
+        <FadeUp className="relative z-10 max-w-3xl mx-auto text-center px-4">
+          <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+            <Sparkles className="h-12 w-12 text-purple-400 mx-auto mb-8" />
+          </motion.div>
+          <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6">
+            Bereit, dein Verkaufs&shy;gespräch unsterblich zu machen?
           </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Hör auf, die gleichen Fragen immer wieder zu beantworten.
-            Lass dein Video die Arbeit machen — personalisiert, skalierbar, rund um die Uhr.
+          <p className="text-lg text-white/50 mb-10 max-w-xl mx-auto">
+            Starte kostenlos. Baue deinen ersten Funnel in 5 Minuten. Keine Kreditkarte.
           </p>
           <Link to="/signup">
-            <Button size="lg" className="text-base px-8 h-12 shadow-lg shadow-primary/20">
-              Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
+            <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base px-10 h-14 shadow-2xl shadow-white/10">
+              Jetzt loslegen <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <p className="text-xs text-muted-foreground mt-4">Keine Kreditkarte nötig · Kostenloser Plan verfügbar</p>
-        </FadeIn>
+        </FadeUp>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-border/40 py-12 px-4 bg-muted/20">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-                  <Play className="h-3.5 w-3.5 text-primary-foreground fill-current" />
-                </div>
-                <span className="font-bold"><span className="text-primary">Vid</span>Path</span>
+      <footer className="border-t border-border/40 py-16 px-4">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
+                <Play className="h-4 w-4 text-primary-foreground fill-current" />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Das interaktive Verkaufsgespräch als Video — personalisiert, skalierbar, 24/7.
-              </p>
+              <span className="font-bold text-lg">VidPath</span>
             </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Produkt</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Preise</a></li>
-                <li><a href="#examples" className="hover:text-foreground transition-colors">Beispiele</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Konto</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/login" className="hover:text-foreground transition-colors">Anmelden</Link></li>
-                <li><Link to="/signup" className="hover:text-foreground transition-colors">Registrieren</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Rechtliches</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><span className="cursor-default">Datenschutz</span></li>
-                <li><span className="cursor-default">Impressum</span></li>
-                <li><span className="cursor-default">AGB</span></li>
-              </ul>
-            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Interaktive Video-Funnels. Personalisiert. Skalierbar. 24/7.
+            </p>
           </div>
-          <div className="border-t border-border/40 pt-8 text-center text-sm text-muted-foreground">
-            © 2026 VidPath. Alle Rechte vorbehalten.
+          <div>
+            <h4 className="font-semibold mb-3 text-sm">Produkt</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><a href="#solution" className="hover:text-foreground transition-colors">Features</a></li>
+              <li><a href="#pricing" className="hover:text-foreground transition-colors">Preise</a></li>
+              <li><a href="#demo" className="hover:text-foreground transition-colors">Demo</a></li>
+            </ul>
           </div>
+          <div>
+            <h4 className="font-semibold mb-3 text-sm">Konto</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/login" className="hover:text-foreground transition-colors">Anmelden</Link></li>
+              <li><Link to="/signup" className="hover:text-foreground transition-colors">Registrieren</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-3 text-sm">Rechtliches</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>Datenschutz</li><li>Impressum</li><li>AGB</li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto border-t border-border/40 mt-12 pt-8 text-center text-sm text-muted-foreground">
+          © 2026 VidPath. Alle Rechte vorbehalten.
         </div>
       </footer>
     </div>
