@@ -1,37 +1,88 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, Zap, BarChart3, Users, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  Play, Zap, BarChart3, Users, ArrowRight, CheckCircle2,
+  Sparkles, MousePointerClick, GitBranch, Globe, Code2,
+  Video, Shield, Rocket, Star, ChevronRight
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
-const features = [
+/* ── Funnel Examples ── */
+const funnelExamples = [
   {
-    icon: Play,
-    title: "Video Funnels",
-    description: "Erstelle interaktive Video-Funnels mit Drag & Drop. Deine Zuschauer entscheiden, was als nächstes passiert.",
+    title: "Immobilien-Funnel",
+    description: "Qualifiziere Käufer automatisch mit Video-Fragen zu Budget, Lage und Objekttyp.",
+    nodes: ["Intro-Video", "Kauf oder Miete?", "Budget-Frage", "Lage wählen", "Lead Capture", "Danke"],
+    color: "from-emerald-500/20 to-teal-500/20",
+    border: "border-emerald-500/30",
+    icon: "🏠",
   },
   {
-    icon: Users,
-    title: "Lead Capture",
-    description: "Sammle Leads direkt in deinen Funnels mit anpassbaren Formularen und Opt-in-Feldern.",
+    title: "Coaching-Funnel",
+    description: "Führe potenzielle Klienten durch ein Assessment und sammle qualifizierte Leads.",
+    nodes: ["Willkommen", "Was ist dein Ziel?", "Erfahrungslevel", "Passender Plan", "Lead Capture", "Buchung"],
+    color: "from-purple-500/20 to-pink-500/20",
+    border: "border-purple-500/30",
+    icon: "💪",
   },
   {
-    icon: BarChart3,
-    title: "Analytics",
-    description: "Verfolge Conversions, Absprungraten und Nutzerverhalten in Echtzeit.",
-  },
-  {
-    icon: Zap,
-    title: "Embed & Teilen",
-    description: "Bette Funnels auf jeder Website ein oder teile sie direkt per Link.",
+    title: "E-Commerce-Funnel",
+    description: "Zeige Produkte interaktiv und leite Kunden zum passenden Angebot.",
+    nodes: ["Produktvideo", "Interesse?", "Größe/Variante", "Upsell-Video", "Lead Capture", "Shop-Link"],
+    color: "from-orange-500/20 to-amber-500/20",
+    border: "border-orange-500/30",
+    icon: "🛒",
   },
 ];
 
+/* ── How it works ── */
+const steps = [
+  {
+    step: "01",
+    title: "Beschreibe deinen Funnel",
+    description: "Sag der KI was du brauchst — oder wähle eine Vorlage. Die KI baut die Grundstruktur in Sekunden.",
+    icon: Sparkles,
+  },
+  {
+    step: "02",
+    title: "Videos hinzufügen",
+    description: "Lade deine Videos hoch oder verlinke sie. Lege Antwort-Buttons, Multiple Choice oder Slider fest.",
+    icon: Video,
+  },
+  {
+    step: "03",
+    title: "Pfade verbinden",
+    description: "Verbinde Nodes per Drag & Drop. Erstelle Verzweigungen basierend auf Nutzer-Antworten.",
+    icon: GitBranch,
+  },
+  {
+    step: "04",
+    title: "Veröffentlichen & Einbetten",
+    description: "Ein Klick — dein Funnel ist live. Bette ihn per Embed-Code auf jeder Website ein.",
+    icon: Globe,
+  },
+];
+
+/* ── Features Grid ── */
+const features = [
+  { icon: Sparkles, title: "KI Funnel-Assistent", description: "Beschreibe deinen Funnel in Worten — die KI baut die komplette Struktur automatisch." },
+  { icon: MousePointerClick, title: "Drag & Drop Builder", description: "Visueller Editor mit Echtzeit-Vorschau. Nodes verbinden, Videos einbetten, Logik definieren." },
+  { icon: GitBranch, title: "Entscheidungspfade", description: "Button, Multiple Choice, Slider — leite Nutzer basierend auf ihren Antworten zum passenden Inhalt." },
+  { icon: Users, title: "Lead Capture", description: "Integrierte Formulare mit Name, E-Mail, Telefon und Opt-in. Leads landen direkt in deinem Dashboard." },
+  { icon: BarChart3, title: "Analytics & Tracking", description: "Verfolge jede Antwort, jeden Pfad und jede Conversion in Echtzeit." },
+  { icon: Code2, title: "Embed überall", description: "Ein Script-Tag — fertig. Dein Funnel läuft auf jeder Website, jedem CMS, jedem Pagebuilder." },
+  { icon: Shield, title: "DSGVO-konform", description: "Daten auf europäischen Servern. Opt-in-Management und Datenschutz eingebaut." },
+  { icon: Zap, title: "API-Integration", description: "Verbinde deine Funnels mit CRMs, E-Mail-Tools und Webhooks per API-Nodes." },
+];
+
+/* ── Pricing ── */
 const plans = [
   {
     name: "Free",
     price: "0€",
     period: "/Monat",
-    features: ["1 Funnel", "100 Leads/Monat", "Basis-Analytics", "Lovable-Branding"],
+    features: ["1 Funnel", "100 Leads/Monat", "KI-Assistent (3 Generierungen)", "Basis-Analytics", "VidPath-Branding"],
     cta: "Kostenlos starten",
     highlighted: false,
   },
@@ -39,7 +90,7 @@ const plans = [
     name: "Pro",
     price: "29€",
     period: "/Monat",
-    features: ["Unlimited Funnels", "5.000 Leads/Monat", "Custom Branding", "Export-Funktion", "Priority Support"],
+    features: ["Unlimited Funnels", "5.000 Leads/Monat", "KI-Assistent unlimited", "Custom Branding", "Export als Standalone", "Priority Support"],
     cta: "Pro wählen",
     highlighted: true,
   },
@@ -47,21 +98,66 @@ const plans = [
     name: "Business",
     price: "79€",
     period: "/Monat",
-    features: ["Alles aus Pro", "Team-Zugang", "API-Zugriff", "Whitelabel", "Dedicated Support"],
+    features: ["Alles aus Pro", "Team-Zugang (5 Seats)", "API-Zugriff", "Whitelabel", "Dedicated Support", "Custom Domain"],
     cta: "Business wählen",
     highlighted: false,
   },
 ];
 
+/* ── Animated counter ── */
+function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const dur = 2000;
+    const steps = 60;
+    const inc = target / steps;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += inc;
+      if (current >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(current));
+    }, dur / steps);
+    return () => clearInterval(timer);
+  }, [target]);
+  return <span>{count.toLocaleString('de-DE')}{suffix}</span>;
+}
+
+/* ── Mini Funnel Flow Visualization ── */
+function FunnelFlowViz({ nodes, color }: { nodes: string[]; color: string }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 mt-4">
+      {nodes.map((node, i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <div className={`px-2.5 py-1 rounded-md bg-gradient-to-r ${color} text-xs font-medium text-foreground border border-border/30`}>
+            {node}
+          </div>
+          {i < nodes.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Index() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Nav */}
-      <nav className="border-b border-border/40 backdrop-blur-sm sticky top-0 z-50 bg-background/80">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="text-xl font-bold tracking-tight">
-            <span className="text-primary">Vid</span>Path
-          </span>
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* ── Nav ── */}
+      <nav className="border-b border-border/40 backdrop-blur-xl sticky top-0 z-50 bg-background/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <Play className="h-4 w-4 text-primary-foreground fill-current" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-primary">Vid</span>Path
+            </span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+            <a href="#how-it-works" className="hover:text-foreground transition-colors">So funktioniert's</a>
+            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+            <a href="#examples" className="hover:text-foreground transition-colors">Beispiele</a>
+            <a href="#pricing" className="hover:text-foreground transition-colors">Preise</a>
+          </div>
           <div className="flex items-center gap-3">
             <Link to="/login">
               <Button variant="ghost" size="sm">Anmelden</Button>
@@ -73,50 +169,150 @@ export default function Index() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            <Zap className="h-3.5 w-3.5" /> Video Funnels, die konvertieren
+      {/* ── Hero ── */}
+      <section className="relative py-20 sm:py-32 px-4 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-8 fade-in">
+            <Sparkles className="h-3.5 w-3.5" />
+            Jetzt mit KI-Funnel-Assistent
           </div>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight mb-6">
-            Verwandle Videos in{" "}
-            <span className="text-primary">interaktive Funnels</span>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+            Videos werden zu{" "}
+            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              interaktiven Funnels
+            </span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            Erstelle Video-Funnels mit Entscheidungspfaden, sammle Leads und steigere deine Conversion-Rate — ohne eine Zeile Code.
+
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
+            Erstelle Video-Funnels mit Entscheidungspfaden, sammle qualifizierte Leads und steigere deine Conversion — mit KI-Unterstützung und ohne eine Zeile Code.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link to="/signup">
-              <Button size="lg" className="text-base px-8">
+              <Button size="lg" className="text-base px-8 h-12 shadow-lg shadow-primary/20">
                 Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link to="#features">
-              <Button variant="outline" size="lg" className="text-base px-8">
-                Features ansehen
+            <a href="#how-it-works">
+              <Button variant="outline" size="lg" className="text-base px-8 h-12">
+                <Play className="mr-2 h-4 w-4" /> So funktioniert's
               </Button>
-            </Link>
+            </a>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={24} /></div>
+              <div className="text-sm text-muted-foreground mt-1">Video-Nodes</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={5} suffix="+" /></div>
+              <div className="text-sm text-muted-foreground mt-1">Node-Typen</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={100} suffix="%" /></div>
+              <div className="text-sm text-muted-foreground mt-1">Customizable</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Builder Preview Mock */}
+        <div className="max-w-5xl mx-auto mt-20 relative">
+          <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl shadow-black/10 overflow-hidden">
+            {/* Mock toolbar */}
+            <div className="h-10 bg-muted/50 border-b border-border/40 flex items-center px-4 gap-2">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400/60" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
+                <div className="w-3 h-3 rounded-full bg-green-400/60" />
+              </div>
+              <span className="text-xs text-muted-foreground ml-4">VidPath Builder — Smart Trading Funnel</span>
+            </div>
+            {/* Mock canvas */}
+            <div className="p-8 bg-gradient-to-br from-muted/20 to-muted/40 min-h-[300px] flex items-center justify-center">
+              <div className="flex items-center gap-4 flex-wrap justify-center">
+                {["Start", "Intro Video", "Anfänger?", "Video A1", "Lead Capture", "Ende"].map((label, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className={`px-4 py-3 rounded-lg border text-sm font-medium shadow-sm ${
+                      i === 0 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300" :
+                      i === 5 ? "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300" :
+                      i === 4 ? "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-300" :
+                      "bg-primary/5 border-primary/20 text-foreground"
+                    }`}>
+                      {label}
+                    </div>
+                    {i < 5 && (
+                      <div className="w-8 h-px bg-border relative">
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-muted-foreground border-y-[3px] border-y-transparent" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Floating KI badge */}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold shadow-lg shadow-primary/30 flex items-center gap-2">
+            <Sparkles className="h-4 w-4" /> KI-generiert in 5 Sekunden
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="py-20 px-4 bg-muted/30">
+      {/* ── How it works ── */}
+      <section id="how-it-works" className="py-24 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Alles was du brauchst</h2>
-          <p className="text-muted-foreground text-center mb-12 max-w-xl mx-auto">
-            Von der Erstellung bis zur Analyse — VidPath gibt dir alle Tools für erfolgreiche Video Funnels.
-          </p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+              <Rocket className="h-3.5 w-3.5" /> In 4 Schritten zum Funnel
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">So einfach funktioniert's</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Vom ersten Prompt bis zum eingebetteten Funnel — in wenigen Minuten.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((s) => (
+              <div key={s.step} className="relative group">
+                <div className="text-6xl font-bold text-primary/10 mb-4">{s.step}</div>
+                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <s.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features ── */}
+      <section id="features" className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Alles was du brauchst</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Ein Tool für den gesamten Funnel-Lifecycle — von der KI-Erstellung bis zur Analyse.
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((f) => (
-              <Card key={f.title} className="border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-colors">
+              <Card key={f.title} className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
                 <CardContent className="pt-6">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                     <f.icon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold mb-2">{f.title}</h3>
-                  <p className="text-sm text-muted-foreground">{f.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -124,26 +320,91 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-4">
+      {/* ── Funnel Examples ── */}
+      <section id="examples" className="py-24 px-4 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+              <GitBranch className="h-3.5 w-3.5" /> Fertige Vorlagen
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Funnel-Beispiele</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Starte mit einer Vorlage oder lass die KI deinen individuellen Funnel bauen.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {funnelExamples.map((ex) => (
+              <Card key={ex.title} className={`${ex.border} bg-card/50 hover:shadow-lg transition-all duration-300`}>
+                <CardContent className="pt-6">
+                  <div className="text-4xl mb-4">{ex.icon}</div>
+                  <h3 className="text-lg font-semibold mb-2">{ex.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{ex.description}</p>
+                  <FunnelFlowViz nodes={ex.nodes} color={ex.color} />
+                  <Link to="/signup" className="block mt-6">
+                    <Button variant="outline" size="sm" className="w-full">
+                      Diese Vorlage nutzen <ArrowRight className="ml-2 h-3 w-3" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Social Proof ── */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-16">Was Nutzer sagen</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { quote: "Mit VidPath habe ich meinen Immobilien-Funnel in 10 Minuten gebaut. Die KI ist der Hammer!", name: "Sarah M.", role: "Immobilienmaklerin", stars: 5 },
+              { quote: "Endlich ein Tool das Video-Funnels einfach macht. Der Drag & Drop Builder ist intuitiv und die Lead-Capture Funktion spart mir Stunden.", name: "Thomas K.", role: "Online-Coach", stars: 5 },
+              { quote: "Die Embed-Funktion ist genial — einen Code kopieren und der Funnel läuft auf meiner Website. Conversion hat sich verdoppelt.", name: "Lisa W.", role: "E-Commerce", stars: 5 },
+            ].map((t, i) => (
+              <Card key={i} className="border-border/50 bg-card/50 text-left">
+                <CardContent className="pt-6">
+                  <div className="flex gap-0.5 mb-3">
+                    {Array.from({ length: t.stars }).map((_, j) => (
+                      <Star key={j} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">"{t.quote}"</p>
+                  <div>
+                    <div className="font-semibold text-sm">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.role}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pricing ── */}
+      <section id="pricing" className="py-24 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Einfache Preise</h2>
-          <p className="text-muted-foreground text-center mb-12 max-w-xl mx-auto">
-            Starte kostenlos und upgrade, wenn du wächst.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Einfache, transparente Preise</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Starte kostenlos. Upgrade wenn dein Business wächst.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
             {plans.map((plan) => (
               <Card
                 key={plan.name}
-                className={`relative flex flex-col ${
+                className={`relative flex flex-col transition-all duration-300 ${
                   plan.highlighted
-                    ? "border-primary shadow-lg shadow-primary/10 scale-105"
-                    : "border-border/50"
+                    ? "border-primary shadow-xl shadow-primary/10 scale-[1.02]"
+                    : "border-border/50 hover:border-primary/30"
                 }`}
               >
                 {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
-                    Beliebt
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full">
+                    Am beliebtesten
                   </div>
                 )}
                 <CardContent className="pt-8 flex flex-col flex-1">
@@ -161,10 +422,7 @@ export default function Index() {
                     ))}
                   </ul>
                   <Link to="/signup">
-                    <Button
-                      className="w-full"
-                      variant={plan.highlighted ? "default" : "outline"}
-                    >
+                    <Button className="w-full" variant={plan.highlighted ? "default" : "outline"}>
                       {plan.cta}
                     </Button>
                   </Link>
@@ -175,29 +433,71 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Bereit loszulegen?</h2>
-          <p className="text-muted-foreground mb-8">
-            Erstelle deinen ersten Video Funnel in wenigen Minuten — kostenlos.
+      {/* ── Final CTA ── */}
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <Sparkles className="h-10 w-10 text-primary mx-auto mb-6" />
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Bereit, deinen ersten Video-Funnel zu bauen?
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+            Starte kostenlos, nutze die KI, und geh live in Minuten — nicht in Wochen.
           </p>
-          <Link to="/signup">
-            <Button size="lg" className="text-base px-8">
-              Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/signup">
+              <Button size="lg" className="text-base px-8 h-12 shadow-lg shadow-primary/20">
+                Jetzt kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">Keine Kreditkarte nötig · Kostenloser Plan verfügbar</p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 py-8 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span>© 2026 VidPath. Alle Rechte vorbehalten.</span>
-          <div className="flex gap-6">
-            <Link to="/login" className="hover:text-foreground transition-colors">Login</Link>
-            <a href="#pricing" className="hover:text-foreground transition-colors">Preise</a>
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+      {/* ── Footer ── */}
+      <footer className="border-t border-border/40 py-12 px-4 bg-muted/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
+                  <Play className="h-3.5 w-3.5 text-primary-foreground fill-current" />
+                </div>
+                <span className="font-bold"><span className="text-primary">Vid</span>Path</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Interaktive Video-Funnels mit KI erstellen, Leads sammeln und Conversions steigern.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 text-sm">Produkt</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
+                <li><a href="#pricing" className="hover:text-foreground transition-colors">Preise</a></li>
+                <li><a href="#examples" className="hover:text-foreground transition-colors">Beispiele</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 text-sm">Konto</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link to="/login" className="hover:text-foreground transition-colors">Anmelden</Link></li>
+                <li><Link to="/signup" className="hover:text-foreground transition-colors">Registrieren</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 text-sm">Rechtliches</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><span className="cursor-default">Datenschutz</span></li>
+                <li><span className="cursor-default">Impressum</span></li>
+                <li><span className="cursor-default">AGB</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border/40 pt-8 text-center text-sm text-muted-foreground">
+            © 2026 VidPath. Alle Rechte vorbehalten.
           </div>
         </div>
       </footer>
