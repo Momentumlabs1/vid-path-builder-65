@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Play, Zap, BarChart3, Users, ArrowRight, CheckCircle2,
   Sparkles, MousePointerClick, GitBranch, Globe, Code2,
-  Video, Shield, Rocket, Star, ChevronRight
+  Video, Shield, Rocket, Star, ChevronRight, Brain,
+  TrendingDown, Clock, Eye, Target, Heart
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -68,7 +69,7 @@ const steps = [
 const features = [
   { icon: Sparkles, title: "KI Funnel-Assistent", description: "Beschreibe deinen Funnel in Worten — die KI baut die komplette Struktur automatisch." },
   { icon: MousePointerClick, title: "Drag & Drop Builder", description: "Visueller Editor mit Echtzeit-Vorschau. Nodes verbinden, Videos einbetten, Logik definieren." },
-  { icon: GitBranch, title: "Entscheidungspfade", description: "Button, Multiple Choice, Slider — leite Nutzer basierend auf ihren Antworten zum passenden Inhalt." },
+  { icon: GitBranch, title: "Entscheidungspfade", description: "Button, Multiple Choice, Slider — leite Zuschauer basierend auf ihren Antworten zum passenden Inhalt." },
   { icon: Users, title: "Lead Capture", description: "Integrierte Formulare mit Name, E-Mail, Telefon und Opt-in. Leads landen direkt in deinem Dashboard." },
   { icon: BarChart3, title: "Analytics & Tracking", description: "Verfolge jede Antwort, jeden Pfad und jede Conversion in Echtzeit." },
   { icon: Code2, title: "Embed überall", description: "Ein Script-Tag — fertig. Dein Funnel läuft auf jeder Website, jedem CMS, jedem Pagebuilder." },
@@ -109,14 +110,14 @@ function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: stri
   const [count, setCount] = useState(0);
   useEffect(() => {
     const dur = 2000;
-    const steps = 60;
-    const inc = target / steps;
+    const numSteps = 60;
+    const inc = target / numSteps;
     let current = 0;
     const timer = setInterval(() => {
       current += inc;
       if (current >= target) { setCount(target); clearInterval(timer); }
       else setCount(Math.floor(current));
-    }, dur / steps);
+    }, dur / numSteps);
     return () => clearInterval(timer);
   }, [target]);
   return <span>{count.toLocaleString('de-DE')}{suffix}</span>;
@@ -153,6 +154,7 @@ export default function Index() {
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+            <a href="#problem" className="hover:text-foreground transition-colors">Das Problem</a>
             <a href="#how-it-works" className="hover:text-foreground transition-colors">So funktioniert's</a>
             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
             <a href="#examples" className="hover:text-foreground transition-colors">Beispiele</a>
@@ -171,7 +173,6 @@ export default function Index() {
 
       {/* ── Hero ── */}
       <section className="relative py-20 sm:py-32 px-4 overflow-hidden">
-        {/* Background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-3xl" />
@@ -180,18 +181,21 @@ export default function Index() {
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-8 fade-in">
             <Sparkles className="h-3.5 w-3.5" />
-            Jetzt mit KI-Funnel-Assistent
+            Das Verkaufsgespräch der Zukunft — als Video-Erlebnis
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-            Videos werden zu{" "}
+            Dein Verkaufsgespräch.{" "}
             <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              interaktiven Funnels
+              Interaktiv. Personalisiert. 24/7.
             </span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            Erstelle Video-Funnels mit Entscheidungspfaden, sammle qualifizierte Leads und steigere deine Conversion — mit KI-Unterstützung und ohne eine Zeile Code.
+            Verwandle dein bestes Verkaufsgespräch in ein interaktives Video-Erlebnis. 
+            Jeder Zuschauer wählt seinen eigenen Weg — und bekommt genau die Antworten, 
+            die ihn zum Abschluss führen. Kein passives Zuschauen. Kein Einheitsbrei. 
+            Sondern ein Erlebnis, das konvertiert.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -200,26 +204,26 @@ export default function Index() {
                 Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <a href="#how-it-works">
+            <a href="#problem">
               <Button variant="outline" size="lg" className="text-base px-8 h-12">
-                <Play className="mr-2 h-4 w-4" /> So funktioniert's
+                <Play className="mr-2 h-4 w-4" /> Warum das funktioniert
               </Button>
             </a>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
+          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={24} /></div>
-              <div className="text-sm text-muted-foreground mt-1">Video-Nodes</div>
+              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={8} /></div>
+              <div className="text-sm text-muted-foreground mt-1">Sek. Aufmerksamkeit</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={5} suffix="+" /></div>
-              <div className="text-sm text-muted-foreground mt-1">Node-Typen</div>
+              <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={3} suffix="x" /></div>
+              <div className="text-sm text-muted-foreground mt-1">höhere Conversion</div>
             </div>
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-foreground"><AnimatedNumber target={100} suffix="%" /></div>
-              <div className="text-sm text-muted-foreground mt-1">Customizable</div>
+              <div className="text-sm text-muted-foreground mt-1">personalisiert</div>
             </div>
           </div>
         </div>
@@ -227,41 +231,225 @@ export default function Index() {
         {/* Builder Preview Mock */}
         <div className="max-w-5xl mx-auto mt-20 relative">
           <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl shadow-black/10 overflow-hidden">
-            {/* Mock toolbar */}
             <div className="h-10 bg-muted/50 border-b border-border/40 flex items-center px-4 gap-2">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-400/60" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
                 <div className="w-3 h-3 rounded-full bg-green-400/60" />
               </div>
-              <span className="text-xs text-muted-foreground ml-4">VidPath Builder — Smart Trading Funnel</span>
+              <span className="text-xs text-muted-foreground ml-4">VidPath Builder — Interaktives Verkaufsgespräch</span>
             </div>
-            {/* Mock canvas */}
-            <div className="p-8 bg-gradient-to-br from-muted/20 to-muted/40 min-h-[300px] flex items-center justify-center">
-              <div className="flex items-center gap-4 flex-wrap justify-center">
-                {["Start", "Intro Video", "Anfänger?", "Video A1", "Lead Capture", "Ende"].map((label, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className={`px-4 py-3 rounded-lg border text-sm font-medium shadow-sm ${
-                      i === 0 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300" :
-                      i === 5 ? "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300" :
-                      i === 4 ? "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-300" :
-                      "bg-primary/5 border-primary/20 text-foreground"
-                    }`}>
-                      {label}
+            <div className="p-8 bg-gradient-to-br from-muted/20 to-muted/40 min-h-[320px]">
+              {/* Branching visualization */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="px-5 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-sm font-medium shadow-sm">
+                  ▶️ Willkommen — Dein persönliches Angebot
+                </div>
+                <div className="w-px h-6 bg-border" />
+                <div className="px-5 py-3 rounded-lg bg-primary/5 border border-primary/20 text-sm font-medium shadow-sm">
+                  🎬 Was interessiert dich am meisten?
+                </div>
+                <div className="flex items-start gap-8 mt-2">
+                  {/* Branch left */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-px h-6 bg-border" />
+                    <div className="px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/30 text-xs font-medium">
+                      💰 "Wie spare ich Geld?"
                     </div>
-                    {i < 5 && (
-                      <div className="w-8 h-px bg-border relative">
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-muted-foreground border-y-[3px] border-y-transparent" />
-                      </div>
-                    )}
+                    <div className="w-px h-4 bg-border" />
+                    <div className="px-3 py-1.5 rounded-md bg-purple-500/5 border border-purple-500/20 text-xs">
+                      Video: Spar-Tipps
+                    </div>
                   </div>
-                ))}
+                  {/* Branch center */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-px h-6 bg-border" />
+                    <div className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-medium">
+                      📈 "Wie wachse ich schneller?"
+                    </div>
+                    <div className="w-px h-4 bg-border" />
+                    <div className="px-3 py-1.5 rounded-md bg-blue-500/5 border border-blue-500/20 text-xs">
+                      Video: Wachstum
+                    </div>
+                  </div>
+                  {/* Branch right */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-px h-6 bg-border" />
+                    <div className="px-4 py-2 rounded-lg bg-orange-500/10 border border-orange-500/30 text-xs font-medium">
+                      🚀 "Zeig mir alles!"
+                    </div>
+                    <div className="w-px h-4 bg-border" />
+                    <div className="px-3 py-1.5 rounded-md bg-orange-500/5 border border-orange-500/20 text-xs">
+                      Video: Komplett-Paket
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="w-20 h-px bg-border" />
+                  <div className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-medium">
+                    📋 Lead Capture
+                  </div>
+                  <div className="w-20 h-px bg-border" />
+                </div>
               </div>
             </div>
           </div>
-          {/* Floating KI badge */}
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-semibold shadow-lg shadow-primary/30 flex items-center gap-2">
-            <Sparkles className="h-4 w-4" /> KI-generiert in 5 Sekunden
+            <Sparkles className="h-4 w-4" /> Jeder Zuschauer erlebt seinen eigenen Pfad
+          </div>
+        </div>
+      </section>
+
+      {/* ── THE PROBLEM ── */}
+      <section id="problem" className="py-24 px-4 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-destructive/10 text-destructive text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+              <TrendingDown className="h-3.5 w-3.5" /> Das Problem
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Die Aufmerksamkeit deiner Zielgruppe ist <span className="text-destructive">tot</span>.
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+              8 Sekunden. So lange hast du, bevor dein Zuschauer weiterscrollt. 
+              Klassische Videos, Landing Pages und PDFs haben keine Chance mehr.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardContent className="pt-6">
+                <Clock className="h-8 w-8 text-destructive mb-4" />
+                <h3 className="font-semibold text-lg mb-2">8 Sekunden Aufmerksamkeit</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Die durchschnittliche Aufmerksamkeitsspanne ist kürzer als die eines Goldfischs. 
+                  Passive Inhalte verlieren sofort.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardContent className="pt-6">
+                <Eye className="h-8 w-8 text-destructive mb-4" />
+                <h3 className="font-semibold text-lg mb-2">95% scrollen weiter</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Klassische Videos werden nach 10 Sekunden abgebrochen. 
+                  Landing Pages haben Bounce-Rates von 70%+. Dein Content verpufft.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardContent className="pt-6">
+                <Target className="h-8 w-8 text-destructive mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Einheitsbrei konvertiert nicht</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Jeder Kunde hat andere Fragen, andere Bedürfnisse. 
+                  Ein Video für alle = für niemanden relevant.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* The Solution */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border/50" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-muted/50 px-6 py-2 rounded-full text-sm font-semibold text-primary border border-primary/20 backdrop-blur-sm">
+                ↓ Die Lösung ↓
+              </span>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-6">
+                <Heart className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Entertainment statt Langeweile</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Menschen wollen eine <strong>Storyline</strong>. Sie wollen entertainet werden, 
+                  mitentscheiden, Teil der Geschichte sein. VidPath macht genau das.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-6">
+                <GitBranch className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Jeder bekommt seinen Weg</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Durch interaktive Verzweigungen erlebt jeder Zuschauer ein <strong>maßgeschneidertes Erlebnis</strong> — 
+                  wie ein persönliches Verkaufsgespräch, aber skalierbar.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-6">
+                <Brain className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-semibold text-lg mb-2">Qualifizierung auf Autopilot</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Jede Antwort verrät dir mehr über deinen Lead. Am Ende weißt du genau, 
+                  <strong> was er will und ob er qualifiziert ist</strong> — bevor du einen Finger rührst.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* ── The Shift — Why interactive video wins ── */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Vom passiven Zuschauer zum <span className="text-primary">aktiven Teilnehmer</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Der Unterschied zwischen einem vergessenen Video und einem, das verkauft.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Old way */}
+            <Card className="border-destructive/20">
+              <CardContent className="pt-6">
+                <div className="text-sm font-semibold text-destructive uppercase tracking-wider mb-4">❌ Klassisch</div>
+                <ul className="space-y-4">
+                  {[
+                    "Lineares Video — für alle gleich",
+                    "Zuschauer ist passiv, scrollt weiter",
+                    "Keine Daten über Interessen",
+                    "Lead-Formular am Ende — 90% sind weg",
+                    "Jeder bekommt die gleiche Botschaft"
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <TrendingDown className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* New way */}
+            <Card className="border-primary/30 shadow-lg shadow-primary/5">
+              <CardContent className="pt-6">
+                <div className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">✅ Mit VidPath</div>
+                <ul className="space-y-4">
+                  {[
+                    "Interaktive Pfade — jeder erlebt seinen Weg",
+                    "Zuschauer entscheidet aktiv mit",
+                    "Jede Antwort = Datenpunkt über den Lead",
+                    "Lead Capture fühlt sich natürlich an",
+                    "Personalisierte Storyline, die fesselt"
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -273,7 +461,7 @@ export default function Index() {
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-4">
               <Rocket className="h-3.5 w-3.5" /> In 4 Schritten zum Funnel
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">So einfach funktioniert's</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">So baust du deinen Video-Funnel</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Vom ersten Prompt bis zum eingebetteten Funnel — in wenigen Minuten.
             </p>
@@ -359,9 +547,9 @@ export default function Index() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-16">Was Nutzer sagen</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { quote: "Mit VidPath habe ich meinen Immobilien-Funnel in 10 Minuten gebaut. Die KI ist der Hammer!", name: "Sarah M.", role: "Immobilienmaklerin", stars: 5 },
-              { quote: "Endlich ein Tool das Video-Funnels einfach macht. Der Drag & Drop Builder ist intuitiv und die Lead-Capture Funktion spart mir Stunden.", name: "Thomas K.", role: "Online-Coach", stars: 5 },
-              { quote: "Die Embed-Funktion ist genial — einen Code kopieren und der Funnel läuft auf meiner Website. Conversion hat sich verdoppelt.", name: "Lisa W.", role: "E-Commerce", stars: 5 },
+              { quote: "Mein Verkaufsgespräch läuft jetzt 24/7 — als interaktives Video. Die Leads sind deutlich besser qualifiziert.", name: "Sarah M.", role: "Immobilienmaklerin", stars: 5 },
+              { quote: "Die Leute lieben es, selbst zu entscheiden. Die Verweildauer ist 4x höher als bei normalen Videos.", name: "Thomas K.", role: "Online-Coach", stars: 5 },
+              { quote: "Embed-Code kopiert, auf meine Seite gesetzt — fertig. Die Conversion hat sich verdreifacht.", name: "Lisa W.", role: "E-Commerce", stars: 5 },
             ].map((t, i) => (
               <Card key={i} className="border-border/50 bg-card/50 text-left">
                 <CardContent className="pt-6">
@@ -441,10 +629,11 @@ export default function Index() {
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <Sparkles className="h-10 w-10 text-primary mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Bereit, deinen ersten Video-Funnel zu bauen?
+            Dein bestes Verkaufsgespräch — als interaktives Video. Für immer.
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Starte kostenlos, nutze die KI, und geh live in Minuten — nicht in Wochen.
+            Hör auf, die gleichen Fragen immer wieder zu beantworten. 
+            Lass dein Video die Arbeit machen — personalisiert, skalierbar und rund um die Uhr.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/signup">
@@ -469,7 +658,7 @@ export default function Index() {
                 <span className="font-bold"><span className="text-primary">Vid</span>Path</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Interaktive Video-Funnels mit KI erstellen, Leads sammeln und Conversions steigern.
+                Das interaktive Verkaufsgespräch als Video — personalisiert, skalierbar, 24/7.
               </p>
             </div>
             <div>
