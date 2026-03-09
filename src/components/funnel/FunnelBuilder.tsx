@@ -71,6 +71,7 @@ function FunnelBuilderInner() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showExporter, setShowExporter] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
   const [funnelName, setFunnelName] = useState('');
   const [currentFunnelId, setCurrentFunnelId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
