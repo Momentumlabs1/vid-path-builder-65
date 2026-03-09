@@ -61,7 +61,12 @@ Du hast folgende Node-Typen zur Verfügung:
 - Start-Node verbindet zum ersten Video-Node
 - Video-Nodes verbinden zu ihren Antwort-Zielen oder zum nächsten Node
 
-Generiere immer einen vollständigen, sofort nutzbaren Funnel mit sinnvollen deutschen Texten.`;
+Generiere immer einen vollständigen, sofort nutzbaren Funnel mit sinnvollen deutschen Texten.
+WICHTIG: Fülle IMMER alle data-Felder der Nodes aus! Leere data-Objekte sind NICHT erlaubt.
+Jeder start-Node braucht mindestens: { label: "Start" }
+Jeder video-Node braucht mindestens: { label: "...", videoUrl: "", overlayText: "...", answerType: "button", answers: [...], nextNodes: {} }
+Jeder leadCapture-Node braucht mindestens: { label: "Lead Capture", title: "...", description: "...", fields: [...], optInText: "..." }
+Jeder end-Node braucht mindestens: { label: "Ende", title: "...", message: "...", redirectUrl: "" }`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
