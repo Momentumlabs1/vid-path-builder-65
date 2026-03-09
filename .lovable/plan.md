@@ -1,56 +1,114 @@
 
 
-# Dropdown-Text: Endgueltige Loesung mit Inline Styles
+## Plan: Modernes Kunden-Interface mit Admin-Trennung
 
-## Analyse des Screenshots
-Die letzten Aenderungen haben teilweise gegriffen: "Lead Capture" und "Ende" sind sichtbar. Aber das erste Item im Dropdown bleibt unsichtbar. Das bedeutet, dass CSS-Klassen allein nicht ausreichen -- Radix UI setzt intern Styles auf `SelectPrimitive.ItemText`, die Tailwind-Klassen ueberschreiben.
+### Aktuelle Situation
+- `/dashboard` – Admin-Dashboard (Momentumlabs-Intern)
+- `/builder` – Admin Funnel Builder
+- `/admin` – Admin Lead Management
+- Alles funktional, aber "intern" gestaltet
 
-## Loesung: Inline `style` statt CSS-Klassen
+### Neue Architektur
 
-### Datei: `src/components/ui/select.tsx`
-
-**SelectItem (Zeile 116-131):**
-Auf dem `SelectPrimitive.Item` Element ein `style={{ color: 'white' }}` setzen. Zusaetzlich auf `SelectPrimitive.ItemText` ebenfalls `style={{ color: 'inherit' }}` setzen.
-
-```tsx
-// Vorher (Zeile 116):
-<SelectPrimitive.Item
-  ref={ref}
-  className={cn(
-    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none text-inherit focus:bg-zinc-700 focus:text-white data-[highlighted]:bg-zinc-700 data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-    className
-  )}
-  {...props}
->
-
-// Nachher:
-<SelectPrimitive.Item
-  ref={ref}
-  style={{ color: 'white' }}
-  className={cn(
-    "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-zinc-700 data-[highlighted]:bg-zinc-700 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-    className
-  )}
-  {...props}
->
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                    ADMIN BEREICH (bleibt)                    │
+│  /admin/*  – Interner Zugriff für euch                      │
+│  - /admin/dashboard                                          │
+│  - /admin/builder                                            │
+│  - /admin/leads                                              │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 KUNDEN APP (neu)                             │
+│  /app/*  – Premium SaaS Interface für Abo-Kunden            │
+│                                                              │
+│  ┌──────────┐  ┌────────────────────────────────────────┐   │
+│  │ Sidebar  │  │  Main Content Area                      │   │
+│  │          │  │                                         │   │
+│  │ 📊 Home  │  │  • Funnel Cards mit Preview-Thumbnails │   │
+│  │ 🎬 Funnels│  │  • Quick Stats                         │   │
+│  │ ➕ Builder│  │  • Recent Activity                     │   │
+│  │ 📈 Analytics│  │                                       │   │
+│  │ 👤 Account│  │                                        │   │
+│  │          │  │                                         │   │
+│  └──────────┘  └────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-Und auf `SelectPrimitive.ItemText` (Zeile 130):
-```tsx
-// Vorher:
-<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+### Neue Dateien
 
-// Nachher:
-<SelectPrimitive.ItemText style={{ color: 'inherit' }}>{children}</SelectPrimitive.ItemText>
+1. **`src/pages/app/AppLayout.tsx`**
+   - Sidebar-Navigation (collapsible)
+   - User Avatar + Account Dropdown
+   - Breadcrumbs
+   - Dark Mode mit Glassmorphism
+
+2. **`src/pages/app/AppDashboard.tsx`**
+   - Funnel-Karten mit Hover-Effekten
+   - Quick-Actions (Neuer Funnel, Duplizieren)
+   - Statistik-Widgets (Conversions, Views, Leads)
+   - "Getting Started" für neue User
+
+3. **`src/pages/app/AppFunnels.tsx`**
+   - Grid/List-Ansicht aller Funnels
+   - Filter & Suche
+   - Bulk Actions (Löschen, Export)
+   - Funnel-Status-Badges
+
+4. **`src/pages/app/AppBuilder.tsx`**
+   - Wrapper um bestehenden `FunnelBuilder`
+   - Modernisierte Header-Bar
+   - Bessere Node-Palette (Drag & Drop)
+   - Keyboard Shortcuts Overlay
+
+5. **`src/pages/app/AppAnalytics.tsx`**
+   - Funnel Performance Charts
+   - Conversion Rates
+   - User Journey Visualization
+   - Export Reports
+
+6. **`src/pages/app/AppSettings.tsx`**
+   - Account-Einstellungen
+   - Branding (Logo, Farben)
+   - API Keys
+   - Integrations
+
+### UI-Komponenten (neu)
+
+- **`AppSidebar.tsx`** – Collapsible Navigation
+- **`FunnelCard.tsx`** – Preview-Karte mit Aktionen
+- **`StatWidget.tsx`** – Animierte Statistik-Kacheln
+- **`QuickActionBar.tsx`** – Floating Action Buttons
+
+### Routing Update (`App.tsx`)
+
+```text
+/           → Landing Page
+/app        → Redirect zu /app/dashboard
+/app/dashboard → Kunden-Dashboard
+/app/funnels   → Funnel-Übersicht
+/app/builder   → Moderner Builder
+/app/builder/:id → Builder mit Funnel
+/app/analytics → Analytics
+/app/settings  → Einstellungen
+
+/admin/*    → Admin-Bereich (bestehend)
 ```
 
-## Warum Inline Styles?
-- Inline `style` hat die hoechste CSS-Spezifitaet
-- Kein Tailwind-Merge-Konflikt moeglich
-- Kein Radix-internes Stylesheet kann es ueberschreiben
-- Es ist die einzige 100% zuverlaessige Methode
+### Design-System
 
-## Aenderungen zusammengefasst
-- **1 Datei**: `src/components/ui/select.tsx`
-- **2 Zeilen**: `style={{ color: 'white' }}` auf Item, `style={{ color: 'inherit' }}` auf ItemText
-- Keine weiteren Dateien betroffen
+- **Sidebar**: Fixed, 280px, collapsible zu 64px
+- **Cards**: Glassmorphism mit subtle Glow
+- **Colors**: Gradient Accents (Purple → Blue)
+- **Typography**: Inter/Figtree, klare Hierarchie
+- **Animations**: Framer Motion für Übergänge
+
+### Technische Details
+
+- Nutzt bestehende `FunnelBuilder`-Logik (Import)
+- Supabase-Queries bleiben gleich
+- Shared Components wo möglich
+- Responsive: Desktop-first, Mobile-optimiert
+
